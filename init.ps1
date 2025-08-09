@@ -1,9 +1,10 @@
 <#
-  BelieveOrNot bootstrapper (diagnostic + hardened)
-  - Adds argument validation and detailed logging inside Ensure-Project + Invoke-Dotnet.
-  - Uses NAMED PARAMETERS at all call sites to avoid positional/array binding slips.
-  - Idempotent: safe to re-run after deleting newly-created files.
-  - Creates/updates solution, projects, references, packages, code stubs, CI.
+  BelieveOrNot bootstrapper (NET 9, fixed & diagnostic)
+  - Idempotent; safe to re-run.
+  - Uses .NET 9 (global.json included) with previews disabled.
+  - Creates/updates solution, projects, references, packages.
+  - Adds SignalR hub, Avalonia client stub, shared DTOs, rules stubs.
+  - Adds CI workflows.
   - Commits to branch 'ai-main' if repo is git-initialized.
 
   Run from repo root: C:\GitHub\BelieveOrNot
@@ -18,6 +19,7 @@ $ErrorActionPreference = "Stop"
 $SolutionName = "BelieveOrNot"
 $Branch       = "ai-main"
 $Root         = (Get-Location).Path
+$Framework    = "net9.0"   # target framework for all projects
 
 # -------------------------
 # Helpers
@@ -27,34 +29,25 @@ function Warn($m){ Write-Host "[WARN] $m" -ForegroundColor Yellow }
 function Fail($m){ Write-Host "[ERROR] $m" -ForegroundColor Red; throw $m }
 
 function Invoke-Dotnet([Parameter(Mandatory=$true)][string[]]$Args){
-  # Normalize to an array before counting
   $nonEmpty = @($Args | Where-Object { $_ -is [string] -and $_.Trim().Length -gt 0 })
-  if (-not $nonEmpty -or $nonEmpty.Count -eq 0) {
-    Fail "Invoke-Dotnet called with no arguments or only empty strings."
-  }
-
+  if (-not $nonEmpty -or $nonEmpty.Count -eq 0) { Fail "Invoke-Dotnet called with no arguments or only empty strings." }
   $joined = ($nonEmpty -join ' ')
   Info ("dotnet {0}" -f $joined)
-
   & dotnet @nonEmpty
   $exit = $LASTEXITCODE
-  if ($exit -ne 0) {
-    Fail ("dotnet failed (exit {0}): {1}" -f $exit, $joined)
-  }
+  if ($exit -ne 0) { Fail ("dotnet failed (exit {0}): {1}" -f $exit, $joined) }
 }
 
 function Ensure-Dir($p){
-  if ([string]::IsNullOrWhiteSpace($p)) { return }  # allow files in repo root (e.g., ".gitignore")
+  if ([string]::IsNullOrWhiteSpace($p)) { return }
   if (-not (Test-Path $p)) { New-Item -ItemType Directory -Force -Path $p | Out-Null }
 }
-
 function Read-FileOrEmpty([string]$p){ if(Test-Path $p){ Get-Content $p -Raw } else { "" } }
-
 function Ensure-File([string]$path, [string]$content){
   $dir = Split-Path -Parent $path
-  if ([string]::IsNullOrWhiteSpace($dir)) { $dir = "." } # root file -> no parent path
+  if ([string]::IsNullOrWhiteSpace($dir)) { $dir = "." }
   Ensure-Dir $dir
-  $cur = if (Test-Path $path) { Get-Content $path -Raw } else { "" }
+  $cur = Read-FileOrEmpty $path
   if ($cur -ne $content) { $content | Set-Content -Path $path -Encoding UTF8 }
 }
 
@@ -76,20 +69,13 @@ function Ensure-Project(
   [Parameter(Mandatory=$true)][string[]]$NewArgs,
   [Parameter(Mandatory=$true)][string]$ProjPath
 ){
-  # Defensive checks + verbose diagnostics
   if (-not $NewArgs) { Fail "Ensure-Project: NewArgs is null/empty for ProjPath='$ProjPath'." }
   $nonEmpty = $NewArgs | Where-Object { $_ -is [string] -and $_.Trim().Length -gt 0 }
   if ($nonEmpty.Count -eq 0) { Fail "Ensure-Project: all NewArgs entries are empty strings for '$ProjPath'." }
-  if (-not ($NewArgs[0] -eq "new" -or $NewArgs[0] -eq "NEW")) {
-    Warn "Ensure-Project: NewArgs[0] is not 'new'. Actual: '$($NewArgs[0])'. Full: $($NewArgs -join ' ')"
-  }
   Info ("Ensure-Project: target '{0}' with args: dotnet {1}" -f $ProjPath, ($NewArgs -join ' '))
-
   if(-not (Test-Path $ProjPath)){
     Invoke-Dotnet -Args $NewArgs
-    if(-not (Test-Path $ProjPath)){
-      Fail "Expected project was not created: $ProjPath. Args used: dotnet $($NewArgs -join ' ')"
-    }
+    if(-not (Test-Path $ProjPath)){ Fail "Expected project was not created: $ProjPath. Args: dotnet $($NewArgs -join ' ')" }
   } else { Info "Project exists: $ProjPath" }
 }
 
@@ -97,7 +83,6 @@ function InSolution([string]$projPath){
   $list = (& dotnet sln "$SolutionName.sln" list 2>$null) | Out-String
   return ($list -match [Regex]::Escape($projPath))
 }
-
 function Ensure-AddedToSolution([Parameter(Mandatory=$true)][string]$ProjPath){
   if(-not (Test-Path $ProjPath)){ Fail "Missing project to add to solution: $ProjPath" }
   if(-not (InSolution $ProjPath)){
@@ -111,11 +96,8 @@ function Ensure-ProjectRef(
 ){
   if(-not (Test-Path $FromProj)){ Fail "Ref source missing: $FromProj" }
   if(-not (Test-Path $ToProj)){ Fail "Ref target missing: $ToProj" }
-
   $xml = [xml](Get-Content $FromProj -Raw)
   if(-not $xml.Project){ Fail "Invalid csproj XML: $FromProj" }
-
-  # Handle projects with no ItemGroup/ProjectReference gracefully
   $nodes = $xml.SelectNodes("//Project/ItemGroup/ProjectReference")
   $hasRef = $false
   if($nodes){
@@ -127,12 +109,9 @@ function Ensure-ProjectRef(
       }
     }
   }
-
   if(-not $hasRef){
     Invoke-Dotnet -Args @("add",$FromProj,"reference",$ToProj)
-  } else {
-    Info "Reference already present: $(Split-Path -Leaf $ToProj) -> $(Split-Path -Leaf $FromProj)"
-  }
+  } else { Info "Reference already present: $(Split-Path -Leaf $ToProj) -> $(Split-Path -Leaf $FromProj)" }
 }
 
 function Ensure-Package([Parameter(Mandatory=$true)][string]$ProjPath, [Parameter(Mandatory=$true)][string]$Pkg){
@@ -170,6 +149,19 @@ function Git-Commit([Parameter(Mandatory=$true)][string]$Branch, [Parameter(Mand
 }
 
 # -------------------------
+# Pin .NET 9 SDK (disable previews)
+# -------------------------
+Ensure-File -path "global.json" -content @'
+{
+  "sdk": {
+    "version": "9.0.100",
+    "rollForward": "latestFeature",
+    "allowPrerelease": false
+  }
+}
+'@
+
+# -------------------------
 # Paths
 # -------------------------
 $sharedProj     = "shared/BelieveOrNot.Shared/BelieveOrNot.Shared.csproj"
@@ -180,17 +172,17 @@ $serverTestProj = "server/BelieveOrNot.Server.Tests/BelieveOrNot.Server.Tests.cs
 $clientProj     = "client/BelieveOrNot.Client.Avalonia/BelieveOrNot.Client.Avalonia.csproj"
 
 # -------------------------
-# Create solution & projects
+# Create solution & projects (NET 9)
 # -------------------------
 Ensure-Solution
 Ensure-AvaloniaTemplates
 
-Ensure-Project -NewArgs @("new","classlib","-n","BelieveOrNot.Shared","-f","net8.0","-o","shared/BelieveOrNot.Shared") -ProjPath $sharedProj
-Ensure-Project -NewArgs @("new","classlib","-n","BelieveOrNot.Rules","-f","net8.0","-o","rules/BelieveOrNot.Rules") -ProjPath $rulesProj
-Ensure-Project -NewArgs @("new","xunit","-n","BelieveOrNot.Rules.Tests","-f","net8.0","-o","rules/BelieveOrNot.Rules.Tests") -ProjPath $rulesTestProj
-Ensure-Project -NewArgs @("new","web","-n","BelieveOrNot.Server","-f","net8.0","-o","server/BelieveOrNot.Server") -ProjPath $serverProj
-Ensure-Project -NewArgs @("new","xunit","-n","BelieveOrNot.Server.Tests","-f","net8.0","-o","server/BelieveOrNot.Server.Tests") -ProjPath $serverTestProj
-Ensure-Project -NewArgs @("new","avalonia.app","-n","BelieveOrNot.Client.Avalonia","-f","net8.0","-o","client/BelieveOrNot.Client.Avalonia") -ProjPath $clientProj
+Ensure-Project -NewArgs @("new","classlib","-n","BelieveOrNot.Shared","-f",$Framework,"-o","shared/BelieveOrNot.Shared") -ProjPath $sharedProj
+Ensure-Project -NewArgs @("new","classlib","-n","BelieveOrNot.Rules","-f",$Framework,"-o","rules/BelieveOrNot.Rules") -ProjPath $rulesProj
+Ensure-Project -NewArgs @("new","xunit","-n","BelieveOrNot.Rules.Tests","-f",$Framework,"-o","rules/BelieveOrNot.Rules.Tests") -ProjPath $rulesTestProj
+Ensure-Project -NewArgs @("new","web","-n","BelieveOrNot.Server","-f",$Framework,"-o","server/BelieveOrNot.Server") -ProjPath $serverProj
+Ensure-Project -NewArgs @("new","xunit","-n","BelieveOrNot.Server.Tests","-f",$Framework,"-o","server/BelieveOrNot.Server.Tests") -ProjPath $serverTestProj
+Ensure-Project -NewArgs @("new","avalonia.app","-n","BelieveOrNot.Client.Avalonia","-f",$Framework,"-o","client/BelieveOrNot.Client.Avalonia") -ProjPath $clientProj
 
 Ensure-AddedToSolution -ProjPath $sharedProj
 Ensure-AddedToSolution -ProjPath $rulesProj
@@ -212,6 +204,7 @@ Ensure-Package -ProjPath $serverProj -Pkg "Microsoft.AspNetCore.SignalR.Protocol
 Ensure-Package -ProjPath $serverProj -Pkg "Microsoft.EntityFrameworkCore.SqlServer"
 Ensure-Package -ProjPath $serverProj -Pkg "Microsoft.EntityFrameworkCore.Design"
 Ensure-Package -ProjPath $serverProj -Pkg "Serilog.AspNetCore"
+Ensure-Package -ProjPath $serverProj -Pkg "Microsoft.Extensions.Hosting.WindowsServices"
 
 Ensure-Package -ProjPath $clientProj -Pkg "Microsoft.AspNetCore.SignalR.Client"
 Ensure-Package -ProjPath $clientProj -Pkg "Microsoft.AspNetCore.SignalR.Protocols.MessagePack"
@@ -222,7 +215,7 @@ Ensure-Package -ProjPath $serverTestProj -Pkg "FluentAssertions"
 # -------------------------
 # Shared DTOs / Enums
 # -------------------------
-$sharedCards = @'
+Ensure-File -path "shared/BelieveOrNot.Shared/Cards.cs" -content @'
 namespace BelieveOrNot.Shared;
 
 public enum Rank
@@ -252,12 +245,11 @@ public sealed record GameStateDto(
 
 public sealed record ErrorDto(string Code, string Message);
 '@
-Ensure-File -path "shared/BelieveOrNot.Shared/Cards.cs" -content $sharedCards
 
 # -------------------------
 # Rules stubs
 # -------------------------
-$deckBuilder = @'
+Ensure-File -path "rules/BelieveOrNot.Rules/DeckBuilder.cs" -content @'
 using BelieveOrNot.Shared;
 using System.Linq;
 using System.Security.Cryptography;
@@ -305,9 +297,8 @@ public static class DeckBuilder
         => new[] { Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades };
 }
 '@
-Ensure-File -path "rules/BelieveOrNot.Rules/DeckBuilder.cs" -content $deckBuilder
 
-$roundEngine = @'
+Ensure-File -path "rules/BelieveOrNot.Rules/RoundEngine.cs" -content @'
 using BelieveOrNot.Shared;
 
 namespace BelieveOrNot.Rules;
@@ -325,12 +316,11 @@ public sealed class RoundEngine
     }
 }
 '@
-Ensure-File -path "rules/BelieveOrNot.Rules/RoundEngine.cs" -content $roundEngine
 
 # -------------------------
 # Server: hub + Program
 # -------------------------
-$serverHub = @'
+Ensure-File -path "server/BelieveOrNot.Server/GameHub.cs" -content @'
 using BelieveOrNot.Shared;
 using Microsoft.AspNetCore.SignalR;
 
@@ -359,10 +349,10 @@ public class GameHub : Hub
     }
 }
 '@
-Ensure-File -path "server/BelieveOrNot.Server/GameHub.cs" -content $serverHub
 
-$serverProgram = @'
+Ensure-File -path "server/BelieveOrNot.Server/Program.cs" -content @'
 using BelieveOrNot.Server;
+using Microsoft.Extensions.Hosting.WindowsServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -379,16 +369,16 @@ app.MapHub<GameHub>("/game");
 
 app.Run();
 '@
-Ensure-File -path "server/BelieveOrNot.Server/Program.cs" -content $serverProgram
 
 Csproj-EnsureServerPublishProps -ProjPath (Join-Path $Root $serverProj)
 
 # -------------------------
-# Client: MainWindow stub
+# Client: MainWindow stub (needs DI for AddMessagePackProtocol)
 # -------------------------
-$clientMainWin = @'
+Ensure-File -path "client/BelieveOrNot.Client.Avalonia/MainWindow.axaml.cs" -content @'
 using Avalonia.Controls;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection; // required for AddMessagePackProtocol()
 
 namespace BelieveOrNot.Client.Avalonia;
 
@@ -423,7 +413,6 @@ public partial class MainWindow : Window
     }
 }
 '@
-Ensure-File -path "client/BelieveOrNot.Client.Avalonia/MainWindow.axaml.cs" -content $clientMainWin
 
 # -------------------------
 # .gitignore & .editorconfig
@@ -465,7 +454,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
     - name: Restore
       run: dotnet restore
     - name: Build
@@ -486,7 +475,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
     - name: Restore
       run: dotnet restore
     - name: Build Avalonia
@@ -502,4 +491,4 @@ Invoke-Dotnet -Args @("build","-c","Release")
 # -------------------------
 # Commit on ai-main (if repo)
 # -------------------------
-Git-Commit -Branch $Branch -Message "feat(scaffold): server hub (/game), Avalonia client, shared DTOs, rules stubs, CI (diagnostic bootstrapper)"
+Git-Commit -Branch $Branch -Message "scaffold: .NET 9 pinned via global.json, server hub (/game), Avalonia client, shared DTOs, rules stubs, CI"

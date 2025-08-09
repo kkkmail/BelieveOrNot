@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection; // required for AddMessagePackProtocol()
 
 namespace BelieveOrNot.Client.Avalonia;
 

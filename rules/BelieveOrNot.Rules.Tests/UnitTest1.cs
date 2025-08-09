@@ -1,4 +1,4 @@
-namespace BelieveOrNot.Rules.Tests;
+﻿namespace BelieveOrNot.Rules.Tests;
 
 public class UnitTest1
 {

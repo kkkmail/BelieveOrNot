@@ -1,4 +1,5 @@
 using BelieveOrNot.Server;
+using Microsoft.Extensions.Hosting.WindowsServices;
 
 var builder = WebApplication.CreateBuilder(args);
 

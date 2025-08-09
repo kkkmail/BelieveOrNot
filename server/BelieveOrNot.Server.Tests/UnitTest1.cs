@@ -1,4 +1,4 @@
-namespace BelieveOrNot.Server.Tests;
+﻿namespace BelieveOrNot.Server.Tests;
 
 public class UnitTest1
 {
