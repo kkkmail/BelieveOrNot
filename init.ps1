@@ -27,22 +27,35 @@ function Warn($m){ Write-Host "[WARN] $m" -ForegroundColor Yellow }
 function Fail($m){ Write-Host "[ERROR] $m" -ForegroundColor Red; throw $m }
 
 function Invoke-Dotnet([Parameter(Mandatory=$true)][string[]]$Args){
-  if (-not $Args -or ($Args | Where-Object { $_ -is [string] -and $_.Trim().Length -gt 0 }).Count -eq 0) {
+  # Normalize to an array before counting
+  $nonEmpty = @($Args | Where-Object { $_ -is [string] -and $_.Trim().Length -gt 0 })
+  if (-not $nonEmpty -or $nonEmpty.Count -eq 0) {
     Fail "Invoke-Dotnet called with no arguments or only empty strings."
   }
-  $joined = ($Args -join ' ')
+
+  $joined = ($nonEmpty -join ' ')
   Info ("dotnet {0}" -f $joined)
-  & dotnet @Args
+
+  & dotnet @nonEmpty
   $exit = $LASTEXITCODE
-  if ($exit -ne 0) { Fail ("dotnet failed (exit {0}): {1}" -f $exit, $joined) }
+  if ($exit -ne 0) {
+    Fail ("dotnet failed (exit {0}): {1}" -f $exit, $joined)
+  }
 }
 
-function Ensure-Dir($p){ if(-not (Test-Path $p)){ New-Item -ItemType Directory -Force -Path $p | Out-Null } }
+function Ensure-Dir($p){
+  if ([string]::IsNullOrWhiteSpace($p)) { return }  # allow files in repo root (e.g., ".gitignore")
+  if (-not (Test-Path $p)) { New-Item -ItemType Directory -Force -Path $p | Out-Null }
+}
+
 function Read-FileOrEmpty([string]$p){ if(Test-Path $p){ Get-Content $p -Raw } else { "" } }
+
 function Ensure-File([string]$path, [string]$content){
-  Ensure-Dir (Split-Path -Parent $path)
-  $cur = Read-FileOrEmpty $path
-  if($cur -ne $content){ $content | Set-Content -Path $path -Encoding UTF8 }
+  $dir = Split-Path -Parent $path
+  if ([string]::IsNullOrWhiteSpace($dir)) { $dir = "." } # root file -> no parent path
+  Ensure-Dir $dir
+  $cur = if (Test-Path $path) { Get-Content $path -Raw } else { "" }
+  if ($cur -ne $content) { $content | Set-Content -Path $path -Encoding UTF8 }
 }
 
 function Ensure-Solution(){
@@ -92,24 +105,34 @@ function Ensure-AddedToSolution([Parameter(Mandatory=$true)][string]$ProjPath){
   } else { Info "Already in solution: $ProjPath" }
 }
 
-function Ensure-ProjectRef([Parameter(Mandatory=$true)][string]$FromProj, [Parameter(Mandatory=$true)][string]$ToProj){
+function Ensure-ProjectRef(
+  [Parameter(Mandatory=$true)][string]$FromProj,
+  [Parameter(Mandatory=$true)][string]$ToProj
+){
   if(-not (Test-Path $FromProj)){ Fail "Ref source missing: $FromProj" }
   if(-not (Test-Path $ToProj)){ Fail "Ref target missing: $ToProj" }
+
   $xml = [xml](Get-Content $FromProj -Raw)
+  if(-not $xml.Project){ Fail "Invalid csproj XML: $FromProj" }
+
+  # Handle projects with no ItemGroup/ProjectReference gracefully
+  $nodes = $xml.SelectNodes("//Project/ItemGroup/ProjectReference")
   $hasRef = $false
-  foreach($ig in $xml.Project.ItemGroup){
-    foreach($pr in $ig.ProjectReference){
+  if($nodes){
+    foreach($pr in $nodes){
       if($pr.Include){
         $abs = Resolve-Path -LiteralPath (Join-Path (Split-Path $FromProj) $pr.Include) -ErrorAction SilentlyContinue
         $toAbs = Resolve-Path -LiteralPath $ToProj -ErrorAction SilentlyContinue
         if($abs -and $toAbs -and ($abs -eq $toAbs)){ $hasRef = $true; break }
       }
     }
-    if($hasRef){ break }
   }
+
   if(-not $hasRef){
     Invoke-Dotnet -Args @("add",$FromProj,"reference",$ToProj)
-  } else { Info "Reference already present: $(Split-Path -Leaf $ToProj) -> $(Split-Path -Leaf $FromProj)" }
+  } else {
+    Info "Reference already present: $(Split-Path -Leaf $ToProj) -> $(Split-Path -Leaf $FromProj)"
+  }
 }
 
 function Ensure-Package([Parameter(Mandatory=$true)][string]$ProjPath, [Parameter(Mandatory=$true)][string]$Pkg){
