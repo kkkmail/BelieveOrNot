@@ -1,0 +1,6 @@
+root = true
+[*.cs]
+dotnet_diagnostic.CA2007.severity = suggestion
+end_of_line = lf
+indent_style = space
+indent_size = 4
