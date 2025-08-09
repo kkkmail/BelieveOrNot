@@ -1,0 +1,4 @@
+blocked_dirs:
+  - .github/workflows
+pr_title_prefix: "AI:"
+max_diff: 1200

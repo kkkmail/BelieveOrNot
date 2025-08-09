@@ -1,0 +1,5 @@
+- Target branch for AI PRs: ai-main
+- Server is authoritative; clients send intents only
+- MessagePack + SignalR only
+- Add/modify tests for rules and hub behavior
+- Do not change public DTOs without updating all call sites
