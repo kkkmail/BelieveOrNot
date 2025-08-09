@@ -1,8 +1,6 @@
-# sweep.yaml
 pr_title_prefix: "AI:"
-default_branch: ai-main   # base branch for PRs; change to main if you prefer
+default_branch: ai-main
 max_diff: 1200
-gha_enabled: false        # set true only if you want Sweep to run/repair your GH Actions automatically
 docs:
   - SPEC.md
   - ARCH.md
