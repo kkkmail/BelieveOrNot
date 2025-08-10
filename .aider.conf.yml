@@ -7,6 +7,4 @@ read:
   always: true
 write:
   always: true
-commit:
-  always: false
-  never: true
+commit: false
