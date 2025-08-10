@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.200
+MinimumVisualStudioVersion = 10.0.40219.1
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Believe.Core", "src\Believe.Core\Believe.Core.csproj", "{A1B2C3D4-E5F6-G7H8-I9J0-KLMNPQRSTU}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Believe.App", "src\Believe.App\Believe.App.csproj", "{VWX1YZ23-4567-890A-BCDE-FGHIJKL0MNOP}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1B2C3D4-E5F6-G7H8-I9J0-KLMNPQRSTU}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-G7H8-I9J0-KLMNPQRSTU}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-G7H8-I9J0-KLMNPQRSTU}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-G7H8-I9J0-KLMNPQRSTU}.Release|Any CPU.Build.0 = Release|Any CPU
+		{VWX1YZ23-4567-890A-BCDE-FGHIJKL0MNOP}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{VWX1YZ23-4567-890A-BCDE-FGHIJKL0MNOP}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{VWX1YZ23-4567-890A-BCDE-FGHIJKL0MNOP}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{VWX1YZ23-4567-890A-BCDE-FGHIJKL0MNOP}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
