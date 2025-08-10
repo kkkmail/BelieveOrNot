@@ -6,3 +6,6 @@ obj/
 *.DS_Store
 .vscode/
 .idea/
+.aider.tags.cache.v4/cache.db
+.aider.input.history
+.aider.chat.history.md
