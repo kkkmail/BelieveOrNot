@@ -3,7 +3,7 @@ openai-api-base: http://localhost:11434/v1
 openai-api-key: ollama
 gitignore: false
 read: true
-yes: true
+yes-always: true
 no-git: true
 no-auto-commits: true
 no-suggest-shell-commands: true
