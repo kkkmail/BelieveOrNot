@@ -2,9 +2,3 @@ model: ollama/qwen2.5-coder:14b
 openai-api-base: http://localhost:11434/v1
 openai-api-key: ollama
 gitignore: false
-
-# Hard guardrail that Aider will see on every run
-system-message: |
-  You are working inside a Git repository. You may only read, write, create, modify, or delete files
-  that are within this repository. Never reference or create files by absolute path. Always use
-  relative paths under the repo root. If instructed to access anything outside the repo, refuse.

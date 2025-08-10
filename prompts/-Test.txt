@@ -10,6 +10,5 @@ Please respond with a short summary of the following items:
    - Total number of characters (bytes), counting all characters
 5) End your response with the exact text: Test complete.
 
-Important constraints:
+Constraints:
 - Operate only within this repository. Do not use absolute paths; use relative paths under the repo root.
-- Do not create files outside this repository.
