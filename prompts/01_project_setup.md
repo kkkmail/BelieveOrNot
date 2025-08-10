@@ -1,25 +1,29 @@
-Create a new C# project structure for the "Believe Or Not" multiplayer card game with the following requirements:
+I need you to create a complete C# solution for a multiplayer card game called "BelieveOrNot". 
 
-1. Create a solution with these projects:
-   - BelieveOrNot.Core (class library) - game rules engine
-   - BelieveOrNot.Server (ASP.NET Core) - SignalR server
-   - BelieveOrNot.Shared (class library) - DTOs and contracts
-   - BelieveOrNot.Tests (xUnit test project)
+Please create these exact projects in this order:
 
-2. Set up proper project references:
-   - Server references Core and Shared
-   - Tests references Core and Shared
-   - Core references Shared
+1. First create the solution file: BelieveOrNot.sln
 
-3. Add these NuGet packages:
-   - BelieveOrNot.Server: Microsoft.AspNetCore.SignalR
-   - BelieveOrNot.Tests: xunit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk
+2. Create these four projects:
+   - BelieveOrNot.Core (ClassLibrary targeting net9.0)
+   - BelieveOrNot.Server (ASP.NET Core Web API targeting net9.0) 
+   - BelieveOrNot.Shared (ClassLibrary targeting net9.0)
+   - BelieveOrNot.Tests (xUnit Test Project targeting net9.0)
 
-4. Create basic folder structure in Core:
-   - Models/ (game entities)
-   - Engine/ (game logic)
-   - Services/ (deck builder, etc)
+3. Set up project references:
+   - BelieveOrNot.Server must reference BelieveOrNot.Core AND BelieveOrNot.Shared
+   - BelieveOrNot.Tests must reference BelieveOrNot.Core AND BelieveOrNot.Shared
+   - BelieveOrNot.Core must reference BelieveOrNot.Shared
 
-5. Create a README.md explaining the project structure and how to run tests
+4. Add NuGet packages:
+   - Add Microsoft.AspNetCore.SignalR to BelieveOrNot.Server
+   - Add xunit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk to BelieveOrNot.Tests
 
-After creating the structure, run `dotnet build` to ensure everything compiles correctly.
+5. Create folder structure in BelieveOrNot.Core:
+   - Models folder
+   - Engine folder
+   - Services folder
+
+6. Create a basic README.md file explaining the project
+
+Use dotnet CLI commands to create everything. After completion, run "dotnet build" to verify it compiles.
