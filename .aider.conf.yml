@@ -1,9 +1,22 @@
+# Aider configuration file
+# This configuration prevents ALL git operations and commits
+
 model: ollama/qwen2.5-coder:14b
 openai-api-base: http://localhost:11434/v1
 openai-api-key: ollama
+
+# File operations
 gitignore: false
-read: true
 yes-always: true
-no-git: true
-no-auto-commits: true
+
+# DISABLE ALL GIT OPERATIONS - multiple settings to ensure no commits
+no-git: true                    # Disable git integration entirely
+no-auto-commits: true          # Disable automatic commits
+no-dirty-commits: true         # Don't commit if repo is dirty
+git: false                     # Explicitly disable git
+auto-commits: false            # Explicitly disable auto commits
+commit: false                  # Disable commit functionality
+
+# Safety settings
 no-suggest-shell-commands: true
+no-auto-test: true
