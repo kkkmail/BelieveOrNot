@@ -1,0 +1,13 @@
+This is a test to verify that the Aider integration works correctly.
+Please respond with a short summary of the following items:
+
+1. Confirm you received this multi-line prompt intact.
+2. Tell me how many lines are in this prompt (count each numbered line separately).
+3. Read the file SPEC.md located in the root folder of this repository.
+4. Count and report:
+   - The total number of lines in SPEC.md
+   - The total number of words in SPEC.md
+   - The total number of characters in SPEC.md
+5. End your response with the phrase: "Test complete."
+
+Do not generate any code, only text.
