@@ -26,7 +26,7 @@ def call_ollama(prompt, model="qwen2.5-coder:14b"):
     }
     
     try:
-        response = requests.post(url, json=data, timeout=300)
+        response = requests.post(url, json=data, timeout=10800)
         response.raise_for_status()
         result = response.json()
         return result.get('response', '')
