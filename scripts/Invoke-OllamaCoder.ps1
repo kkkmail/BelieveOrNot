@@ -1,30 +1,73 @@
 function Invoke-OllamaCoder {
     param(
         [Parameter(Mandatory=$true)]
-        [string]$PromptFile
+        [string]$PromptFile,
+        
+        [Parameter(Mandatory=$false)]
+        [string]$PromptsFolder = "prompts"
     )
 
-    # Load required functions
-    $scriptDirectory = $PSScriptRoot
-    . "$scriptDirectory\Write-ServiceLog.ps1"
-    . "$scriptDirectory\Call-Ollama.ps1"
-    . "$scriptDirectory\Extract-CommandsAndFiles.ps1"
-    . "$scriptDirectory\Execute-Commands.ps1"
-    . "$scriptDirectory\Write-Files.ps1"
+    try {
+        # Load required functions
+        $scriptDirectory = $PSScriptRoot
+        . "$scriptDirectory\Write-ServiceLog.ps1"
+        . "$scriptDirectory\Call-Ollama.ps1"
+        . "$scriptDirectory\Extract-CommandsAndFiles.ps1"
+        . "$scriptDirectory\Execute-Commands.ps1"
+        . "$scriptDirectory\Write-Files.ps1"
 
-    # Main execution
-    if (-not (Test-Path $PromptFile)) {
-        Write-ServiceLog "Prompt file not found: $PromptFile" -Level "Error"
-        return
-    }
+        Write-ServiceLog "Script directory: $scriptDirectory" -Level "Info"
 
-    # Read the prompt
-    $prompt = Get-Content $PromptFile -Raw
+        # Determine full path to prompt file
+        $fullPromptPath = $null
+        
+        # Disallow absolute paths for security
+        if ([System.IO.Path]::IsPathRooted($PromptFile)) {
+            Write-ServiceLog "Absolute paths are not allowed for prompt files: $PromptFile" -Level "Error"
+            return
+        }
+        
+        # If PromptFile contains path separators, treat as relative path from current directory
+        if ($PromptFile -match '[/\\]') {
+            $fullPromptPath = Join-Path (Get-Location) $PromptFile
+        } else {
+            # Just filename, look in prompts folder
+            $promptsPath = Join-Path $PSScriptRoot ".." $PromptsFolder
+            $fullPromptPath = Join-Path $promptsPath $PromptFile
+        }
 
-    Write-ServiceLog "Sending prompt to Ollama..." -Level "Info"
+        Write-ServiceLog "Looking for prompt file at: $fullPromptPath" -Level "Info"
 
-    # Enhanced prompt for better code generation
-    $enhancedPrompt = @"
+        # Check if prompt file exists
+        if (-not (Test-Path $fullPromptPath)) {
+            Write-ServiceLog "Prompt file not found: $fullPromptPath" -Level "Error"
+            
+            # Try to find it in prompts folder if not already tried
+            if (-not ($PromptFile -match '[/\\]')) {
+                $promptsPath = Join-Path $PSScriptRoot ".." $PromptsFolder
+                Write-ServiceLog "Searching in prompts folder: $promptsPath" -Level "Warning"
+                
+                if (Test-Path $promptsPath) {
+                    $foundFiles = Get-ChildItem -Path $promptsPath -Filter "*$PromptFile*" -Recurse
+                    if ($foundFiles) {
+                        Write-ServiceLog "Found similar files:" -Level "Warning"
+                        foreach ($file in $foundFiles) {
+                            Write-ServiceLog "  $($file.FullName)" -Level "Warning"
+                        }
+                    }
+                }
+            }
+            return
+        }
+
+        # Read the prompt
+        Write-ServiceLog "Reading prompt from: $fullPromptPath" -Level "Info"
+        $prompt = Get-Content $fullPromptPath -Raw
+
+        Write-ServiceLog "Sending prompt to Ollama..." -Level "Info"
+
+        # Enhanced prompt for better code generation
+        $enhancedPrompt = @"
 You are a senior software developer. Please read the following requirements and provide a complete implementation with:
 
 1. All necessary shell commands (in ```sh code blocks)
@@ -37,44 +80,49 @@ $prompt
 Please provide shell commands first, then all file contents. Be very explicit about file paths and ensure the project structure is correct.
 "@
 
-    $response = Call-Ollama -Prompt $enhancedPrompt
+        $response = Call-Ollama -Prompt $enhancedPrompt
 
-    if ($response) {
-        Write-ServiceLog "Response received ($($response.Length) characters)" -Level "Info"
-        
-        # Extract commands and files
-        $commands, $files = Extract-CommandsAndFiles -Response $response
-        
-        if ($commands.Count -gt 0) {
-            Write-ServiceLog "Found $($commands.Count) commands:" -Level "Info"
-            foreach ($cmd in $commands) {
-                Write-ServiceLog "  $cmd" -Level "Info"
+        if ($response) {
+            Write-ServiceLog "Response received ($($response.Length) characters)" -Level "Info"
+            
+            # Extract commands and files
+            $commands, $files = Extract-CommandsAndFiles -Response $response
+            
+            if ($commands.Count -gt 0) {
+                Write-ServiceLog "Found $($commands.Count) commands:" -Level "Info"
+                foreach ($cmd in $commands) {
+                    Write-ServiceLog "  $cmd" -Level "Info"
+                }
+                
+                $proceed = Read-Host "`nExecute these commands? (y/N)"
+                if ($proceed -eq 'y') {
+                    Execute-Commands -Commands $commands
+                }
             }
             
-            $proceed = Read-Host "`nExecute these commands? (y/N)"
-            if ($proceed -eq 'y') {
-                Execute-Commands -Commands $commands
-            }
-        }
-        
-        if ($files.Count -gt 0) {
-            Write-ServiceLog "Found $($files.Count) files:" -Level "Info"
-            foreach ($filepath in $files.Keys) {
-                Write-ServiceLog "  $filepath" -Level "Info"
+            if ($files.Count -gt 0) {
+                Write-ServiceLog "Found $($files.Count) files:" -Level "Info"
+                foreach ($filepath in $files.Keys) {
+                    Write-ServiceLog "  $filepath" -Level "Info"
+                }
+                
+                $proceed = Read-Host "`nCreate these files? (y/N)"
+                if ($proceed -eq 'y') {
+                    Write-Files -Files $files
+                }
             }
             
-            $proceed = Read-Host "`nCreate these files? (y/N)"
-            if ($proceed -eq 'y') {
-                Write-Files -Files $files
-            }
+            # Save full response for review
+            $responseFile = "response_$([System.IO.Path]::GetFileNameWithoutExtension($PromptFile)).txt"
+            $response | Out-File -FilePath $responseFile -Encoding UTF8
+            Write-ServiceLog "Full response saved to: $responseFile" -Level "Info"
         }
-        
-        # Save full response for review
-        $responseFile = "response_$([System.IO.Path]::GetFileNameWithoutExtension($PromptFile)).txt"
-        $response | Out-File -FilePath $responseFile -Encoding UTF8
-        Write-ServiceLog "Full response saved to: $responseFile" -Level "Info"
+        else {
+            Write-ServiceLog "Failed to get response from Ollama" -Level "Error"
+        }
     }
-    else {
-        Write-ServiceLog "Failed to get response from Ollama" -Level "Error"
+    catch {
+        Write-ServiceLog "ERROR in Invoke-OllamaCoder: $_" -Level "Error"
+        Write-ServiceLog "Stack trace: $($_.ScriptStackTrace)" -Level "Error"
     }
 }
