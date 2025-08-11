@@ -40,8 +40,8 @@ function Extract-CommandsAndFiles {
         }
         else {
             # Look for file references
-            if ($line.Trim() -match '\.(cs|csproj|sln|md)) {
-                $potentialFile = $line.Trim() -replace ':, ''
+            if ($line.Trim() -match '\.(cs|csproj|sln|md)') {
+                $potentialFile = $line.Trim() -replace ':', ''
                 if ($potentialFile -match '[/\\]' -or $potentialFile -match '\.') {
                     $currentFile = $potentialFile
                 }
