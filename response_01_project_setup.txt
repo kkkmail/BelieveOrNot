@@ -1,0 +1,41 @@
+```sh
+# Create solution file
+dotnet new sln -n BelieveOrNot
+
+# Create projects
+dotnet new classlib -n BelieveOrNot.Core --framework net9.0
+dotnet new webapi -n BelieveOrNot.Server --framework net9.0
+dotnet new classlib -n BelieveOrNot.Shared --framework net9.0
+dotnet new xunit -n BelieveOrNot.Tests --framework net9.0
+
+# Add projects to solution
+dotnet sln add ./BelieveOrNot.Core/BelieveOrNot.Core.csproj
+dotnet sln add ./BelieveOrNot.Server/BelieveOrNot.Server.csproj
+dotnet sln add ./BelieveOrNot.Shared/BelieveOrNot.Shared.csproj
+dotnet sln add ./BelieveOrNot.Tests/BelieveOrNot.Tests.csproj
+
+# Set up project references
+dotnet add ./BelieveOrNot.Server/BelieveOrNot.Server.csproj reference ./BelieveOrNot.Core/BelieveOrNot.Core.csproj
+dotnet add ./BelieveOrNot.Server/BelieveOrNot.Server.csproj reference ./BelieveOrNot.Shared/BelieveOrNot.Shared.csproj
+dotnet add ./BelieveOrNot.Tests/BelieveOrNot.Tests.csproj reference ./BelieveOrNot.Core/BelieveOrNot.Core.csproj
+dotnet add ./BelieveOrNot.Tests/BelieveOrNot.Tests.csproj reference ./BelieveOrNot.Shared/BelieveOrNot.Shared.csproj
+dotnet add ./BelieveOrNot.Core/BelieveOrNot.Core.csproj reference ./BelieveOrNot.Shared/BelieveOrNot.Shared.csproj
+
+# Add NuGet packages
+dotnet add ./BelieveOrNot.Server/BelieveOrNot.Server.csproj package Microsoft.AspNetCore.SignalR
+dotnet add ./BelieveOrNot.Tests/BelieveOrNot.Tests.csproj package xunit
+dotnet add ./BelieveOrNot.Tests/BelieveOrNot.Tests.csproj package xunit.runner.visualstudio
+dotnet add ./BelieveOrNot.Tests/BelieveOrNot.Tests.csproj package Microsoft.NET.Test.Sdk
+
+# Create folder structure in BelieveOrNot.Core
+mkdir -p ./BelieveOrNot.Core/Models
+mkdir -p ./BelieveOrNot.Core/Engine
+mkdir -p ./BelieveOrNot.Core/Services
+
+# Create basic README.md file
+echo "# BelieveOrNot" > ./README.md
+echo "This is a multiplayer card game called BelieveOrNot." >> ./README.md
+
+# Build solution to verify it compiles
+dotnet build
+```
