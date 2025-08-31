@@ -5,6 +5,7 @@ obj/
 *.swp
 *.DS_Store
 .vscode/
+.vs/
 .idea/
 .aider.tags.cache.v4/cache.db
 .aider.input.history
