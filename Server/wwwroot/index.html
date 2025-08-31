@@ -250,7 +250,7 @@
         .card.hearts {
             color: #dc3545;
         }
-        
+
         .card.diamonds {
             color: #dc3545;
         }
@@ -258,7 +258,7 @@
         .card.clubs {
             color: #333;
         }
-        
+
         .card.spades {
             color: #333;
         }
@@ -457,7 +457,7 @@
 </head>
 <body>
     <div class="connection-status" id="connectionStatus">Connecting...</div>
-    
+
     <div class="container">
         <div class="game-header">
             <h1>🎴 Believe Or Not</h1>
@@ -467,13 +467,13 @@
         <!-- Game Setup -->
         <div class="game-setup" id="gameSetup">
             <h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
-            
+
             <div class="setup-form">
                 <div class="form-group">
                     <label for="playerName">Your Name:</label>
                     <input type="text" id="playerName" placeholder="Enter your name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="deckSize">Deck Size:</label>
                     <select id="deckSize">
@@ -482,7 +482,7 @@
                         <option value="52" selected>52 cards (2-A)</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="jokerCount">Number of Jokers:</label>
                     <select id="jokerCount">
@@ -491,20 +491,20 @@
                         <option value="4">4</option>
                     </select>
                 </div>
-                
+
                 <button class="btn btn-primary" onclick="createMatch()">Create New Game</button>
-                
+
                 <div style="text-align: center; margin: 20px 0; color: #666;">
                     <hr style="margin: 10px 0;">
                     <span>Or</span>
                     <hr style="margin: 10px 0;">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="matchId">Match ID to Join:</label>
                     <input type="text" id="matchId" placeholder="Enter match ID">
                 </div>
-                
+
                 <button class="btn btn-secondary" onclick="joinMatch()">Join Existing Game</button>
             </div>
         </div>
@@ -531,7 +531,7 @@
                     <h3>Table Pile</h3>
                     <div id="tablePileDisplay">No cards on table</div>
                 </div>
-                
+
                 <button class="btn btn-success hidden" id="startRoundBtn" onclick="startRound()">Start Round</button>
             </div>
 
@@ -606,7 +606,7 @@
         async function initializeConnection() {
             // Update this URL to match your server address
             const serverUrl = "http://localhost:5000/game"; // or https://localhost:5001/game
-            
+
             connection = new signalR.HubConnectionBuilder()
                 .withUrl(serverUrl)
                 .withAutomaticReconnect()
@@ -661,10 +661,10 @@
                     playerId = ourPlayer.id;
                     console.log("Set playerId to:", playerId);
                 }
-                
+
                 showGameBoard();
                 showMessage(`Game created! Share the Match ID with others to join.`);
-                
+
                 // Show start button if enough players
                 if (result.players && result.players.length >= 2) {
                     document.getElementById('startRoundBtn').classList.remove('hidden');
@@ -679,7 +679,7 @@
         async function joinMatch() {
             const playerName = document.getElementById('playerName').value.trim();
             const matchId = document.getElementById('matchId').value.trim();
-            
+
             if (!playerName || !matchId) {
                 alert('Please enter your name and match ID');
                 return;
@@ -694,7 +694,7 @@
                     playerId = ourPlayer.id;
                     console.log("Set playerId to:", playerId);
                 }
-                
+
                 showGameBoard();
                 showMessage(`Joined game! Waiting for other players.`);
             } catch (err) {
@@ -733,10 +733,10 @@
             document.getElementById('announcedRank').textContent = gameState.announcedRank || '-';
             document.getElementById('tablePileCount').textContent = gameState.tablePileCount;
             document.getElementById('displayMatchId').value = gameState.matchId;
-            
+
             // Update current player
             if (gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
-                document.getElementById('currentPlayerName').textContent = 
+                document.getElementById('currentPlayerName').textContent =
                     gameState.players[gameState.currentPlayerIndex].name;
             }
 
@@ -763,9 +763,9 @@
 
             // Show start button only for creator and when there are enough players
             const startBtn = document.getElementById('startRoundBtn');
-            if (gameState.phase === 0 && 
-                gameState.players.length >= 2 && 
-                playerId && 
+            if (gameState.phase === 0 &&
+                gameState.players.length >= 2 &&
+                playerId &&
                 gameState.creatorPlayerId === playerId) {
                 startBtn.classList.remove('hidden');
             } else {
@@ -802,7 +802,7 @@
             const handCards = document.getElementById('handCards');
             const handCount = document.getElementById('handCount');
             handCards.innerHTML = '';
-            
+
             if (!gameState.yourHand) {
                 handCount.textContent = '0';
                 return;
@@ -814,16 +814,16 @@
                 if (a.rank === 'Joker' && b.rank !== 'Joker') return -1;
                 if (a.rank !== 'Joker' && b.rank === 'Joker') return 1;
                 if (a.rank === 'Joker' && b.rank === 'Joker') return 0;
-                
+
                 // Sort by rank
                 const rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
                 const aRankIndex = rankOrder.indexOf(a.rank);
                 const bRankIndex = rankOrder.indexOf(b.rank);
-                
+
                 if (aRankIndex !== bRankIndex) {
                     return aRankIndex - bRankIndex;
                 }
-                
+
                 // Sort by suit
                 const suitOrder = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
                 return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
@@ -833,12 +833,12 @@
 
             sortedHand.forEach((card, index) => {
                 // Find original index for selection tracking
-                const originalIndex = gameState.yourHand.findIndex(c => 
+                const originalIndex = gameState.yourHand.findIndex(c =>
                     c.rank === card.rank && c.suit === card.suit);
-                
+
                 const cardElement = document.createElement('div');
                 cardElement.className = `card ${getSuitClass(card.suit)}`;
-                
+
                 if (card.rank === 'Joker') {
                     cardElement.classList.add('joker');
                     cardElement.innerHTML = `
@@ -851,9 +851,9 @@
                         <div class="suit">${getSuitSymbol(card.suit)}</div>
                     `;
                 }
-                
+
                 cardElement.onclick = () => toggleCardSelection(originalIndex);
-                
+
                 if (selectedCards.includes(originalIndex)) {
                     cardElement.classList.add('selected');
                 }
@@ -893,13 +893,14 @@
                 }
             }
             updateHandDisplay();
+            updateActionsDisplay();
         }
 
         function updateActionsDisplay() {
             const playBtn = document.getElementById('playBtn');
             const challengeBtn = document.getElementById('challengeBtn');
             const rankSelector = document.getElementById('rankSelector');
-            
+
             // Hide all by default
             playBtn.classList.add('hidden');
             challengeBtn.classList.add('hidden');
@@ -910,7 +911,7 @@
             // Check if it's our turn by comparing our playerId with current player
             const currentPlayer = gameState.players[gameState.currentPlayerIndex];
             const isMyTurn = currentPlayer && currentPlayer.id === playerId;
-            
+
             console.log("Turn check - Current player:", currentPlayer?.name, "My ID:", playerId, "Is my turn:", isMyTurn);
 
             if (isMyTurn) {
@@ -967,6 +968,7 @@
                 });
 
                 selectedCards = [];
+                updateActionsDisplay();
             } catch (err) {
                 console.error("Failed to play cards:", err);
                 alert("Failed to play cards: " + err);
@@ -976,13 +978,13 @@
         function showChallenge() {
             const challengeArea = document.getElementById('challengeArea');
             const challengeCards = document.getElementById('challengeCards');
-            
+
             challengeArea.classList.remove('hidden');
             challengeCards.innerHTML = '';
 
             // Show cards from last play for challenge
             const lastPlayCount = Math.min(3, gameState.tablePileCount); // Assume last play was max 3 cards
-            
+
             for (let i = 0; i < lastPlayCount; i++) {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'challenge-card';
@@ -999,7 +1001,7 @@
 
         function selectChallengeCard(index) {
             selectedChallengeIndex = index;
-            
+
             // Update visual selection
             const challengeCards = document.querySelectorAll('.challenge-card');
             challengeCards.forEach((card, i) => {
@@ -1054,7 +1056,7 @@
         function showMessage(message) {
             const messageArea = document.getElementById('messageArea');
             messageArea.textContent = message;
-            
+
             // Clear message after 5 seconds
             setTimeout(() => {
                 if (messageArea.textContent === message) {
