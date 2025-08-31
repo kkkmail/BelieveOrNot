@@ -23,10 +23,10 @@ function updateActionsDisplay() {
     console.log("2-player with zero cards:", is2PlayerWithZeroCards);
     console.log("Game state - tablePileCount:", gameState.tablePileCount, "announcedRank:", gameState.announcedRank);
 
+    // ONLY show buttons if it's my turn
     if (isMyTurn) {
-        // It's our turn
         if (!gameState.announcedRank) {
-            // Opening turn (no announced rank yet) - can always play
+            // Opening turn (no announced rank yet) - can play
             if (selectedCards.length > 0 && !is2PlayerWithZeroCards) {
                 rankSelector.classList.remove('hidden');
                 playBtn.classList.remove('hidden');
@@ -35,20 +35,20 @@ function updateActionsDisplay() {
         } else {
             // Subsequent turns
             if (is2PlayerWithZeroCards) {
-                // 2-player game with one having 0 cards - can only challenge, not play
+                // Special case: 2-player game with one having 0 cards - can only challenge
                 if (gameState.tablePileCount > 0 && gameState.announcedRank) {
                     challengeBtn.classList.remove('hidden');
                     const opponentWithZeroCards = playersWithNoCards[0];
                     challengeBtn.textContent = `Challenge ${opponentWithZeroCards.name}`;
                 }
             } else {
-                // Normal game - can play or challenge
+                // Normal turn - can play or challenge
                 if (selectedCards.length > 0) {
                     playBtn.classList.remove('hidden');
                     playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
                 }
                 
-                // Show challenge button if there are cards on the table to challenge
+                // Can challenge previous player if there are cards on table
                 if (gameState.tablePileCount > 0 && gameState.announcedRank) {
                     const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
                     const previousPlayer = gameState.players[previousPlayerIndex];
@@ -58,11 +58,6 @@ function updateActionsDisplay() {
                 }
             }
         }
-    } else {
-        // Not our turn - can challenge if there are cards on table from current player
-        if (gameState.tablePileCount > 0 && gameState.announcedRank) {
-            challengeBtn.classList.remove('hidden');
-            challengeBtn.textContent = `Challenge ${currentPlayer.name}`;
-        }
     }
+    // REMOVED: No buttons visible when it's not your turn
 }

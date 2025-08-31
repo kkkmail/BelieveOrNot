@@ -122,7 +122,8 @@ public class GameEngine : IGameEngine
         var flippedCard = match.TablePile[cardIndex];
 
         // Determine if challenge succeeded
-        bool challengeHit = flippedCard.Rank == match.AnnouncedRank;
+        // FIXED: Jokers match any announced rank
+        bool challengeHit = flippedCard.Rank == match.AnnouncedRank || flippedCard.IsJoker;
 
         // Determine who collects the pile
         Player collector;
@@ -130,7 +131,14 @@ public class GameEngine : IGameEngine
         {
             // Challenger was wrong, they collect
             collector = challenger;
-            result = $"{challenger.Name} challenged and was wrong! {flippedCard} matched {match.AnnouncedRank}";
+            if (flippedCard.IsJoker)
+            {
+                result = $"{challenger.Name} challenged and was wrong! {flippedCard} (Joker) matches any rank including {match.AnnouncedRank}";
+            }
+            else
+            {
+                result = $"{challenger.Name} challenged and was wrong! {flippedCard} matched {match.AnnouncedRank}";
+            }
         }
         else
         {
