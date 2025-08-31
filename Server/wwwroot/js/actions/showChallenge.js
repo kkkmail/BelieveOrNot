@@ -8,7 +8,8 @@ function showChallenge() {
     // Debug: Log the game state to understand what data we have
     console.log("Challenge - Game State:", {
         tablePileCount: gameState.tablePileCount,
-        lastPlayCount: gameState.lastPlayCount,
+        lastPlayCardCount: gameState.lastPlayCardCount,
+        LastPlayCardCount: gameState.LastPlayCardCount,
         currentPlayerIndex: gameState.currentPlayerIndex,
         announcedRank: gameState.announcedRank
     });
@@ -16,14 +17,16 @@ function showChallenge() {
     // Determine how many cards to show for challenge
     let cardsToShow;
     
-    if (gameState.lastPlayCount && gameState.lastPlayCount > 0) {
-        // Use lastPlayCount if available from server
-        cardsToShow = Math.min(gameState.lastPlayCount, 3);
+    // Fixed: Use the correct property name from C# (LastPlayCardCount)
+    const lastPlayCount = gameState.lastPlayCardCount || gameState.LastPlayCardCount;
+    
+    if (lastPlayCount && lastPlayCount > 0) {
+        // Use LastPlayCardCount if available from server
+        cardsToShow = Math.min(lastPlayCount, 3);
     } else if (gameState.tablePileCount > 0) {
-        // Fallback: if we don't have lastPlayCount, assume they played 1-3 cards
-        // This is not ideal but better than showing 0 cards
+        // Fallback: This should not happen, but if LastPlayCardCount is missing
+        console.error("LastPlayCardCount not available! This is a server issue.");
         cardsToShow = Math.min(gameState.tablePileCount, 3);
-        console.warn("lastPlayCount not available, using tablePileCount as fallback");
     } else {
         console.error("No cards available to challenge");
         alert("No cards available to challenge");
@@ -31,7 +34,7 @@ function showChallenge() {
         return;
     }
 
-    console.log(`Showing ${cardsToShow} cards for challenge (last play count: ${gameState.lastPlayCount})`);
+    console.log(`Showing ${cardsToShow} cards for challenge (last play count: ${lastPlayCount})`);
 
     // Create challenge cards
     for (let i = 0; i < cardsToShow; i++) {

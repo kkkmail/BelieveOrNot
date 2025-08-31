@@ -109,11 +109,8 @@ public class GameEngine : IGameEngine
         // Auto-dispose four-of-a-kind after play
         AutoDisposeFourOfAKind(player);
 
-        // REMOVED: Do not check for round end here
-        // Just continue to next player
-
-        // Next player's turn
-        match.CurrentPlayerIndex = (match.CurrentPlayerIndex + 1) % match.Players.Count;
+        // Advance to next active player (skip players with 0 cards)
+        AdvanceToNextActivePlayer(match);
 
         result = $"{player.Name} played {request.Cards!.Count} card(s) claiming {match.AnnouncedRank}";
     }
@@ -153,14 +150,32 @@ public class GameEngine : IGameEngine
         // Auto-dispose four-of-a-kind after collection
         AutoDisposeFourOfAKind(collector);
 
-        // REMOVED: Do not check for round end here either
-        // Challenge resolution continues the game normally
-
-        // Next turn goes to left of collector
+        // Set current player to collector, then advance to next active player
         var collectorIndex = match.Players.IndexOf(collector);
-        match.CurrentPlayerIndex = (collectorIndex + 1) % match.Players.Count;
+        match.CurrentPlayerIndex = collectorIndex;
+        AdvanceToNextActivePlayer(match);
 
         result += $" {collector.Name} collected {collectedCount} cards";
+    }
+
+    private void AdvanceToNextActivePlayer(Match match)
+    {
+        int attempts = 0;
+        int maxAttempts = match.Players.Count;
+        
+        do 
+        {
+            match.CurrentPlayerIndex = (match.CurrentPlayerIndex + 1) % match.Players.Count;
+            attempts++;
+            
+            // If we've checked all players and none have cards, something is wrong
+            if (attempts >= maxAttempts)
+            {
+                // This should trigger round end - all players are out
+                break;
+            }
+        } 
+        while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
     }
 
     private void AutoDisposeFourOfAKind(Player player)
@@ -218,6 +233,9 @@ public class GameEngine : IGameEngine
 
         if (request.Action == ActionType.Play)
         {
+            // Players with 0 cards cannot play
+            if (player.Hand.Count == 0) return false;
+
             // For play actions, must be current player's turn
             var currentPlayer = match.Players[match.CurrentPlayerIndex];
             if (currentPlayer.Id != playerId) return false;
@@ -261,6 +279,9 @@ public class GameEngine : IGameEngine
         }
         else if (request.Action == ActionType.Challenge)
         {
+            // Players with 0 cards CANNOT challenge
+            if (player.Hand.Count == 0) return false;
+
             // Can challenge if there's a table pile with announced rank
             // Any player can challenge (not just current player)
             if (match.TablePile.Count == 0 || match.AnnouncedRank == null)
