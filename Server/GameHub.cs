@@ -6,28 +6,33 @@ public class GameHub : Hub
     private readonly IGameEngine _gameEngine;
     private readonly IMatchManager _matchManager;
     private readonly ConcurrentDictionary<Guid, Guid> _processedCommands = new();
-    
+    // Track connection to player mapping
+    private static readonly ConcurrentDictionary<string, (Guid MatchId, Guid PlayerId)> _connectionToPlayer = new();
+
     public GameHub(IGameEngine gameEngine, IMatchManager matchManager)
     {
         _gameEngine = gameEngine;
         _matchManager = matchManager;
     }
-    
+
     public async Task<GameStateDto> CreateOrJoinMatch(CreateMatchRequest request)
     {
         Match match;
-        
+
         try
         {
             // Try to create new match
             match = _matchManager.CreateMatch(request.PlayerName, request.Settings);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{match.Id}");
+
+            // Map this connection to the creator player
+            _connectionToPlayer[Context.ConnectionId] = (match.Id, match.Players[0].Id);
         }
         catch
         {
             throw new HubException("Failed to create match");
         }
-        
+
         var state = new GameStateDto
         {
             MatchId = match.Id,
@@ -42,16 +47,21 @@ public class GameHub : Hub
             }).ToList(),
             CreatorPlayerId = match.Players[0].Id
         };
-        
+
+        // Broadcast to group
         await Clients.Group($"match:{match.Id}").SendAsync("StateUpdate", state, Guid.Empty);
         return state;
     }
-    
+
     public async Task<Match> JoinExistingMatch(Guid matchId, string playerName)
     {
         var match = _matchManager.JoinMatch(matchId, playerName);
         await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
-        
+
+        // Map this connection to the joining player
+        var joiningPlayer = match.Players.Last();
+        _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
+
         var state = new GameStateDto
         {
             MatchId = match.Id,
@@ -66,16 +76,17 @@ public class GameHub : Hub
             }).ToList(),
             CreatorPlayerId = match.Players[0].Id
         };
-        
+
+        // Broadcast to group
         await Clients.Group($"match:{matchId}").SendAsync("StateUpdate", state, Guid.Empty);
         return match;
     }
-    
+
     public async Task StartRound(Guid matchId, Guid requestingPlayerId)
     {
         var match = _matchManager.GetMatch(matchId);
         if (match == null) throw new HubException("Match not found");
-        
+
         // Check if requesting player is the creator (first player)
         if (requestingPlayerId != match.Players[0].Id)
         {
@@ -83,14 +94,9 @@ public class GameHub : Hub
         }
 
         _gameEngine.StartNewRound(match);
-        
-        // Send personalized state to each player
-        foreach (var player in match.Players)
-        {
-            var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, player.Id);
-            playerState.CreatorPlayerId = match.Players[0].Id;
-            await Clients.Group($"match:{matchId}").SendAsync("StateUpdate", playerState, Guid.Empty);
-        }
+
+        // Send personalized states to all connections in the match
+        await BroadcastPersonalizedStates(match);
     }
 
     public async Task<GameStateDto> SubmitMove(SubmitMoveRequest request)
@@ -114,20 +120,46 @@ public class GameHub : Hub
             var state = _gameEngine.SubmitMove(gameMatch, request.PlayerId, request);
             _processedCommands.TryAdd(request.ClientCmdId, request.MatchId);
 
-            // Send personalized state to each player in the match
-            foreach (var player in gameMatch.Players)
-            {
-                var playerState = _gameEngine.CreateGameStateDtoForPlayer(gameMatch, player.Id);
-                playerState.LastAction = state.LastAction;
-                playerState.CreatorPlayerId = gameMatch.Players[0].Id;
-                await Clients.Group($"match:{request.MatchId}").SendAsync("StateUpdate", playerState, request.ClientCmdId);
-            }
-            
+            // Send personalized states to all connections in the match
+            await BroadcastPersonalizedStates(gameMatch, state.LastAction);
+
             return state;
         }
         catch (Exception ex)
         {
             throw new HubException($"Invalid move: {ex.Message}");
         }
+    }
+
+    private async Task BroadcastPersonalizedStates(Match match, string? lastAction = null)
+    {
+        // Get all connections in this match group
+        var matchGroupName = $"match:{match.Id}";
+
+        // Send personalized state to each connection based on their mapped player
+        var tasks = _connectionToPlayer
+            .Where(kvp => kvp.Value.MatchId == match.Id)
+            .Select(async kvp =>
+            {
+                var connectionId = kvp.Key;
+                var playerId = kvp.Value.PlayerId;
+
+                var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, playerId);
+                playerState.CreatorPlayerId = match.Players[0].Id;
+                if (lastAction != null)
+                {
+                    playerState.LastAction = lastAction;
+                }
+
+                await Clients.Client(connectionId).SendAsync("StateUpdate", playerState, Guid.Empty);
+            });
+
+        await Task.WhenAll(tasks);
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        _connectionToPlayer.TryRemove(Context.ConnectionId, out _);
+        await base.OnDisconnectedAsync(exception);
     }
 }

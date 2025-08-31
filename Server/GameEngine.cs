@@ -9,7 +9,7 @@ public class GameEngine : IGameEngine
             throw new InvalidOperationException("Need at least 2 players to start a round");
         }
 
-        // Build and shuffle deck
+        // Build and shuffle deck ONCE
         var deck = DeckBuilder.BuildDeck(match.Settings.DeckSize, match.Settings.JokerCount);
         DeckBuilder.Shuffle(deck, _random);
 
@@ -22,10 +22,11 @@ public class GameEngine : IGameEngine
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
 
-        // Deal cards properly - one by one to each player
+        // Deal cards properly - one at a time to each player in rotation
+        int playerCount = match.Players.Count;
         for (int cardIndex = 0; cardIndex < deck.Count; cardIndex++)
         {
-            var playerIndex = cardIndex % match.Players.Count;
+            var playerIndex = cardIndex % playerCount;
             match.Players[playerIndex].Hand.Add(deck[cardIndex]);
         }
 
@@ -81,18 +82,25 @@ public class GameEngine : IGameEngine
     
     private void HandlePlayAction(Match match, Player player, SubmitMoveRequest request, out string result)
     {
-        // Remove cards from player's hand using proper matching
-        foreach (var cardToRemove in request.Cards!)
+        // Remove cards from player's hand - create copies to avoid reference issues
+        var cardsToRemove = new List<Card>();
+        foreach (var requestedCard in request.Cards!)
         {
             var cardInHand = player.Hand.FirstOrDefault(c => 
-                c.Rank == cardToRemove.Rank && c.Suit == cardToRemove.Suit);
+                c.Rank == requestedCard.Rank && c.Suit == requestedCard.Suit);
             if (cardInHand != null)
             {
-                player.Hand.Remove(cardInHand);
+                cardsToRemove.Add(cardInHand);
             }
         }
         
-        // Add cards to table pile
+        // Actually remove the cards
+        foreach (var card in cardsToRemove)
+        {
+            player.Hand.Remove(card);
+        }
+        
+        // Add the requested cards to table pile (not the ones from hand)
         match.TablePile.AddRange(request.Cards!);
         match.LastPlayCardCount = request.Cards!.Count;
         
@@ -137,8 +145,8 @@ public class GameEngine : IGameEngine
         }
         
         // Collector takes all cards
-        collector.Hand.AddRange(match.TablePile);
         var collectedCount = match.TablePile.Count;
+        collector.Hand.AddRange(match.TablePile);
         match.TablePile.Clear();
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
@@ -216,12 +224,29 @@ public class GameEngine : IGameEngine
             if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)
                 return false;
             
-            // Check player has these cards (proper matching)
-            foreach (var requestedCard in request.Cards)
+            // Check player has these cards - count how many of each card type they have
+            var playerCardCounts = new Dictionary<(string rank, string suit), int>();
+            foreach (var card in player.Hand)
             {
-                var hasCard = player.Hand.Any(c => 
-                    c.Rank == requestedCard.Rank && c.Suit == requestedCard.Suit);
-                if (!hasCard) return false;
+                var key = (card.Rank, card.Suit);
+                playerCardCounts[key] = playerCardCounts.GetValueOrDefault(key, 0) + 1;
+            }
+            
+            var requestedCardCounts = new Dictionary<(string rank, string suit), int>();
+            foreach (var card in request.Cards)
+            {
+                var key = (card.Rank, card.Suit);
+                requestedCardCounts[key] = requestedCardCounts.GetValueOrDefault(key, 0) + 1;
+            }
+            
+            // Verify player has enough of each requested card type
+            foreach (var kvp in requestedCardCounts)
+            {
+                if (!playerCardCounts.ContainsKey(kvp.Key) || 
+                    playerCardCounts[kvp.Key] < kvp.Value)
+                {
+                    return false;
+                }
             }
             
             // Opening turn must declare rank
@@ -235,7 +260,7 @@ public class GameEngine : IGameEngine
         else if (request.Action == ActionType.Challenge)
         {
             // Can challenge if there's a table pile with announced rank
-            // Don't need to be current player to challenge
+            // Any player can challenge (not just current player)
             if (match.TablePile.Count == 0 || match.AnnouncedRank == null)
                 return false;
             
@@ -274,7 +299,8 @@ public class GameEngine : IGameEngine
         var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == requestingPlayerId);
         if (requestingPlayer != null)
         {
-            state.YourHand = new List<Card>(requestingPlayer.Hand);
+            // Create a copy to avoid reference issues
+            state.YourHand = requestingPlayer.Hand.Select(c => new Card(c.Rank, c.Suit)).ToList();
         }
         
         return state;
