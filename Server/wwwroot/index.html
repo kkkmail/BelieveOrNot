@@ -207,38 +207,59 @@
         }
 
         .card {
-            width: 70px;
-            height: 100px;
-            border: 2px solid #333;
-            border-radius: 8px;
+            width: 90px;
+            height: 130px;
+            border: 3px solid #333;
+            border-radius: 12px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 16px;
             font-weight: bold;
             background: white;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
         }
 
         .card.selected {
             border-color: #007bff;
             background: #e3f2fd;
-            transform: translateY(-10px);
+            transform: translateY(-15px);
         }
 
-        .card.hearts, .card.diamonds {
+        .card .rank {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .card .suit {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .card.hearts {
+            color: #dc3545;
+        }
+        
+        .card.diamonds {
             color: #dc3545;
         }
 
-        .card.clubs, .card.spades {
+        .card.clubs {
+            color: #333;
+        }
+        
+        .card.spades {
             color: #333;
         }
 
@@ -246,6 +267,7 @@
             background: linear-gradient(45deg, #ff6b6b, #feca57);
             color: white;
             border-color: #ff6b6b;
+            font-size: 18px;
         }
 
         .actions-area {
@@ -496,6 +518,7 @@
                     <div>Current Turn: <span id="currentPlayerName">-</span></div>
                     <div>Announced Rank: <span id="announcedRank">-</span></div>
                     <div>Table Cards: <span id="tablePileCount">0</span></div>
+                    <div>Match ID: <input type="text" id="displayMatchId" readonly style="border: none; background: transparent; width: 280px; text-align: center; font-family: monospace;"></div>
                 </div>
             </div>
 
@@ -632,9 +655,15 @@
                 });
 
                 currentMatch = result;
-                playerId = result.players[0].id; // First player is the creator
+                // Find our player ID by name since we're the creator
+                const ourPlayer = result.players.find(p => p.name === playerName);
+                if (ourPlayer) {
+                    playerId = ourPlayer.id;
+                    console.log("Set playerId to:", playerId);
+                }
+                
                 showGameBoard();
-                showMessage(`Game created! Match ID: ${result.matchId}`);
+                showMessage(`Game created! Share the Match ID with others to join.`);
                 
                 // Show start button if enough players
                 if (result.players && result.players.length >= 2) {
@@ -659,7 +688,13 @@
             try {
                 const result = await connection.invoke("JoinExistingMatch", matchId, playerName);
                 currentMatch = result;
-                playerId = result.players[result.players.length - 1].id; // Last player is the joiner
+                // Find our player ID by name since we just joined
+                const ourPlayer = result.players.find(p => p.name === playerName);
+                if (ourPlayer) {
+                    playerId = ourPlayer.id;
+                    console.log("Set playerId to:", playerId);
+                }
+                
                 showGameBoard();
                 showMessage(`Joined game! Waiting for other players.`);
             } catch (err) {
@@ -694,6 +729,7 @@
             document.getElementById('roundNumber').textContent = gameState.roundNumber;
             document.getElementById('announcedRank').textContent = gameState.announcedRank || '-';
             document.getElementById('tablePileCount').textContent = gameState.tablePileCount;
+            document.getElementById('displayMatchId').value = gameState.matchId;
             
             // Update current player
             if (gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
@@ -771,7 +807,20 @@
             gameState.yourHand.forEach((card, index) => {
                 const cardElement = document.createElement('div');
                 cardElement.className = `card ${getSuitClass(card.suit)}`;
-                cardElement.textContent = getCardDisplay(card);
+                
+                if (card.rank === 'Joker') {
+                    cardElement.classList.add('joker');
+                    cardElement.innerHTML = `
+                        <div class="rank">🃏</div>
+                        <div class="suit">JOKER</div>
+                    `;
+                } else {
+                    cardElement.innerHTML = `
+                        <div class="rank">${card.rank}</div>
+                        <div class="suit">${getSuitSymbol(card.suit)}</div>
+                    `;
+                }
+                
                 cardElement.onclick = () => toggleCardSelection(index);
                 
                 if (selectedCards.includes(index)) {
@@ -783,13 +832,21 @@
         }
 
         function getSuitClass(suit) {
-            if (suit.toLowerCase().includes('joker')) return 'joker';
-            if (suit === 'Hearts' || suit === 'Diamonds') return 'hearts';
-            return 'clubs';
+            if (suit === 'Hearts') return 'hearts';
+            if (suit === 'Diamonds') return 'diamonds';
+            if (suit === 'Clubs') return 'clubs';
+            if (suit === 'Spades') return 'spades';
+            return 'joker';
         }
 
-        function getCardDisplay(card) {
-            return card.rank === 'Joker' ? '🃏' : card.rank;
+        function getSuitSymbol(suit) {
+            switch(suit) {
+                case 'Hearts': return '♥️';
+                case 'Diamonds': return '♦️';
+                case 'Clubs': return '♣️';
+                case 'Spades': return '♠️';
+                default: return '🃏';
+            }
         }
 
         function toggleCardSelection(cardIndex) {
@@ -817,14 +874,21 @@
             challengeBtn.classList.add('hidden');
             rankSelector.classList.add('hidden');
 
-            if (!gameState || gameState.phase !== 1) return;
+            if (!gameState || gameState.phase !== 1 || !playerId) return;
 
-            // Find current player
+            // Check if it's our turn by comparing our playerId with current player
             const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-            const isMyTurn = currentPlayer && gameState.yourHand && 
-                           currentPlayer.name === document.getElementById('playerName').value;
+            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
+            
+            console.log("Turn check - Current player:", currentPlayer, "My ID:", playerId, "Is my turn:", isMyTurn);
 
-            if (!isMyTurn) return;
+            if (!isMyTurn) {
+                // Show challenge button if not our turn but there are cards on table
+                if (gameState.tablePileCount > 0 && gameState.announcedRank) {
+                    challengeBtn.classList.remove('hidden');
+                }
+                return;
+            }
 
             // Opening turn (no announced rank yet)
             if (!gameState.announcedRank) {
