@@ -705,10 +705,13 @@
 
         // Start a new round
         async function startRound() {
-            if (!currentMatch) return;
+            if (!currentMatch || !playerId) {
+                alert('Cannot start round: match or player not found');
+                return;
+            }
 
             try {
-                await connection.invoke("StartRound", currentMatch.matchId);
+                await connection.invoke("StartRound", currentMatch.matchId, playerId);
             } catch (err) {
                 console.error("Failed to start round:", err);
                 alert("Failed to start round: " + err);
@@ -758,9 +761,12 @@
             // Update scores
             updateScoresDisplay();
 
-            // Show start button if needed
+            // Show start button only for creator and when there are enough players
             const startBtn = document.getElementById('startRoundBtn');
-            if (gameState.phase === 0 && gameState.players.length >= 2) {
+            if (gameState.phase === 0 && 
+                gameState.players.length >= 2 && 
+                playerId && 
+                gameState.creatorPlayerId === playerId) {
                 startBtn.classList.remove('hidden');
             } else {
                 startBtn.classList.add('hidden');
@@ -802,9 +808,34 @@
                 return;
             }
 
-            handCount.textContent = gameState.yourHand.length;
+            // Sort cards: Jokers first, then by rank, then by suit
+            const sortedHand = [...gameState.yourHand].sort((a, b) => {
+                // Jokers come first
+                if (a.rank === 'Joker' && b.rank !== 'Joker') return -1;
+                if (a.rank !== 'Joker' && b.rank === 'Joker') return 1;
+                if (a.rank === 'Joker' && b.rank === 'Joker') return 0;
+                
+                // Sort by rank
+                const rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+                const aRankIndex = rankOrder.indexOf(a.rank);
+                const bRankIndex = rankOrder.indexOf(b.rank);
+                
+                if (aRankIndex !== bRankIndex) {
+                    return aRankIndex - bRankIndex;
+                }
+                
+                // Sort by suit
+                const suitOrder = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+                return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+            });
 
-            gameState.yourHand.forEach((card, index) => {
+            handCount.textContent = sortedHand.length;
+
+            sortedHand.forEach((card, index) => {
+                // Find original index for selection tracking
+                const originalIndex = gameState.yourHand.findIndex(c => 
+                    c.rank === card.rank && c.suit === card.suit);
+                
                 const cardElement = document.createElement('div');
                 cardElement.className = `card ${getSuitClass(card.suit)}`;
                 
@@ -821,9 +852,9 @@
                     `;
                 }
                 
-                cardElement.onclick = () => toggleCardSelection(index);
+                cardElement.onclick = () => toggleCardSelection(originalIndex);
                 
-                if (selectedCards.includes(index)) {
+                if (selectedCards.includes(originalIndex)) {
                     cardElement.classList.add('selected');
                 }
 
@@ -880,31 +911,33 @@
             const currentPlayer = gameState.players[gameState.currentPlayerIndex];
             const isMyTurn = currentPlayer && currentPlayer.id === playerId;
             
-            console.log("Turn check - Current player:", currentPlayer, "My ID:", playerId, "Is my turn:", isMyTurn);
+            console.log("Turn check - Current player:", currentPlayer?.name, "My ID:", playerId, "Is my turn:", isMyTurn);
 
-            if (!isMyTurn) {
-                // Show challenge button if not our turn but there are cards on table
-                if (gameState.tablePileCount > 0 && gameState.announcedRank) {
-                    challengeBtn.classList.remove('hidden');
-                }
-                return;
-            }
-
-            // Opening turn (no announced rank yet)
-            if (!gameState.announcedRank) {
-                if (selectedCards.length > 0) {
-                    rankSelector.classList.remove('hidden');
-                    playBtn.classList.remove('hidden');
-                    playBtn.textContent = `Play ${selectedCards.length} Card(s)`;
+            if (isMyTurn) {
+                // It's our turn - show play options
+                if (!gameState.announcedRank) {
+                    // Opening turn (no announced rank yet)
+                    if (selectedCards.length > 0) {
+                        rankSelector.classList.remove('hidden');
+                        playBtn.classList.remove('hidden');
+                        playBtn.textContent = `Play ${selectedCards.length} Card(s)`;
+                    }
+                } else {
+                    // Subsequent turns - can play or challenge
+                    if (selectedCards.length > 0) {
+                        playBtn.classList.remove('hidden');
+                        playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
+                    }
+                    if (gameState.tablePileCount > 0) {
+                        challengeBtn.classList.remove('hidden');
+                        challengeBtn.textContent = "Challenge Previous Player";
+                    }
                 }
             } else {
-                // Subsequent turns
-                if (selectedCards.length > 0) {
-                    playBtn.classList.remove('hidden');
-                    playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
-                }
-                if (gameState.tablePileCount > 0) {
+                // Not our turn - can only challenge if there are cards on table
+                if (gameState.tablePileCount > 0 && gameState.announcedRank) {
                     challengeBtn.classList.remove('hidden');
+                    challengeBtn.textContent = `Challenge ${currentPlayer?.name || 'Previous Player'}`;
                 }
             }
         }

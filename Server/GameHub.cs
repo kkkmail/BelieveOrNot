@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
 
 public class GameHub : Hub
@@ -39,7 +39,8 @@ public class GameHub : Hub
                 HandCount = p.Hand.Count,
                 Score = p.Score,
                 IsConnected = p.IsConnected
-            }).ToList()
+            }).ToList(),
+            CreatorPlayerId = match.Players[0].Id
         };
         
         await Clients.Group($"match:{match.Id}").SendAsync("StateUpdate", state, Guid.Empty);
@@ -62,17 +63,24 @@ public class GameHub : Hub
                 HandCount = p.Hand.Count,
                 Score = p.Score,
                 IsConnected = p.IsConnected
-            }).ToList()
+            }).ToList(),
+            CreatorPlayerId = match.Players[0].Id
         };
         
         await Clients.Group($"match:{matchId}").SendAsync("StateUpdate", state, Guid.Empty);
         return match;
     }
     
-    public async Task StartRound(Guid matchId)
+    public async Task StartRound(Guid matchId, Guid requestingPlayerId)
     {
         var match = _matchManager.GetMatch(matchId);
         if (match == null) throw new HubException("Match not found");
+        
+        // Check if requesting player is the creator (first player)
+        if (requestingPlayerId != match.Players[0].Id)
+        {
+            throw new HubException("Only the match creator can start the round");
+        }
 
         _gameEngine.StartNewRound(match);
         
@@ -80,6 +88,7 @@ public class GameHub : Hub
         foreach (var player in match.Players)
         {
             var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, player.Id);
+            playerState.CreatorPlayerId = match.Players[0].Id;
             await Clients.Group($"match:{matchId}").SendAsync("StateUpdate", playerState, Guid.Empty);
         }
     }
@@ -99,9 +108,7 @@ public class GameHub : Hub
         var gameMatch = _matchManager.GetMatch(request.MatchId);
         if (gameMatch == null) throw new HubException("Match not found");
 
-        // We need to identify the player making this request
-        // For now, we'll assume it's the current turn player
-        // In a real implementation, you'd track connection IDs to player IDs
+        // Use the player ID from the current turn (for now - this is the original approach)
         var currentPlayer = gameMatch.Players[gameMatch.CurrentPlayerIndex];
         
         try
@@ -114,6 +121,7 @@ public class GameHub : Hub
             {
                 var playerState = _gameEngine.CreateGameStateDtoForPlayer(gameMatch, player.Id);
                 playerState.LastAction = state.LastAction;
+                playerState.CreatorPlayerId = gameMatch.Players[0].Id;
                 await Clients.Group($"match:{request.MatchId}").SendAsync("StateUpdate", playerState, request.ClientCmdId);
             }
             
