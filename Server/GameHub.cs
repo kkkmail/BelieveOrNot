@@ -108,12 +108,10 @@ public class GameHub : Hub
         var gameMatch = _matchManager.GetMatch(request.MatchId);
         if (gameMatch == null) throw new HubException("Match not found");
 
-        // Use the player ID from the current turn (for now - this is the original approach)
-        var currentPlayer = gameMatch.Players[gameMatch.CurrentPlayerIndex];
-        
         try
         {
-            var state = _gameEngine.SubmitMove(gameMatch, currentPlayer.Id, request);
+            // Use the player ID from the request
+            var state = _gameEngine.SubmitMove(gameMatch, request.PlayerId, request);
             _processedCommands.TryAdd(request.ClientCmdId, request.MatchId);
 
             // Send personalized state to each player in the match

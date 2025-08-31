@@ -1,4 +1,4 @@
-﻿public class GameEngine : IGameEngine
+public class GameEngine : IGameEngine
 {
     private readonly Random _random = new();
     
@@ -22,12 +22,11 @@
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
 
-        // Deal cards
-        int playerIndex = 0;
-        foreach (var card in deck)
+        // Deal cards properly - one by one to each player
+        for (int cardIndex = 0; cardIndex < deck.Count; cardIndex++)
         {
-            match.Players[playerIndex].Hand.Add(card);
-            playerIndex = (playerIndex + 1) % match.Players.Count;
+            var playerIndex = cardIndex % match.Players.Count;
+            match.Players[playerIndex].Hand.Add(deck[cardIndex]);
         }
 
         // Auto-dispose four-of-a-kinds
@@ -82,10 +81,15 @@
     
     private void HandlePlayAction(Match match, Player player, SubmitMoveRequest request, out string result)
     {
-        // Remove cards from player's hand
-        foreach (var card in request.Cards!)
+        // Remove cards from player's hand using proper matching
+        foreach (var cardToRemove in request.Cards!)
         {
-            player.Hand.Remove(card);
+            var cardInHand = player.Hand.FirstOrDefault(c => 
+                c.Rank == cardToRemove.Rank && c.Suit == cardToRemove.Suit);
+            if (cardInHand != null)
+            {
+                player.Hand.Remove(cardInHand);
+            }
         }
         
         // Add cards to table pile
@@ -134,6 +138,7 @@
         
         // Collector takes all cards
         collector.Hand.AddRange(match.TablePile);
+        var collectedCount = match.TablePile.Count;
         match.TablePile.Clear();
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
@@ -145,7 +150,7 @@
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = (collectorIndex + 1) % match.Players.Count;
         
-        result += $" {collector.Name} collected {match.TablePile.Count} cards";
+        result += $" {collector.Name} collected {collectedCount} cards";
     }
     
     private void AutoDisposeFourOfAKind(Player player)
@@ -198,21 +203,25 @@
     {
         if (match.Phase != GamePhase.InProgress) return false;
         
-        var currentPlayer = match.Players[match.CurrentPlayerIndex];
-        if (currentPlayer.Id != playerId) return false;
-        
-        var player = match.Players.First(p => p.Id == playerId);
+        var player = match.Players.FirstOrDefault(p => p.Id == playerId);
+        if (player == null) return false;
         
         if (request.Action == ActionType.Play)
         {
+            // For play actions, must be current player's turn
+            var currentPlayer = match.Players[match.CurrentPlayerIndex];
+            if (currentPlayer.Id != playerId) return false;
+            
             // Validate play action
             if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)
                 return false;
             
-            // Check player has these cards
-            foreach (var card in request.Cards)
+            // Check player has these cards (proper matching)
+            foreach (var requestedCard in request.Cards)
             {
-                if (!player.Hand.Contains(card)) return false;
+                var hasCard = player.Hand.Any(c => 
+                    c.Rank == requestedCard.Rank && c.Suit == requestedCard.Suit);
+                if (!hasCard) return false;
             }
             
             // Opening turn must declare rank
@@ -225,7 +234,8 @@
         }
         else if (request.Action == ActionType.Challenge)
         {
-            // Can only challenge if there's a table pile with announced rank
+            // Can challenge if there's a table pile with announced rank
+            // Don't need to be current player to challenge
             if (match.TablePile.Count == 0 || match.AnnouncedRank == null)
                 return false;
             

@@ -960,6 +960,7 @@
                 await connection.invoke("SubmitMove", {
                     matchId: gameState.matchId,
                     clientCmdId: generateGuid(),
+                    playerId: playerId,
                     action: 0, // Play
                     cards: cardsToPlay,
                     declaredRank: declaredRank
@@ -1020,6 +1021,7 @@
                 await connection.invoke("SubmitMove", {
                     matchId: gameState.matchId,
                     clientCmdId: generateGuid(),
+                    playerId: playerId,
                     action: 1, // Challenge
                     challengePickIndex: selectedChallengeIndex
                 });
