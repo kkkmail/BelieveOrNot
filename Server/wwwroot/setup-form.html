@@ -1,0 +1,41 @@
+<h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
+
+<div class="setup-form">
+    <div class="form-group">
+        <label for="playerName">Your Name:</label>
+        <input type="text" id="playerName" placeholder="Enter your name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="deckSize">Deck Size:</label>
+        <select id="deckSize">
+            <option value="32">32 cards (7-A)</option>
+            <option value="36">36 cards (6-A)</option>
+            <option value="52" selected>52 cards (2-A)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="jokerCount">Number of Jokers:</label>
+        <select id="jokerCount">
+            <option value="0" selected>0</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary" onclick="createMatch()">Create New Game</button>
+
+    <div style="text-align: center; margin: 20px 0; color: #666;">
+        <hr style="margin: 10px 0;">
+        <span>Or</span>
+        <hr style="margin: 10px 0;">
+    </div>
+
+    <div class="form-group">
+        <label for="matchId">Match ID to Join:</label>
+        <input type="text" id="matchId" placeholder="Enter match ID">
+    </div>
+
+    <button class="btn btn-secondary" onclick="joinMatch()">Join Existing Game</button>
+</div>

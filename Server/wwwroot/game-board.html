@@ -1,0 +1,85 @@
+<!-- Game Status -->
+<div class="game-status">
+    <h2 id="gamePhase">Waiting for Players</h2>
+    <div class="status-info">
+        <div>Round: <span id="roundNumber">0</span></div>
+        <div>Current Turn: <span id="currentPlayerName">-</span></div>
+        <div>Announced Rank: <span id="announcedRank">-</span></div>
+        <div>Table Cards: <span id="tablePileCount">0</span></div>
+        <div>Match ID: <input type="text" id="displayMatchId" readonly style="border: none; background: transparent; width: 280px; text-align: center; font-family: monospace;"></div>
+    </div>
+</div>
+
+<!-- Players Area -->
+<div class="players-area" id="playersArea">
+    <!-- Players will be populated here -->
+</div>
+
+<!-- Table Area -->
+<div class="table-area">
+    <div class="table-pile">
+        <h3>Table Pile</h3>
+        <div id="tablePileDisplay">No cards on table</div>
+    </div>
+    <button class="btn btn-success hidden" id="startRoundBtn" onclick="startRound()">Start Round</button>
+</div>
+
+<!-- Hand Area -->
+<div class="hand-area">
+    <h3>Your Hand (<span id="handCount">0</span> cards)</h3>
+    <div class="hand-cards" id="handCards">
+        <!-- Player's cards will be populated here -->
+    </div>
+
+    <!-- Actions Area -->
+    <div class="actions-area" id="actionsArea">
+        <!-- Opening turn rank selection -->
+        <div class="rank-selector hidden" id="rankSelector">
+            <label for="declaredRank">Declare Rank:</label>
+            <select id="declaredRank">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="J">J</option>
+                <option value="Q">Q</option>
+                <option value="K">K</option>
+                <option value="A">A</option>
+                <option value="Joker">Joker</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary hidden" id="playBtn" onclick="playCards()">Play Selected Cards</button>
+        <button class="btn btn-warning hidden" id="challengeBtn" onclick="showChallenge()">Challenge!</button>
+    </div>
+
+    <!-- Challenge Area -->
+    <div class="challenge-area hidden" id="challengeArea">
+        <h3>Choose a card to flip from the last play:</h3>
+        <div class="challenge-cards" id="challengeCards">
+            <!-- Challenge cards will be populated here -->
+        </div>
+        <div>
+            <button class="btn btn-warning" onclick="submitChallenge()">Flip Selected Card</button>
+            <button class="btn btn-secondary" onclick="hideChallenge()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scoring Area -->
+<div class="scoring-area">
+    <h3>Scores</h3>
+    <div class="score-table" id="scoreTable">
+        <!-- Scores will be populated here -->
+    </div>
+</div>
+
+<!-- Message Area -->
+<div class="message-area" id="messageArea">
+    Welcome to Believe Or Not! Wait for other players to join.
+</div>

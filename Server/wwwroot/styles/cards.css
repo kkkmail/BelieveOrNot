@@ -1,0 +1,64 @@
+/* Card Styles */
+.card {
+    width: 90px;
+    height: 130px;
+    border: 3px solid #333;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+}
+
+.card.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+    transform: translateY(-15px);
+}
+
+.card .rank {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.card .suit {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.card.hearts {
+    color: #dc3545;
+}
+
+.card.diamonds {
+    color: #dc3545;
+}
+
+.card.clubs {
+    color: #333;
+}
+
+.card.spades {
+    color: #333;
+}
+
+.card.joker {
+    background: linear-gradient(45deg, #ff6b6b, #feca57);
+    color: white;
+    border-color: #ff6b6b;
+    font-size: 18px;
+}
