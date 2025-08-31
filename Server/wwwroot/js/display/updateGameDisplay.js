@@ -1,4 +1,3 @@
-// Update the game display based on current state
 function updateGameDisplay() {
     if (!gameState) return;
 
@@ -7,6 +6,9 @@ function updateGameDisplay() {
     document.getElementById('announcedRank').textContent = gameState.announcedRank || '-';
     document.getElementById('tablePileCount').textContent = gameState.tablePileCount;
     document.getElementById('displayMatchId').value = gameState.matchId;
+
+    // Update table pile display
+    updateTablePileDisplay();
 
     // Update current player
     if (gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
@@ -45,4 +47,7 @@ function updateGameDisplay() {
     } else {
         startBtn.classList.add('hidden');
     }
+
+    // Clear any lingering card selections after state update
+    selectedCards = [];
 }

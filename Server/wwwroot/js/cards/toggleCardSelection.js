@@ -10,6 +10,11 @@ function toggleCardSelection(cardIndex) {
             return;
         }
     }
+    
+    // Update display immediately and clear any phantom selections
     updateHandDisplay();
     updateActionsDisplay();
+    
+    // Force refresh of card selection state
+    console.log('Selected cards:', selectedCards);
 }

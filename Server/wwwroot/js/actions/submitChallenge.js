@@ -4,6 +4,22 @@ async function submitChallenge() {
         return;
     }
 
+    // Show confirmation dialog
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    const isMyTurn = currentPlayer && currentPlayer.id === playerId;
+    const targetPlayer = isMyTurn 
+        ? gameState.players[(gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length]
+        : currentPlayer;
+
+    const confirmed = confirm(
+        `Are you sure you want to challenge ${targetPlayer?.name || 'the previous player'}?\n` +
+        `You are challenging that card ${selectedChallengeIndex + 1} is NOT a ${gameState.announcedRank}.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
     try {
         await connection.invoke("SubmitMove", {
             matchId: gameState.matchId,

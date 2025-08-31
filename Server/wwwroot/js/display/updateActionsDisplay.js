@@ -15,6 +15,7 @@ function updateActionsDisplay() {
     const isMyTurn = currentPlayer && currentPlayer.id === playerId;
 
     console.log("Turn check - Current player:", currentPlayer?.name, "My ID:", playerId, "Is my turn:", isMyTurn);
+    console.log("Game state - tablePileCount:", gameState.tablePileCount, "announcedRank:", gameState.announcedRank);
 
     if (isMyTurn) {
         // It's our turn - show play options
@@ -31,16 +32,22 @@ function updateActionsDisplay() {
                 playBtn.classList.remove('hidden');
                 playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
             }
-            if (gameState.tablePileCount > 0) {
+            
+            // Show challenge button if there are cards on the table to challenge
+            if (gameState.tablePileCount > 0 && gameState.announcedRank) {
+                // Get the player who played the last cards (previous player)
+                const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+                const previousPlayer = gameState.players[previousPlayerIndex];
+                
                 challengeBtn.classList.remove('hidden');
-                challengeBtn.textContent = "Challenge Previous Player";
+                challengeBtn.textContent = `Challenge ${previousPlayer.name}`;
             }
         }
     } else {
-        // Not our turn - can only challenge if there are cards on table
+        // Not our turn - can challenge if there are cards on table from current player
         if (gameState.tablePileCount > 0 && gameState.announcedRank) {
             challengeBtn.classList.remove('hidden');
-            challengeBtn.textContent = `Challenge ${currentPlayer?.name || 'Previous Player'}`;
+            challengeBtn.textContent = `Challenge ${currentPlayer.name}`;
         }
     }
 }
