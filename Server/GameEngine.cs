@@ -68,12 +68,8 @@ public class GameEngine : IGameEngine
             HandleChallengeAction(match, player, request, out result);
         }
 
-        // Check for round end
-        if (match.Players.Any(p => p.Hand.Count == 0))
-        {
-            EndRound(match);
-            result += " Round ended!";
-        }
+        // DO NOT check for round end here
+        // The round continues regardless of player card counts
 
         var state = CreateGameStateDto(match, playerId);
         state.LastAction = result;
@@ -112,6 +108,9 @@ public class GameEngine : IGameEngine
 
         // Auto-dispose four-of-a-kind after play
         AutoDisposeFourOfAKind(player);
+
+        // REMOVED: Do not check for round end here
+        // Just continue to next player
 
         // Next player's turn
         match.CurrentPlayerIndex = (match.CurrentPlayerIndex + 1) % match.Players.Count;
@@ -153,6 +152,9 @@ public class GameEngine : IGameEngine
 
         // Auto-dispose four-of-a-kind after collection
         AutoDisposeFourOfAKind(collector);
+
+        // REMOVED: Do not check for round end here either
+        // Challenge resolution continues the game normally
 
         // Next turn goes to left of collector
         var collectorIndex = match.Players.IndexOf(collector);
