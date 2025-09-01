@@ -1,6 +1,5 @@
 async function initializeConnection() {
-    // Update this URL to match your server address
-    const serverUrl = "http://localhost:5000/game"; // or https://localhost:5001/game
+    const serverUrl = "http://localhost:5000/game";
 
     connection = new signalR.HubConnectionBuilder()
         .withUrl(serverUrl)
@@ -8,12 +7,24 @@ async function initializeConnection() {
         .build();
 
     connection.on("StateUpdate", (state, clientCmdIdEcho) => {
-        console.log("Game state updated:", state);
+        console.log("=== STATE UPDATE RECEIVED ===");
+        console.log("Full state:", state);
+        console.log("LastAction:", state.LastAction);
+        console.log("===========================");
+        
         gameState = state;
         
         // If there's a LastAction, show it as a game event
         if (state.LastAction && state.LastAction.trim() !== '') {
-            console.log("Broadcasting game event:", state.LastAction);
+            console.log("Processing LastAction:", state.LastAction);
+            
+            // Test the message system directly
+            const messageArea = document.getElementById('messageArea');
+            console.log("Message area element:", messageArea);
+            
+            if (messageArea) {
+                console.log("Current message area content before update:", messageArea.innerHTML);
+            }
             
             // Parse and enhance event messages for better display
             let eventMessage = state.LastAction;
@@ -33,7 +44,23 @@ async function initializeConnection() {
                 eventMessage = '🎯 ' + eventMessage;
             }
             
-            showMessage(eventMessage, 0, true); // Show as persistent game event
+            console.log("Processed event message:", eventMessage);
+            console.log("About to call showMessage...");
+            
+            // Call showMessage and see what happens
+            showMessage(eventMessage, 0, true);
+            
+            console.log("showMessage called");
+            
+            // Check message area after update
+            if (messageArea) {
+                console.log("Message area content after showMessage:", messageArea.innerHTML);
+            }
+            
+            // Also check the event history
+            console.log("Current event history:", window.gameEventHistory);
+        } else {
+            console.log("No LastAction in state update");
         }
         
         updateGameDisplay();
