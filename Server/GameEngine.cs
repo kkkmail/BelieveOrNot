@@ -38,7 +38,7 @@ public class GameEngine : IGameEngine
         match.Phase = GamePhase.InProgress;
         match.RoundNumber++;
 
-        var roundStartMessage = $"Round {match.RoundNumber} started!";
+        var roundStartMessage = $"🎯 Round {match.RoundNumber} started!";
         if (disposalEvents.Any())
         {
             roundStartMessage += " " + string.Join(" ", disposalEvents);
@@ -120,6 +120,8 @@ public class GameEngine : IGameEngine
             result += " " + string.Join(" ", disposalEvents);
         }
 
+        // FIXED: Round does NOT end when someone plays their last card
+        // Round continues - next player can challenge or play
         AdvanceToNextActivePlayer(match);
     }
 
@@ -166,7 +168,6 @@ public class GameEngine : IGameEngine
 
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = collectorIndex;
-        AdvanceToNextActivePlayer(match);
 
         result = challengeDetails + " " + challengeResult;
         if (disposalEvents.Any())
@@ -174,11 +175,19 @@ public class GameEngine : IGameEngine
             result += " " + string.Join(" ", disposalEvents);
         }
 
+        // CORRECT RULE: Round ends ONLY after challenge if at least one player has zero cards
         var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
         if (playersWithNoCards.Any())
         {
             EndRound(match);
-            result += " " + (match.LastRoundEndMessage ?? "Round ended!");
+            if (!string.IsNullOrEmpty(match.LastRoundEndMessage))
+            {
+                result += " " + match.LastRoundEndMessage;
+            }
+        }
+        else
+        {
+            AdvanceToNextActivePlayer(match);
         }
     }
 
@@ -215,7 +224,8 @@ public class GameEngine : IGameEngine
 
             if (attempts >= maxAttempts)
             {
-                EndRound(match);
+                // This should not happen in normal gameplay
+                Console.WriteLine("WARNING: All players have 0 cards but round hasn't ended - this shouldn't happen");
                 break;
             }
         } while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
@@ -276,20 +286,22 @@ public class GameEngine : IGameEngine
         string roundEndMessage;
         if (winners.Count == 1)
         {
-            roundEndMessage = $"Round {match.RoundNumber} ended! {winners[0].Name} wins!";
+            roundEndMessage = $"🏁 Round {match.RoundNumber} ended! {winners[0].Name} wins!";
         }
         else if (winners.Count > 1)
         {
             var winnerNames = string.Join(", ", winners.Select(w => w.Name));
-            roundEndMessage = $"Round {match.RoundNumber} ended! Winners: {winnerNames}";
+            roundEndMessage = $"🏁 Round {match.RoundNumber} ended! Winners: {winnerNames}";
         }
         else
         {
-            roundEndMessage = $"Round {match.RoundNumber} ended!";
+            roundEndMessage = $"🏁 Round {match.RoundNumber} ended!";
         }
 
         roundEndMessage += " Scoring: " + string.Join(", ", roundResults);
         match.LastRoundEndMessage = roundEndMessage;
+
+        Console.WriteLine($"Round ended: {roundEndMessage}");
     }
 
     public bool IsValidMove(Match match, Guid playerId, SubmitMoveRequest request)
@@ -305,6 +317,16 @@ public class GameEngine : IGameEngine
 
             var currentPlayer = match.Players[match.CurrentPlayerIndex];
             if (currentPlayer.Id != playerId) return false;
+
+            // FIXED: 2-player rule - if one player has 0 cards, the other can only challenge (not play)
+            if (match.Players.Count == 2)
+            {
+                var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
+                if (playersWithNoCards.Any())
+                {
+                    return false; // Cannot play when opponent has 0 cards in 2-player game
+                }
+            }
 
             if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)
                 return false;
