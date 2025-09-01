@@ -18,14 +18,6 @@ async function initializeConnection() {
         if (state.LastAction && state.LastAction.trim() !== '') {
             console.log("Processing LastAction:", state.LastAction);
             
-            // Test the message system directly
-            const messageArea = document.getElementById('messageArea');
-            console.log("Message area element:", messageArea);
-            
-            if (messageArea) {
-                console.log("Current message area content before update:", messageArea.innerHTML);
-            }
-            
             // Parse and enhance event messages for better display
             let eventMessage = state.LastAction;
             
@@ -51,19 +43,19 @@ async function initializeConnection() {
             showMessage(eventMessage, 0, true);
             
             console.log("showMessage called");
-            
-            // Check message area after update
-            if (messageArea) {
-                console.log("Message area content after showMessage:", messageArea.innerHTML);
-            }
-            
-            // Also check the event history
-            console.log("Current event history:", window.gameEventHistory);
         } else {
             console.log("No LastAction in state update");
         }
         
         updateGameDisplay();
+    });
+
+    // NEW: Listen for message broadcasts from other players
+    connection.on("MessageBroadcast", (message, senderName) => {
+        console.log("Message broadcast received:", message, "from:", senderName);
+        
+        // Add the message to local history and display
+        addToEventHistory(message);
     });
 
     try {

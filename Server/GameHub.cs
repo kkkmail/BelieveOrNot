@@ -17,6 +17,24 @@ public class GameHub : Hub
         _matchManager = matchManager;
     }
 
+    // NEW: Method to broadcast messages to all players in a match
+    public async Task BroadcastMessage(Guid matchId, string message)
+    {
+        var match = _matchManager.GetMatch(matchId);
+        if (match == null) throw new HubException("Match not found");
+
+        // Find the requesting player
+        var connectionInfo = _connectionToPlayer.FirstOrDefault(kvp => kvp.Key == Context.ConnectionId);
+        if (connectionInfo.Key == null) throw new HubException("Player not found");
+
+        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == connectionInfo.Value.PlayerId);
+        if (requestingPlayer == null) throw new HubException("Player not in match");
+
+        // Broadcast the message to all players in the match
+        var timestampedMessage = $"{DateTime.Now:HH:mm:ss}: {message}";
+        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", timestampedMessage, requestingPlayer.Name);
+    }
+
     public async Task<GameStateDto> CreateOrJoinMatch(CreateMatchRequest request)
     {
         Match match;
