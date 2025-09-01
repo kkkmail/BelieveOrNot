@@ -24,7 +24,7 @@ function updateCardPileDisplay() {
         return;
     }
 
-    // FIXED: Create visual stack of full-size cards with LEFT offset (growth direction)
+    // FIXED: Create visual stack with ONLY horizontal offset (no diagonal)
     cardPile.innerHTML = '';
     
     // Show exact number of cards with LEFT offset to simulate growth
@@ -39,10 +39,10 @@ function updateCardPileDisplay() {
         const cardBack = document.createElement('div');
         cardBack.className = 'card-back pile-card';
         cardBack.style.position = 'absolute';
-        cardBack.style.left = `${startX - (i * offsetX)}px`; // FIXED: Cards grow to the left
-        cardBack.style.top = `${i * 1}px`; // Slight vertical offset
+        cardBack.style.left = `${startX - (i * offsetX)}px`; // Cards grow to the left
+        cardBack.style.top = '0px'; // FIXED: No vertical offset - purely horizontal
         cardBack.style.zIndex = i;
-        cardBack.style.width = `${cardWidth}px`; // FIXED: Same size as hand cards
+        cardBack.style.width = `${cardWidth}px`;
         cardBack.style.height = `${cardHeight}px`;
         
         cardPile.appendChild(cardBack);
@@ -108,15 +108,25 @@ function handlePreviousCardClick(cardIndex) {
     // Check if we can challenge
     if (!gameState || gameState.phase !== 1) {
         console.log("Cannot challenge: game not in progress");
+        showMessage("Cannot challenge: game not in progress", 3000, false);
         return;
     }
     
     if (!gameState.tablePileCount || gameState.tablePileCount === 0) {
         console.log("Cannot challenge: no cards on table");
+        showMessage("Cannot challenge: no cards on table", 3000, false);
         return;
     }
     
-    // Check if it's the right time to challenge (not our turn, or 2-player special case)
+    if (!gameState.announcedRank) {
+        console.log("Cannot challenge: no announced rank");
+        showMessage("Cannot challenge: no announced rank", 3000, false);
+        return;
+    }
+    
+    // FIXED: Challenge logic - can challenge when:
+    // 1. It's our turn (normal challenge)
+    // 2. OR in 2-player game when opponent has 0 cards
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     const isMyTurn = currentPlayer && currentPlayer.id === playerId;
     
@@ -124,11 +134,20 @@ function handlePreviousCardClick(cardIndex) {
     const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
     const is2PlayerWithZeroCards = gameState.players.length === 2 && playersWithNoCards.length > 0;
     
-    const canChallenge = !isMyTurn || is2PlayerWithZeroCards;
+    // FIXED: Can challenge when it IS our turn, OR 2-player special case
+    const canChallenge = isMyTurn || is2PlayerWithZeroCards;
+    
+    console.log("Challenge check:", {
+        isMyTurn,
+        is2PlayerWithZeroCards,
+        canChallenge,
+        currentPlayerName: currentPlayer?.name,
+        myPlayerId: playerId
+    });
     
     if (!canChallenge) {
-        console.log("Cannot challenge: not the right time");
-        showMessage("You can challenge when it's not your turn, or when opponent has 0 cards in 2-player game!", 3000, false);
+        console.log("Cannot challenge: not the right conditions");
+        showMessage("You can only challenge when it's your turn!", 3000, false);
         return;
     }
     
