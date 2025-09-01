@@ -35,23 +35,29 @@ public class MatchManager : IMatchManager
             throw new InvalidOperationException("Cannot join match in progress");
         }
         
-        // ENHANCEMENT: Handle duplicate names
+        // Handle duplicate names
         var uniqueName = EnsureUniqueName(match, playerName);
         
         match.Players.Add(new Player { Name = uniqueName });
         return match;
     }
     
-    // NEW: Shuffle players (except creator) before new round
+    // Shuffle players (except creator) before new round
     public void ShufflePlayersForNewRound(Match match)
     {
-        if (match.Players.Count <= 2) return; // No need to shuffle with 2 or fewer players
+        if (match.Players.Count <= 2) 
+        {
+            Console.WriteLine("No shuffling needed: 2 or fewer players");
+            return; // No need to shuffle with 2 or fewer players
+        }
         
         // Keep the creator (first player) in position, shuffle the rest
         var creator = match.Players[0];
         var otherPlayers = match.Players.Skip(1).ToList();
         
-        // Shuffle other players
+        Console.WriteLine($"Before shuffle: {string.Join(", ", match.Players.Select(p => p.Name))}");
+        
+        // Shuffle other players using Fisher-Yates algorithm
         for (int i = otherPlayers.Count - 1; i > 0; i--)
         {
             int j = _random.Next(i + 1);
@@ -63,10 +69,11 @@ public class MatchManager : IMatchManager
         match.Players.Add(creator);
         match.Players.AddRange(otherPlayers);
         
-        Console.WriteLine($"Players shuffled for new round: {string.Join(", ", match.Players.Select(p => p.Name))}");
+        Console.WriteLine($"After shuffle: {string.Join(", ", match.Players.Select(p => p.Name))}");
+        Console.WriteLine($"Creator '{creator.Name}' remains at position 0");
     }
     
-    // NEW: Ensure unique player names
+    // Ensure unique player names
     private string EnsureUniqueName(Match match, string desiredName)
     {
         var existingNames = match.Players.Select(p => p.Name).ToHashSet();

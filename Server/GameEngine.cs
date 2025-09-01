@@ -1,6 +1,13 @@
 public class GameEngine : IGameEngine
 {
     private readonly Random _random = new();
+    private readonly IMatchManager _matchManager;
+
+    // Constructor for dependency injection
+    public GameEngine(IMatchManager matchManager)
+    {
+        _matchManager = matchManager;
+    }
 
     public GameStateDto StartNewRound(Match match)
     {
@@ -8,6 +15,9 @@ public class GameEngine : IGameEngine
         {
             throw new InvalidOperationException("Need at least 2 players to start a round");
         }
+
+        // FIXED: Shuffle players (except creator) at the beginning of each new round
+        _matchManager.ShufflePlayersForNewRound(match);
 
         var deck = DeckBuilder.BuildDeck(match.Settings.DeckSize, match.Settings.JokerCount);
         DeckBuilder.Shuffle(deck, _random);
@@ -49,6 +59,7 @@ public class GameEngine : IGameEngine
         return state;
     }
 
+    // ... rest of the methods remain the same as in the previous artifact
     public GameStateDto CreateGameStateDtoForPlayer(Match match, Guid playerId)
     {
         return CreateGameStateDto(match, playerId);
@@ -120,8 +131,6 @@ public class GameEngine : IGameEngine
             result += " " + string.Join(" ", disposalEvents);
         }
 
-        // FIXED: Round does NOT end when someone plays their last card
-        // Round continues - next player can challenge or play
         AdvanceToNextActivePlayer(match);
     }
 
@@ -175,7 +184,6 @@ public class GameEngine : IGameEngine
             result += " " + string.Join(" ", disposalEvents);
         }
 
-        // CORRECT RULE: Round ends ONLY after challenge if at least one player has zero cards
         var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
         if (playersWithNoCards.Any())
         {
@@ -224,7 +232,6 @@ public class GameEngine : IGameEngine
 
             if (attempts >= maxAttempts)
             {
-                // This should not happen in normal gameplay
                 Console.WriteLine("WARNING: All players have 0 cards but round hasn't ended - this shouldn't happen");
                 break;
             }
@@ -318,13 +325,12 @@ public class GameEngine : IGameEngine
             var currentPlayer = match.Players[match.CurrentPlayerIndex];
             if (currentPlayer.Id != playerId) return false;
 
-            // FIXED: 2-player rule - if one player has 0 cards, the other can only challenge (not play)
             if (match.Players.Count == 2)
             {
                 var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
                 if (playersWithNoCards.Any())
                 {
-                    return false; // Cannot play when opponent has 0 cards in 2-player game
+                    return false;
                 }
             }
 
