@@ -11,7 +11,8 @@ function showChallenge() {
         lastPlayCardCount: gameState.lastPlayCardCount,
         LastPlayCardCount: gameState.LastPlayCardCount,
         currentPlayerIndex: gameState.currentPlayerIndex,
-        announcedRank: gameState.announcedRank
+        announcedRank: gameState.announcedRank,
+        selectedChallengeIndex: selectedChallengeIndex
     });
 
     // Determine how many cards to show for challenge
@@ -36,14 +37,16 @@ function showChallenge() {
 
     console.log(`Showing ${cardsToShow} cards for challenge (last play count: ${lastPlayCount})`);
 
-    // Reset selection
-    selectedChallengeIndex = -1;
-
     // Create challenge cards with proper event handling
     for (let i = 0; i < cardsToShow; i++) {
         const cardElement = document.createElement('div');
         cardElement.className = 'challenge-card';
         cardElement.textContent = `Card ${i + 1}`;
+        
+        // FIXED: Check if this card is already selected (from table click)
+        if (selectedChallengeIndex === i) {
+            cardElement.classList.add('selected');
+        }
         
         // Use proper event listener instead of onclick to prevent violations
         cardElement.addEventListener('click', function(event) {
@@ -60,4 +63,7 @@ function showChallenge() {
     if (instruction) {
         instruction.textContent = `Choose a card to flip from the last play (${cardsToShow} cards):`;
     }
+    
+    // FIXED: Update table display to show current selection
+    updatePreviousPlayDisplay();
 }

@@ -1,4 +1,4 @@
-/* Game Board Styles - Updated for new table layout */
+/* Game Board Styles - Updated layout with last play on right */
 .game-board {
     background: rgba(255,255,255,0.95);
     padding: 30px;
@@ -121,7 +121,7 @@
     color: #666;
 }
 
-/* Updated table area with new layout */
+/* Updated table area layout */
 .table-area {
     text-align: center;
     margin-bottom: 30px;
@@ -133,19 +133,20 @@
 
 .table-display {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: flex-start;
     gap: 40px;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
-/* Card pile section */
+/* Card pile section - LEFT SIDE */
 .table-pile-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    flex: 1;
 }
 
 .pile-label {
@@ -156,7 +157,7 @@
 
 .card-pile {
     position: relative;
-    width: 80px;
+    width: 100px; /* Wider to accommodate horizontal spread */
     height: 110px;
     margin: 10px;
 }
@@ -167,12 +168,13 @@
     font-weight: 600;
 }
 
-/* Previous play section */
+/* Previous play section - RIGHT SIDE */
 .previous-play-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    flex: 1;
 }
 
 .play-label {
@@ -186,7 +188,7 @@
     gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
-    min-height: 110px;
+    min-height: 130px; /* Match hand card height */
     align-items: center;
 }
 
@@ -194,6 +196,7 @@
     font-size: 14px;
     color: #666;
     font-weight: 600;
+    text-align: center;
 }
 
 .hand-area {
@@ -232,8 +235,8 @@
 }
 
 .challenge-card {
-    width: 70px;
-    height: 100px;
+    width: 90px; /* Same size as hand cards */
+    height: 130px;
     border: 2px solid #ffc107;
     border-radius: 8px;
     display: flex;
@@ -296,4 +299,22 @@
     font-size: 18px;
     font-weight: bold;
     color: #007bff;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .table-display {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .table-pile-section,
+    .previous-play-section {
+        flex: none;
+    }
+    
+    .card-pile {
+        width: 80px;
+    }
 }

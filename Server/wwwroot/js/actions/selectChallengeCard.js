@@ -1,8 +1,8 @@
 function selectChallengeCard(index) {
-    // Clear any previous selection
+    // Set the selected challenge index
     selectedChallengeIndex = index;
 
-    // Update visual selection
+    // Update visual selection in challenge area
     const challengeCards = document.querySelectorAll('.challenge-card');
     challengeCards.forEach((card, i) => {
         card.classList.remove('selected');
@@ -11,5 +11,8 @@ function selectChallengeCard(index) {
         }
     });
     
-    console.log(`Selected challenge card at index: ${index}`);
+    // FIXED: Also update the table display to show the selection
+    updatePreviousPlayDisplay();
+    
+    console.log(`Selected challenge card at index: ${index} (synced with table display)`);
 }

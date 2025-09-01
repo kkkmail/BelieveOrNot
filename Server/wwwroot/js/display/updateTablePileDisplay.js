@@ -24,41 +24,19 @@ function updateCardPileDisplay() {
         return;
     }
 
-    // Create visual stack of face-down cards
+    // Create visual stack of face-down cards with horizontal offset
     cardPile.innerHTML = '';
     
-    // Show up to 5 card backs stacked with slight offset
-    const cardsToShow = Math.min(pileCardCount, 5);
-    
-    for (let i = 0; i < cardsToShow; i++) {
+    // Show all cards with slight horizontal offset (no limit of 5)
+    for (let i = 0; i < pileCardCount; i++) {
         const cardBack = document.createElement('div');
         cardBack.className = 'card-back';
         cardBack.style.position = 'absolute';
-        cardBack.style.left = `${i * 2}px`;
-        cardBack.style.top = `${i * 2}px`;
+        cardBack.style.left = `${i * 3}px`; // Increased horizontal offset
+        cardBack.style.top = `${i * 1}px`; // Slight vertical offset
         cardBack.style.zIndex = i;
         
         cardPile.appendChild(cardBack);
-    }
-    
-    // If there are more than 5 cards, show a count indicator
-    if (pileCardCount > 5) {
-        const countIndicator = document.createElement('div');
-        countIndicator.className = 'pile-count-indicator';
-        countIndicator.textContent = `+${pileCardCount - 5}`;
-        countIndicator.style.cssText = `
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #dc3545;
-            color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: bold;
-            z-index: 10;
-        `;
-        cardPile.appendChild(countIndicator);
     }
 }
 
@@ -87,10 +65,10 @@ function updatePreviousPlayDisplay() {
     
     playInfoDisplay.innerHTML = `${previousPlayer?.name || 'Previous Player'}<br>${lastPlayCount} card(s) as ${announcedRank}`;
     
-    // Create clickable face-up cards for the previous play
+    // Create clickable face-up cards for the previous play (same size as hand cards)
     for (let i = 0; i < lastPlayCount; i++) {
         const cardElement = document.createElement('div');
-        cardElement.className = 'card table-card previous-play-card';
+        cardElement.className = 'card previous-play-card';
         cardElement.style.cursor = 'pointer';
         
         // Show question marks since we don't know the actual cards
@@ -105,6 +83,11 @@ function updatePreviousPlayDisplay() {
             event.stopPropagation();
             handlePreviousCardClick(i);
         });
+        
+        // Show selection if this card is currently selected for challenge
+        if (selectedChallengeIndex === i) {
+            cardElement.classList.add('challenge-selected');
+        }
         
         previousPlayCards.appendChild(cardElement);
     }
@@ -124,39 +107,43 @@ function handlePreviousCardClick(cardIndex) {
         return;
     }
     
+    // Check if it's the right time to challenge (not our turn, or 2-player special case)
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    const canChallenge = currentPlayer && currentPlayer.id !== playerId; // Not our turn
+    const isMyTurn = currentPlayer && currentPlayer.id === playerId;
+    
+    // Special 2-player rule
+    const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
+    const is2PlayerWithZeroCards = gameState.players.length === 2 && playersWithNoCards.length > 0;
+    
+    const canChallenge = !isMyTurn || is2PlayerWithZeroCards;
     
     if (!canChallenge) {
         console.log("Cannot challenge: not the right time");
-        showMessage("You can only challenge when it's not your turn!", 3000, false);
+        showMessage("You can challenge when it's not your turn, or when opponent has 0 cards in 2-player game!", 3000, false);
         return;
     }
     
-    // Auto-select this card and show challenge interface
+    // FIXED: This should be equivalent to clicking Challenge button + selecting this card
+    // 1. Set the selected challenge index
     selectedChallengeIndex = cardIndex;
     
-    // Highlight the selected card
-    const previousCards = document.querySelectorAll('.previous-play-card');
-    previousCards.forEach((card, i) => {
-        card.classList.remove('challenge-selected');
-        if (i === cardIndex) {
-            card.classList.add('challenge-selected');
+    // 2. Show the challenge area (same as clicking Challenge button)
+    showChallenge();
+    
+    // 3. Update both displays to show the selection
+    updatePreviousPlayDisplay(); // Update table display
+    updateChallengeCardsSelection(); // Update challenge area display
+    
+    console.log(`Challenge initiated for card ${cardIndex + 1}, challenge area shown`);
+}
+
+// NEW: Function to update challenge area selection to match table selection
+function updateChallengeCardsSelection() {
+    const challengeCards = document.querySelectorAll('.challenge-card');
+    challengeCards.forEach((card, i) => {
+        card.classList.remove('selected');
+        if (i === selectedChallengeIndex) {
+            card.classList.add('selected');
         }
     });
-    
-    // Show confirmation dialog
-    const previousPlayer = gameState.players[(gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length];
-    const confirmed = confirm(
-        `Challenge ${previousPlayer?.name || 'previous player'}?\n` +
-        `You are challenging that card ${cardIndex + 1} is NOT a ${gameState.announcedRank}.`
-    );
-    
-    if (confirmed) {
-        submitChallenge();
-    } else {
-        // Clear selection if cancelled
-        selectedChallengeIndex = -1;
-        previousCards.forEach(card => card.classList.remove('challenge-selected'));
-    }
 }

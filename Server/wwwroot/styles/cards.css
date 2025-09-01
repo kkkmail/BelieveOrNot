@@ -1,4 +1,4 @@
-/* Card Styles - Dynamic sizing with larger fonts */
+/* Card Styles - Much larger fonts and better card back */
 .card {
     width: 90px;
     height: 130px;
@@ -29,21 +29,21 @@
     transform: translateY(-15px);
 }
 
-/* Dynamic font sizing based on card dimensions */
+/* Much larger font sizing - rank is substantially bigger */
 .card .rank {
     font-weight: bold;
     margin-bottom: 2px;
     line-height: 1;
     text-align: center;
-    /* Calculate font size as percentage of card width - rank is larger */
-    font-size: min(max(2.2vw, 24px), 32px); /* Responsive with min/max bounds */
+    /* SUBSTANTIALLY LARGER rank font */
+    font-size: min(max(3.5vw, 36px), 48px); /* Much bigger than before */
 }
 
 .card .suit {
     line-height: 1;
     text-align: center;
-    /* Calculate font size as percentage of card width - suit is smaller than rank */
-    font-size: min(max(1.8vw, 20px), 28px); /* Responsive with min/max bounds */
+    /* Slightly larger suit font */
+    font-size: min(max(2.5vw, 24px), 32px); /* Bigger than before */
 }
 
 /* Color classes for suits */
@@ -70,72 +70,68 @@
 }
 
 .card.joker .rank {
-    font-size: min(max(1.6vw, 18px), 24px); /* Slightly smaller for joker text */
+    font-size: min(max(2.5vw, 28px), 36px); /* Smaller for joker emoji */
 }
 
 .card.joker .suit {
-    font-size: min(max(1.4vw, 14px), 18px); /* Even smaller for "JOKER" text */
+    font-size: min(max(1.8vw, 18px), 24px); /* Smaller for "JOKER" text */
     font-weight: 600;
 }
 
-/* Table cards - slightly smaller for the pile display */
-.table-card {
-    width: 70px;
-    height: 100px;
-    margin: 2px;
-    display: inline-block;
-}
-
-.table-card .rank {
-    font-size: min(max(1.8vw, 18px), 24px);
-}
-
-.table-card .suit {
-    font-size: min(max(1.4vw, 16px), 20px);
-}
-
-/* Card back design for face-down cards */
+/* Better card back design */
 .card-back {
     width: 70px;
     height: 100px;
-    border: 2px solid #333;
+    border: 2px solid #2c3e50;
     border-radius: 8px;
-    background: linear-gradient(45deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(52, 152, 219, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(155, 89, 182, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #34495e 0%, #2c3e50 50%, #34495e 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     margin: 2px;
     cursor: default;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    overflow: hidden;
 }
 
 .card-back::before {
-    content: "🂠";
-    font-size: 24px;
-    color: #fff;
-    opacity: 0.8;
+    content: "♠♥♦♣";
+    font-size: 16px;
+    color: #ecf0f1;
+    opacity: 0.6;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .card-back::after {
     content: "";
     position: absolute;
-    top: 4px;
-    left: 4px;
-    right: 4px;
-    bottom: 4px;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 4px;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 5px;
+    background: 
+        repeating-linear-gradient(45deg, 
+            transparent 0px, 
+            transparent 2px, 
+            rgba(255,255,255,0.05) 2px, 
+            rgba(255,255,255,0.05) 4px);
 }
 
-/* Previous player cards - clickable and highlighted */
+/* Previous player cards - same size as hand cards */
 .previous-play-card {
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .previous-play-card:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(255,193,7,0.4);
     border-color: #ffc107;
 }
@@ -143,7 +139,8 @@
 .previous-play-card.challenge-selected {
     border-color: #dc3545;
     background: #f8d7da;
-    transform: scale(1.15);
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(220,53,69,0.4);
 }
 
 /* Responsive adjustments for different screen sizes */
@@ -154,24 +151,16 @@
     }
     
     .card .rank {
-        font-size: min(max(3.5vw, 20px), 28px);
+        font-size: min(max(5vw, 30px), 40px); /* Still very large on mobile */
     }
     
     .card .suit {
-        font-size: min(max(3vw, 18px), 24px);
+        font-size: min(max(3.5vw, 22px), 28px); /* Larger suit on mobile */
     }
     
-    .table-card, .card-back, .previous-play-card {
+    .card-back {
         width: 60px;
         height: 85px;
-    }
-    
-    .table-card .rank {
-        font-size: min(max(2.8vw, 16px), 20px);
-    }
-    
-    .table-card .suit {
-        font-size: min(max(2.4vw, 14px), 18px);
     }
 }
 
@@ -182,15 +171,19 @@
     }
     
     .card .rank {
-        font-size: min(max(4.5vw, 18px), 24px);
+        font-size: min(max(6vw, 26px), 34px); /* Large even on small phones */
     }
     
     .card .suit {
-        font-size: min(max(4vw, 16px), 20px);
+        font-size: min(max(4.5vw, 20px), 24px); /* Larger suit on small phones */
     }
     
-    .table-card, .card-back, .previous-play-card {
+    .card-back {
         width: 50px;
         height: 70px;
+    }
+    
+    .card-back::before {
+        font-size: 12px;
     }
 }
