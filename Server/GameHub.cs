@@ -45,7 +45,10 @@ public class GameHub : Hub
                 Score = p.Score,
                 IsConnected = p.IsConnected
             }).ToList(),
-            CreatorPlayerId = match.Players[0].Id
+            CreatorPlayerId = match.Players[0].Id,
+            DeckSize = match.Settings.DeckSize,
+            JokerCount = match.Settings.JokerCount,
+            LastAction = $"🎮 {request.PlayerName} created the game!"
         };
 
         // Broadcast to group
@@ -74,7 +77,10 @@ public class GameHub : Hub
                 Score = p.Score,
                 IsConnected = p.IsConnected
             }).ToList(),
-            CreatorPlayerId = match.Players[0].Id
+            CreatorPlayerId = match.Players[0].Id,
+            DeckSize = match.Settings.DeckSize,
+            JokerCount = match.Settings.JokerCount,
+            LastAction = $"👋 {playerName} joined the game!"
         };
 
         // Broadcast to group
@@ -93,10 +99,11 @@ public class GameHub : Hub
             throw new HubException("Only the match creator can start the round");
         }
 
+        var playerName = match.Players.First(p => p.Id == requestingPlayerId).Name;
         _gameEngine.StartNewRound(match);
 
-        // Send personalized states to all connections in the match
-        await BroadcastPersonalizedStates(match);
+        // Send personalized states to all connections in the match with round start message
+        await BroadcastPersonalizedStates(match, $"🎯 {playerName} started Round {match.RoundNumber}!");
     }
 
     public async Task<GameStateDto> SubmitMove(SubmitMoveRequest request)
@@ -146,6 +153,8 @@ public class GameHub : Hub
 
                 var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, playerId);
                 playerState.CreatorPlayerId = match.Players[0].Id;
+                playerState.DeckSize = match.Settings.DeckSize;
+                playerState.JokerCount = match.Settings.JokerCount;
                 if (lastAction != null)
                 {
                     playerState.LastAction = lastAction;

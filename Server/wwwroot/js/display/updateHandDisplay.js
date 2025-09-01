@@ -32,8 +32,6 @@ function updateHandDisplay() {
     handCount.textContent = sortedHand.length;
 
     sortedHand.forEach((card, sortedIndex) => {
-        // FIXED: Use the sorted index directly instead of trying to find original index
-        // This ensures each card (including identical jokers) gets a unique index
         const cardElement = document.createElement('div');
         cardElement.className = `card ${getSuitClass(card.suit)}`;
 
@@ -50,8 +48,12 @@ function updateHandDisplay() {
             `;
         }
 
-        // FIXED: Use sortedIndex directly for selection tracking
-        cardElement.onclick = () => toggleCardSelection(sortedIndex);
+        // FIXED: Use proper event listener instead of onclick
+        cardElement.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleCardSelection(sortedIndex);
+        });
 
         if (selectedCards.includes(sortedIndex)) {
             cardElement.classList.add('selected');

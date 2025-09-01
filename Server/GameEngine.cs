@@ -18,6 +18,7 @@ public class GameEngine : IGameEngine
         {
             player.Hand.Clear();
         }
+
         match.TablePile.Clear();
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
@@ -47,33 +48,6 @@ public class GameEngine : IGameEngine
     public GameStateDto CreateGameStateDtoForPlayer(Match match, Guid playerId)
     {
         return CreateGameStateDto(match, playerId);
-    }
-
-    public GameStateDto SubmitMove(Match match, Guid playerId, SubmitMoveRequest request)
-    {
-        if (!IsValidMove(match, playerId, request))
-        {
-            throw new InvalidOperationException("Invalid move");
-        }
-
-        var player = match.Players.First(p => p.Id == playerId);
-        var result = string.Empty;
-
-        if (request.Action == ActionType.Play)
-        {
-            HandlePlayAction(match, player, request, out result);
-        }
-        else if (request.Action == ActionType.Challenge)
-        {
-            HandleChallengeAction(match, player, request, out result);
-        }
-
-        // DO NOT check for round end here
-        // The round continues regardless of player card counts
-
-        var state = CreateGameStateDto(match, playerId);
-        state.LastAction = result;
-        return state;
     }
 
     private void HandlePlayAction(Match match, Player player, SubmitMoveRequest request, out string result)
@@ -109,10 +83,18 @@ public class GameEngine : IGameEngine
         // Auto-dispose four-of-a-kind after play
         AutoDisposeFourOfAKind(player);
 
+        // Check if player reached zero cards and announce it
+        if (player.Hand.Count == 0)
+        {
+            result = $"{player.Name} played {request.Cards!.Count} card(s) claiming {match.AnnouncedRank} and has NO CARDS LEFT! 🎯 {player.Name} is out of cards but the round continues!";
+        }
+        else
+        {
+            result = $"{player.Name} played {request.Cards!.Count} card(s) claiming {match.AnnouncedRank}";
+        }
+
         // Advance to next active player (skip players with 0 cards)
         AdvanceToNextActivePlayer(match);
-
-        result = $"{player.Name} played {request.Cards!.Count} card(s) claiming {match.AnnouncedRank}";
     }
 
     private void HandleChallengeAction(Match match, Player challenger, SubmitMoveRequest request, out string result)
@@ -146,7 +128,6 @@ public class GameEngine : IGameEngine
         Console.WriteLine($"Announced rank: {match.AnnouncedRank}");
 
         // Determine if challenge succeeded
-        // FIXED: Jokers match any announced rank
         bool challengeHit = flippedCard.Rank == match.AnnouncedRank || flippedCard.IsJoker;
         Console.WriteLine(
             $"Challenge hit: {challengeHit} (card rank: {flippedCard.Rank}, announced: {match.AnnouncedRank}, is joker: {flippedCard.IsJoker})");
@@ -201,9 +182,38 @@ public class GameEngine : IGameEngine
         match.CurrentPlayerIndex = collectorIndex;
         AdvanceToNextActivePlayer(match);
 
+        // CHECK FOR ROUND END AFTER CHALLENGE RESOLUTION
+        // This is the natural point where rounds can end - after challenge resolution
+        var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
+        if (playersWithNoCards.Any())
+        {
+            EndRound(match);
+            // Combine challenge result with round end message
+            result += " " + (match.LastRoundEndMessage ?? "Round ended!");
+        }
+
         Console.WriteLine($"Final result: {result}");
         Console.WriteLine("=== END CHALLENGE DEBUG ===");
     }
+
+    // private void AdvanceToNextActivePlayer(Match match)
+    // {
+    //     int attempts = 0;
+    //     int maxAttempts = match.Players.Count;
+    //
+    //     do
+    //     {
+    //         match.CurrentPlayerIndex = (match.CurrentPlayerIndex + 1) % match.Players.Count;
+    //         attempts++;
+    //
+    //         // If we've checked all players and none have cards, something is wrong
+    //         if (attempts >= maxAttempts)
+    //         {
+    //             // This should trigger round end - all players are out
+    //             break;
+    //         }
+    //     } while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
+    // }
 
     private void AdvanceToNextActivePlayer(Match match)
     {
@@ -215,14 +225,24 @@ public class GameEngine : IGameEngine
             match.CurrentPlayerIndex = (match.CurrentPlayerIndex + 1) % match.Players.Count;
             attempts++;
 
-            // If we've checked all players and none have cards, something is wrong
+            // If we've checked all players and none have cards, end the round
             if (attempts >= maxAttempts)
             {
-                // This should trigger round end - all players are out
+                // All players have 0 cards - this shouldn't happen normally but is a safety net
+                Console.WriteLine("All players have 0 cards - ending round");
+                EndRound(match);
                 break;
             }
+        } while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
+
+        // Additional check: If only 1 active player remains and there are cards on table,
+        // they must challenge (covered by existing 2-player rule logic)
+        var activePlayers = match.Players.Where(p => p.Hand.Count > 0).ToList();
+        if (activePlayers.Count == 1 && match.TablePile.Count > 0)
+        {
+            Console.WriteLine($"Only 1 active player ({activePlayers[0].Name}) remains with cards on table - they must challenge");
+            // The UI logic should handle forcing the challenge
         }
-        while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
     }
 
     private void AutoDisposeFourOfAKind(Player player)
@@ -246,6 +266,9 @@ public class GameEngine : IGameEngine
     {
         match.Phase = GamePhase.RoundEnd;
 
+        var roundResults = new List<string>();
+        var winners = new List<Player>();
+
         // Calculate scores
         foreach (var player in match.Players)
         {
@@ -265,10 +288,70 @@ public class GameEngine : IGameEngine
             {
                 roundScore += match.Settings.WinnerBonus;
                 match.DealerIndex = match.Players.IndexOf(player); // Winner becomes next dealer
+                winners.Add(player);
             }
 
             player.Score += roundScore;
+
+            // Add to round results
+            if (player.Hand.Count == 0)
+            {
+                roundResults.Add($"🏆 {player.Name}: {roundScore} points (Winner bonus + no cards)");
+            }
+            else
+            {
+                roundResults.Add($"📊 {player.Name}: {roundScore} points ({player.Hand.Count} cards remaining)");
+            }
         }
+
+        // Create round end message
+        string roundEndMessage;
+        if (winners.Count == 1)
+        {
+            roundEndMessage = $"🎉 Round {match.RoundNumber} ended! {winners[0].Name} wins!";
+        }
+        else if (winners.Count > 1)
+        {
+            var winnerNames = string.Join(", ", winners.Select(w => w.Name));
+            roundEndMessage = $"🎉 Round {match.RoundNumber} ended! Winners: {winnerNames}";
+        }
+        else
+        {
+            roundEndMessage = $"⭐ Round {match.RoundNumber} ended!";
+        }
+
+        // Add scoring details
+        roundEndMessage += " Scoring: " + string.Join(", ", roundResults);
+
+        // Store the round end message (will be broadcast by the calling method)
+        match.LastRoundEndMessage = roundEndMessage;
+    }
+
+    public GameStateDto SubmitMove(Match match, Guid playerId, SubmitMoveRequest request)
+    {
+        if (!IsValidMove(match, playerId, request))
+        {
+            throw new InvalidOperationException("Invalid move");
+        }
+
+        var player = match.Players.First(p => p.Id == playerId);
+        var result = string.Empty;
+
+        if (request.Action == ActionType.Play)
+        {
+            HandlePlayAction(match, player, request, out result);
+        }
+        else if (request.Action == ActionType.Challenge)
+        {
+            HandleChallengeAction(match, player, request, out result);
+        }
+
+        // REMOVED: No immediate round ending when players reach 0 cards
+        // The round continues until explicitly ended by other conditions
+
+        var state = CreateGameStateDto(match, playerId);
+        state.LastAction = result;
+        return state;
     }
 
     public bool IsValidMove(Match match, Guid playerId, SubmitMoveRequest request)
