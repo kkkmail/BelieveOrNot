@@ -40,6 +40,7 @@ function setupGameBoardEventListeners() {
     setTimeout(() => {
         setupGameButtons();
         setupChallengeButtons();
+        setupCopyButton(); // NEW: Setup copy match ID button
     }, 100);
 }
 
@@ -106,5 +107,21 @@ function setupChallengeButtons() {
             hideChallenge();
         });
         console.log("Hide challenge button listener added");
+    }
+}
+
+// NEW: Setup copy match ID button
+function setupCopyButton() {
+    const copyMatchIdBtn = document.getElementById('copyMatchIdBtn');
+    
+    if (copyMatchIdBtn && !copyMatchIdBtn.hasAttribute('data-listener')) {
+        copyMatchIdBtn.setAttribute('data-listener', 'true');
+        copyMatchIdBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("Copy match ID button clicked");
+            copyMatchId();
+        });
+        console.log("Copy match ID button listener added");
     }
 }
