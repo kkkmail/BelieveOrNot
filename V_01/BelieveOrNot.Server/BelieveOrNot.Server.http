@@ -1,0 +1,6 @@
+@BelieveOrNot.Server_HostAddress = http://localhost:5257
+
+GET {{BelieveOrNot.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

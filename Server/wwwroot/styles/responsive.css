@@ -1,0 +1,77 @@
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .game-header h1 {
+        font-size: 2em;
+    }
+
+    .players-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hand-cards {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .actions-area {
+        flex-direction: column;
+    }
+
+    .status-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-group input, .form-group select {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .card {
+        width: 80px;
+        height: 115px;
+        font-size: 14px;
+    }
+
+    .card .rank {
+        font-size: 18px;
+        margin-bottom: 6px;
+    }
+
+    .card .suit {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.8em;
+    }
+
+    .game-header p {
+        font-size: 1em;
+    }
+
+    .game-setup, .game-board {
+        padding: 20px;
+    }
+
+    .table-area {
+        padding: 20px;
+    }
+
+    .score-table {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .challenge-cards {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

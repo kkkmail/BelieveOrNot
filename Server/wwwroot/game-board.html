@@ -1,0 +1,94 @@
+<!-- Game Status -->
+<div class="game-status">
+    <h2 id="gamePhase">Waiting for Players</h2>
+    <div class="status-info">
+        <div>Round: <span id="roundNumber">0</span></div>
+        <div>Current Turn: <span id="currentPlayerName">-</span></div>
+        <div>Announced Rank: <span id="announcedRank">-</span></div>
+        <div>Table Cards: <span id="tablePileCount">0</span></div>
+        <div class="match-id-section">
+            Match ID: 
+            <input type="text" id="displayMatchId" readonly style="border: none; background: transparent; width: 200px; text-align: center; font-family: monospace; font-size: 14px;">
+            <button class="btn-copy" id="copyMatchIdBtn" title="Copy Match ID">📋</button>
+        </div>
+    </div>
+</div>
+
+<!-- Players Area -->
+<div class="players-area" id="playersArea">
+    <!-- Players will be populated here -->
+</div>
+
+<!-- Table Area -->
+<div class="table-area">
+    <div class="table-display">
+        <h3>Table</h3>
+        
+        <!-- FIXED: Previous player's cards on LEFT (we read from left to right) -->
+        <div class="previous-play-section" id="previousPlaySection">
+            <div class="play-label">Last Play</div>
+            <div class="previous-play-cards" id="previousPlayCards">
+                <!-- Previous player's face-up cards will appear here -->
+            </div>
+            <div class="play-info" id="playInfoDisplay">No previous play</div>
+        </div>
+        
+        <!-- FIXED: Card pile on RIGHT -->
+        <div class="table-pile-section">
+            <div class="pile-label">Card Pile</div>
+            <div class="card-pile" id="cardPile">
+                <!-- Face-down card backs will be stacked here -->
+            </div>
+            <div class="pile-count" id="pileCountDisplay">0 cards</div>
+        </div>
+    </div>
+    
+    <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
+</div>
+
+<!-- Hand Area -->
+<div class="hand-area">
+    <h3>Your Hand (<span id="handCount">0</span> cards)</h3>
+    <div class="hand-cards" id="handCards">
+        <!-- Player's cards will be populated here -->
+    </div>
+
+    <!-- Actions Area -->
+    <div class="actions-area" id="actionsArea">
+        <!-- Opening turn rank selection -->
+        <div class="rank-selector hidden" id="rankSelector">
+            <label for="declaredRank">Declare Rank:</label>
+            <select id="declaredRank">
+                <!-- Options will be populated dynamically by updateRankDropdown() -->
+            </select>
+        </div>
+
+        <button class="btn btn-primary hidden" id="playBtn">Play Selected Cards</button>
+        <button class="btn btn-warning hidden" id="challengeBtn">Challenge!</button>
+    </div>
+
+    <!-- Challenge Area -->
+    <div class="challenge-area hidden" id="challengeArea">
+        <h3>Choose a card to flip from the last play:</h3>
+        <div class="challenge-cards" id="challengeCards">
+            <!-- Challenge cards will be populated here -->
+        </div>
+        <div>
+            <button class="btn btn-warning" id="submitChallengeBtn">Flip Selected Card</button>
+            <button class="btn btn-secondary" id="hideChallengeBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scoring Area -->
+<div class="scoring-area">
+    <h3>Scores</h3>
+    <div class="score-table" id="scoreTable">
+        <!-- Scores will be populated here -->
+    </div>
+</div>
+
+<!-- Message Area -->
+<div class="message-area" id="messageArea">
+    Welcome to Believe Or Not! Wait for other players to join.
+</div>

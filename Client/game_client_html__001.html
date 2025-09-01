@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Believe Or Not - Bluffing Card Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .game-header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .game-setup {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .setup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .game-board {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .players-area {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .player-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 150px;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .player-card.current-turn {
+            border-color: #28a745;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .player-card h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .player-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .table-area {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(0,100,0,0.1);
+            border-radius: 15px;
+            border: 3px dashed #28a745;
+        }
+
+        .table-pile {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .hand-area {
+            margin-top: 30px;
+        }
+
+        .hand-cards {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 70px;
+            height: 100px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .card.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+            transform: translateY(-10px);
+        }
+
+        .card.hearts, .card.diamonds {
+            color: #dc3545;
+        }
+
+        .card.clubs, .card.spades {
+            color: #333;
+        }
+
+        .card.joker {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border-color: #ff6b6b;
+        }
+
+        .actions-area {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .rank-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .rank-selector select {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .game-status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .game-status h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .status-info {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .challenge-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,193,7,0.2);
+            border-radius: 10px;
+            border: 2px dashed #ffc107;
+        }
+
+        .challenge-cards {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .challenge-card {
+            width: 70px;
+            height: 100px;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            background: #fff3cd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .challenge-card:hover {
+            transform: scale(1.05);
+            background: #ffeaa7;
+        }
+
+        .challenge-card.selected {
+            border-color: #dc3545;
+            background: #f8d7da;
+            transform: scale(1.1);
+        }
+
+        .message-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(23, 162, 184, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .connection-status.connected {
+            background: #28a745;
+        }
+
+        .connection-status.disconnected {
+            background: #dc3545;
+        }
+
+        .scoring-area {
+            margin-top: 30px;
+            background: rgba(108, 117, 125, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .scoring-area h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .score-table {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 100px;
+        }
+
+        .score-item .player-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .score-item .score {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .game-header h1 {
+                font-size: 2em;
+            }
+
+            .players-area {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hand-cards {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .actions-area {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">Connecting...</div>
+    
+    <div class="container">
+        <div class="game-header">
+            <h1>🎴 Believe Or Not</h1>
+            <p>The Ultimate Bluffing Card Game</p>
+        </div>
+
+        <!-- Game Setup -->
+        <div class="game-setup" id="gameSetup">
+            <h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
+            
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deckSize">Deck Size:</label>
+                    <select id="deckSize">
+                        <option value="32">32 cards (7-A)</option>
+                        <option value="36">36 cards (6-A)</option>
+                        <option value="52" selected>52 cards (2-A)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="jokerCount">Number of Jokers:</label>
+                    <select id="jokerCount">
+                        <option value="0" selected>0</option>
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" onclick="createMatch()">Create New Game</button>
+                
+                <div style="text-align: center; margin: 20px 0; color: #666;">
+                    <hr style="margin: 10px 0;">
+                    <span>Or</span>
+                    <hr style="margin: 10px 0;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="matchId">Match ID to Join:</label>
+                    <input type="text" id="matchId" placeholder="Enter match ID">
+                </div>
+                
+                <button class="btn btn-secondary" onclick="joinMatch()">Join Existing Game</button>
+            </div>
+        </div>
+
+        <!-- Game Board -->
+        <div class="game-board" id="gameBoard">
+            <div class="game-status">
+                <h2 id="gamePhase">Waiting for Players</h2>
+                <div class="status-info">
+                    <div>Round: <span id="roundNumber">0</span></div>
+                    <div>Current Turn: <span id="currentPlayerName">-</span></div>
+                    <div>Announced Rank: <span id="announcedRank">-</span></div>
+                    <div>Table Cards: <span id="tablePileCount">0</span></div>
+                </div>
+            </div>
+
+            <div class="players-area" id="playersArea">
+                <!-- Players will be populated here -->
+            </div>
+
+            <div class="table-area">
+                <div class="table-pile">
+                    <h3>Table Pile</h3>
+                    <div id="tablePileDisplay">No cards on table</div>
+                </div>
+                
+                <button class="btn btn-success hidden" id="startRoundBtn" onclick="startRound()">Start Round</button>
+            </div>
+
+            <div class="hand-area">
+                <h3>Your Hand (<span id="handCount">0</span> cards)</h3>
+                <div class="hand-cards" id="handCards">
+                    <!-- Player's cards will be populated here -->
+                </div>
+
+                <div class="actions-area" id="actionsArea">
+                    <!-- Opening turn rank selection -->
+                    <div class="rank-selector hidden" id="rankSelector">
+                        <label for="declaredRank">Declare Rank:</label>
+                        <select id="declaredRank">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="J">J</option>
+                            <option value="Q">Q</option>
+                            <option value="K">K</option>
+                            <option value="A">A</option>
+                            <option value="Joker">Joker</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary hidden" id="playBtn" onclick="playCards()">Play Selected Cards</button>
+                    <button class="btn btn-warning hidden" id="challengeBtn" onclick="showChallenge()">Challenge!</button>
+                </div>
+
+                <!-- Challenge Area -->
+                <div class="challenge-area hidden" id="challengeArea">
+                    <h3>Choose a card to flip from the last play:</h3>
+                    <div class="challenge-cards" id="challengeCards">
+                        <!-- Challenge cards will be populated here -->
+                    </div>
+                    <div>
+                        <button class="btn btn-warning" onclick="submitChallenge()">Flip Selected Card</button>
+                        <button class="btn btn-secondary" onclick="hideChallenge()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scoring-area">
+                <h3>Scores</h3>
+                <div class="score-table" id="scoreTable">
+                    <!-- Scores will be populated here -->
+                </div>
+            </div>
+
+            <div class="message-area" id="messageArea">
+                Welcome to Believe Or Not! Wait for other players to join.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let connection;
+        let currentMatch;
+        let gameState;
+        let selectedCards = [];
+        let selectedChallengeIndex = -1;
+        let playerId = null;
+
+        // Initialize SignalR connection
+        async function initializeConnection() {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/game")
+                .build();
+
+            connection.on("StateUpdate", (state, clientCmdIdEcho) => {
+                console.log("Game state updated:", state);
+                gameState = state;
+                updateGameDisplay();
+            });
+
+            try {
+                await connection.start();
+                updateConnectionStatus("connected");
+                console.log("SignalR Connected");
+            } catch (err) {
+                console.error("Connection failed:", err);
+                updateConnectionStatus("disconnected");
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.className = `connection-status ${status}`;
+            statusElement.textContent = status === 'connected' ? 'Connected' : 'Disconnected';
+        }
+
+        // Create a new match
+        async function createMatch() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter your name');
+                return;
+            }
+
+            const settings = {
+                deckSize: parseInt(document.getElementById('deckSize').value),
+                jokerCount: parseInt(document.getElementById('jokerCount').value),
+                jokerDisposalEnabled: parseInt(document.getElementById('jokerCount').value) >= 4
+            };
+
+            try {
+                const result = await connection.invoke("CreateOrJoinMatch", {
+                    playerName: playerName,
+                    settings: settings
+                });
+
+                currentMatch = result;
+                playerId = result.players[0].id; // First player is the creator
+                showGameBoard();
+                showMessage(`Game created! Match ID: ${result.matchId}`);
+                
+                // Show start button if enough players
+                if (result.players && result.players.length >= 2) {
+                    document.getElementById('startRoundBtn').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Failed to create match:", err);
+                alert("Failed to create match: " + err);
+            }
+        }
+
+        // Join an existing match
+        async function joinMatch() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const matchId = document.getElementById('matchId').value.trim();
+            
+            if (!playerName || !matchId) {
+                alert('Please enter your name and match ID');
+                return;
+            }
+
+            try {
+                const result = await connection.invoke("JoinExistingMatch", matchId, playerName);
+                currentMatch = result;
+                playerId = result.players[result.players.length - 1].id; // Last player is the joiner
+                showGameBoard();
+                showMessage(`Joined game! Waiting for other players.`);
+            } catch (err) {
+                console.error("Failed to join match:", err);
+                alert("Failed to join match: " + err);
+            }
+        }
+
+        // Start a new round
+        async function startRound() {
+            if (!currentMatch) return;
+
+            try {
+                await connection.invoke("StartRound", currentMatch.matchId);
+            } catch (err) {
+                console.error("Failed to start round:", err);
+                alert("Failed to start round: " + err);
+            }
+        }
+
+        // Show game board and hide setup
+        function showGameBoard() {
+            document.getElementById('gameSetup').style.display = 'none';
+            document.getElementById('gameBoard').style.display = 'block';
+        }
+
+        // Update the game display based on current state
+        function updateGameDisplay() {
+            if (!gameState) return;
+
+            // Update basic game info
+            document.getElementById('roundNumber').textContent = gameState.roundNumber;
+            document.getElementById('announcedRank').textContent = gameState.announcedRank || '-';
+            document.getElementById('tablePileCount').textContent = gameState.tablePileCount;
+            
+            // Update current player
+            if (gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
+                document.getElementById('currentPlayerName').textContent = 
+                    gameState.players[gameState.currentPlayerIndex].name;
+            }
+
+            // Update phase
+            const phaseText = {
+                0: 'Waiting for Players',
+                1: 'Game In Progress',
+                2: 'Round Ended',
+                3: 'Game Ended'
+            };
+            document.getElementById('gamePhase').textContent = phaseText[gameState.phase] || 'Unknown';
+
+            // Update players display
+            updatePlayersDisplay();
+
+            // Update hand
+            updateHandDisplay();
+
+            // Update actions
+            updateActionsDisplay();
+
+            // Update scores
+            updateScoresDisplay();
+
+            // Show start button if needed
+            const startBtn = document.getElementById('startRoundBtn');
+            if (gameState.phase === 0 && gameState.players.length >= 2) {
+                startBtn.classList.remove('hidden');
+            } else {
+                startBtn.classList.add('hidden');
+            }
+        }
+
+        function updatePlayersDisplay() {
+            const playersArea = document.getElementById('playersArea');
+            playersArea.innerHTML = '';
+
+            if (!gameState.players) return;
+
+            gameState.players.forEach((player, index) => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'player-card';
+                if (index === gameState.currentPlayerIndex) {
+                    playerCard.classList.add('current-turn');
+                }
+
+                playerCard.innerHTML = `
+                    <h3>${player.name} ${!player.isConnected ? '(Disconnected)' : ''}</h3>
+                    <div class="player-stats">
+                        <div>Cards: ${player.handCount}</div>
+                        <div>Score: ${player.score}</div>
+                    </div>
+                `;
+
+                playersArea.appendChild(playerCard);
+            });
+        }
+
+        function updateHandDisplay() {
+            const handCards = document.getElementById('handCards');
+            const handCount = document.getElementById('handCount');
+            handCards.innerHTML = '';
+            
+            if (!gameState.yourHand) {
+                handCount.textContent = '0';
+                return;
+            }
+
+            handCount.textContent = gameState.yourHand.length;
+
+            gameState.yourHand.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = `card ${getSuitClass(card.suit)}`;
+                cardElement.textContent = getCardDisplay(card);
+                cardElement.onclick = () => toggleCardSelection(index);
+                
+                if (selectedCards.includes(index)) {
+                    cardElement.classList.add('selected');
+                }
+
+                handCards.appendChild(cardElement);
+            });
+        }
+
+        function getSuitClass(suit) {
+            if (suit.toLowerCase().includes('joker')) return 'joker';
+            if (suit === 'Hearts' || suit === 'Diamonds') return 'hearts';
+            return 'clubs';
+        }
+
+        function getCardDisplay(card) {
+            return card.rank === 'Joker' ? '🃏' : card.rank;
+        }
+
+        function toggleCardSelection(cardIndex) {
+            const index = selectedCards.indexOf(cardIndex);
+            if (index > -1) {
+                selectedCards.splice(index, 1);
+            } else {
+                if (selectedCards.length < 3) {
+                    selectedCards.push(cardIndex);
+                } else {
+                    alert('You can only select up to 3 cards at a time');
+                    return;
+                }
+            }
+            updateHandDisplay();
+        }
+
+        function updateActionsDisplay() {
+            const playBtn = document.getElementById('playBtn');
+            const challengeBtn = document.getElementById('challengeBtn');
+            const rankSelector = document.getElementById('rankSelector');
+            
+            // Hide all by default
+            playBtn.classList.add('hidden');
+            challengeBtn.classList.add('hidden');
+            rankSelector.classList.add('hidden');
+
+            if (!gameState || gameState.phase !== 1) return;
+
+            // Find current player
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            const isMyTurn = currentPlayer && gameState.yourHand && 
+                           currentPlayer.name === document.getElementById('playerName').value;
+
+            if (!isMyTurn) return;
+
+            // Opening turn (no announced rank yet)
+            if (!gameState.announcedRank) {
+                if (selectedCards.length > 0) {
+                    rankSelector.classList.remove('hidden');
+                    playBtn.classList.remove('hidden');
+                    playBtn.textContent = `Play ${selectedCards.length} Card(s)`;
+                }
+            } else {
+                // Subsequent turns
+                if (selectedCards.length > 0) {
+                    playBtn.classList.remove('hidden');
+                    playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
+                }
+                if (gameState.tablePileCount > 0) {
+                    challengeBtn.classList.remove('hidden');
+                }
+            }
+        }
+
+        async function playCards() {
+            if (selectedCards.length === 0) {
+                alert('Please select cards to play');
+                return;
+            }
+
+            const cardsToPlay = selectedCards.map(index => gameState.yourHand[index]);
+            let declaredRank = gameState.announcedRank;
+
+            // If opening turn, get declared rank
+            if (!gameState.announcedRank) {
+                declaredRank = document.getElementById('declaredRank').value;
+            }
+
+            try {
+                await connection.invoke("SubmitMove", {
+                    matchId: gameState.matchId,
+                    clientCmdId: generateGuid(),
+                    action: 0, // Play
+                    cards: cardsToPlay,
+                    declaredRank: declaredRank
+                });
+
+                selectedCards = [];
+            } catch (err) {
+                console.error("Failed to play cards:", err);
+                alert("Failed to play cards: " + err);
+            }
+        }
+
+        function showChallenge() {
+            const challengeArea = document.getElementById('challengeArea');
+            const challengeCards = document.getElementById('challengeCards');
+            
+            challengeArea.classList.remove('hidden');
+            challengeCards.innerHTML = '';
+
+            // Show cards from last play for challenge
+            const lastPlayCount = Math.min(3, gameState.tablePileCount); // Assume last play was max 3 cards
+            
+            for (let i = 0; i < lastPlayCount; i++) {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'challenge-card';
+                cardElement.textContent = '?';
+                cardElement.onclick = () => selectChallengeCard(i);
+                challengeCards.appendChild(cardElement);
+            }
+        }
+
+        function hideChallenge() {
+            document.getElementById('challengeArea').classList.add('hidden');
+            selectedChallengeIndex = -1;
+        }
+
+        function selectChallengeCard(index) {
+            selectedChallengeIndex = index;
+            
+            // Update visual selection
+            const challengeCards = document.querySelectorAll('.challenge-card');
+            challengeCards.forEach((card, i) => {
+                if (i === index) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        async function submitChallenge() {
+            if (selectedChallengeIndex === -1) {
+                alert('Please select a card to flip');
+                return;
+            }
+
+            try {
+                await connection.invoke("SubmitMove", {
+                    matchId: gameState.matchId,
+                    clientCmdId: generateGuid(),
+                    action: 1, // Challenge
+                    challengePickIndex: selectedChallengeIndex
+                });
+
+                hideChallenge();
+                selectedChallengeIndex = -1;
+            } catch (err) {
+                console.error("Failed to challenge:", err);
+                alert("Failed to challenge: " + err);
+            }
+        }
+
+        function updateScoresDisplay() {
+            const scoreTable = document.getElementById('scoreTable');
+            scoreTable.innerHTML = '';
+
+            if (!gameState.players) return;
+
+            gameState.players.forEach(player => {
+                const scoreItem = document.createElement('div');
+                scoreItem.className = 'score-item';
+                scoreItem.innerHTML = `
+                    <div class="player-name">${player.name}</div>
+                    <div class="score">${player.score}</div>
+                `;
+                scoreTable.appendChild(scoreItem);
+            });
+        }
+
+        function showMessage(message) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.textContent = message;
+            
+            // Clear message after 5 seconds
+            setTimeout(() => {
+                if (messageArea.textContent === message) {
+                    messageArea.textContent = '';
+                }
+            }, 5000);
+        }
+
+        function generateGuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeConnection();
+        });
+    </script>
+</body>
+</html>

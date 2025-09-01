@@ -9,7 +9,7 @@ Scope: End-to-end rules and product requirements for a multiplayer desktop card 
 
 Believe Or Not is a bluffing card game for 2+ players. Players sit in a circle. On each turn the active player either:
 - Play (Believe): place 1-3 face-down cards and (truthfully or not) claim they match the currently announced rank.
-- Challenge (Do Not Believe): flip exactly one card from the face-down pile to test that claim.
+- Challenge (Do Not Believe): flip exactly one card from the face-down pile placed by the previous player only to test that claim.
 
 Cards are dealt out to all players at the start of a round. The round ends when any player's hand becomes empty. Rounds repeat; points are tallied across rounds to rank players for the "game" session.
 
@@ -32,7 +32,7 @@ The server is authoritative; clients send intents and render state snapshots.
 
 ### 3.1 Deck configuration
 At game start the game starter chooses:
-- Deck size: one of 32, 36, or 54 (standard ranks per region; see section 12).
+- Deck size: one of 32, 36, 52 or 54 (standard ranks per region; see section 12).
 - Jokers: integer >= 0; included as rank "Joker".  
 - Joker disposal enabled: boolean (required if 4+ jokers are used to allow disposing 4 jokers as a set; see section 7).
 - Scoring weights (defaults in parentheses):
@@ -63,7 +63,7 @@ A round consists of a sequence of turns and table collections:
 2. Subsequent turns (announced rank fixed)  
    Active player chooses:
    - Play (Believe): place 1-3 more face-down cards, implicitly claiming they are of the same announced rank.  
-   - Challenge (Do Not Believe): flip exactly one card from the face-down table pile (see section 6).
+   - Challenge (Do Not Believe): flip exactly one card from the face-down table pile but only from the part placed by the previus player (see section 6).
 
 3. Collection  
    When a Challenge happens, one player collects all cards currently on the table pile (see section 6). The turn sequence resets:
@@ -71,7 +71,7 @@ A round consists of a sequence of turns and table collections:
    - The first move will declare a new announced rank.
 
 4. Round end  
-   The round ends immediately when any player's hand becomes empty. Scoring is applied (section 8) and the winner becomes the next dealer (section 3.2).
+   The round ends immediately when any player's hand becomes empty and the turn ends. Scoring is applied (section 8) and the winner becomes the next dealer (section 3.2).
 
 ---
 
@@ -88,7 +88,7 @@ A round consists of a sequence of turns and table collections:
 ## 6) Challenge action -- resolution
 
 When a player Challenges:
-1. The challenger selects exactly one index within the current table pile (0-based from the top of the pile recommended; server may store canonical order).
+1. The challenger selects exactly one index within the current table pile but6 only from the cards placed by the prevous player (0-based from the top of the pile recommended; server may store canonical order).
 2. Server flips that card (logically; clients display the outcome):
    - Hit (truthful): If the flipped card's rank equals the announced rank, the challenger must collect the entire table pile into their hand.
    - Miss (lie): Otherwise, the previous player (the one who made the last Play) collects the entire pile.

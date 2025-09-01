@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Believe Or Not - Bluffing Card Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/game-board.css">
+    <link rel="stylesheet" href="styles/cards.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Connection Status -->
+    <div class="connection-status" id="connectionStatus">Connecting...</div>
+
+    <div class="container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <h1>🎴 Believe Or Not</h1>
+            <p>The Ultimate Bluffing Card Game</p>
+        </header>
+
+        <!-- Game Setup Section -->
+        <section class="game-setup" id="gameSetup">
+            <!-- This content will be loaded from setup-form.html -->
+        </section>
+
+        <!-- Game Board Section -->
+        <section class="game-board" id="gameBoard">
+            <!-- This content will be loaded from game-board.html -->
+        </section>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/core/variables.js"></script>
+    <script src="js/core/initializeConnection.js"></script>
+    <script src="js/core/updateConnectionStatus.js"></script>
+
+    <script src="js/game/createMatch.js"></script>
+    <script src="js/game/joinMatch.js"></script>
+    <script src="js/game/startRound.js"></script>
+    <script src="js/game/showGameBoard.js"></script>
+
+    <script src="js/display/updateGameDisplay.js"></script>
+    <script src="js/display/updateTablePileDisplay.js"></script>
+    <script src="js/display/updatePlayersDisplay.js"></script>
+    <script src="js/display/updateHandDisplay.js"></script>
+    <script src="js/display/updateActionsDisplay.js"></script>
+    <script src="js/display/updateScoresDisplay.js"></script>
+
+    <script src="js/utils/updateRankDropdown.js"></script>
+
+    <script src="js/cards/getSuitClass.js"></script>
+    <script src="js/cards/getSuitSymbol.js"></script>
+    <script src="js/cards/toggleCardSelection.js"></script>
+
+    <script src="js/actions/playCards.js"></script>
+    <script src="js/actions/showChallenge.js"></script>
+    <script src="js/actions/hideChallenge.js"></script>
+    <script src="js/actions/selectChallengeCard.js"></script>
+    <script src="js/actions/submitChallenge.js"></script>
+
+    <script src="js/utils/showMessage.js"></script>
+    <script src="js/utils/broadcastMessage.js"></script>
+    <script src="js/utils/addToEventHistory.js"></script>
+    <script src="js/utils/showEventHistory.js"></script>
+    <script src="js/utils/updateRankDropdown.js"></script>
+    <script src="js/utils/updateCardPlayPreview.js"></script>
+    <script src="js/utils/testMessageSystem.js"></script>
+    <script src="js/utils/generateGuid.js"></script>
+    <script src="js/utils/loadHtmlContent.js"></script>
+    <script src="js/utils/setupEventListeners.js"></script>
+    <script src="js/utils/copyMatchId.js"></script>
+
+    <script src="js/initialization.js"></script>
+</body>
+</html>
