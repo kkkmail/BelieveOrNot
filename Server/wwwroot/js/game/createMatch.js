@@ -1,4 +1,3 @@
-// Create a new match
 async function createMatch() {
     const playerName = document.getElementById('playerName').value.trim();
     if (!playerName) {
@@ -19,11 +18,19 @@ async function createMatch() {
         });
 
         currentMatch = result;
-        // Find our player ID by name since we're the creator
-        const ourPlayer = result.players.find(p => p.name === playerName);
-        if (ourPlayer) {
+        
+        // FIXED: Creator is always the first player, so use index 0
+        if (result.players && result.players.length > 0) {
+            const ourPlayer = result.players[0]; // Creator is always first
             playerId = ourPlayer.id;
-            console.log("Set playerId to:", playerId);
+            console.log("Set playerId to:", playerId, "for creator:", ourPlayer.name);
+            
+            // Creator name shouldn't change, but check just in case
+            if (ourPlayer.name !== playerName) {
+                console.log(`Creator name changed from "${playerName}" to "${ourPlayer.name}"`);
+            }
+        } else {
+            console.error("No players found in match result");
         }
 
         showGameBoard();

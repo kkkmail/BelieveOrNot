@@ -1,4 +1,17 @@
 function toggleCardSelection(cardIndex) {
+    // CRITICAL FIX: Prevent card selection when round has ended
+    if (gameState && gameState.phase === 2) { // RoundEnd
+        console.log("Card selection disabled: Round has ended");
+        showMessage("Round has ended. Wait for the game creator to start a new round.", 3000);
+        return;
+    }
+
+    // CRITICAL FIX: Prevent card selection during game setup or other non-active phases
+    if (!gameState || gameState.phase !== 1) {
+        console.log("Card selection disabled: Game not in progress");
+        return;
+    }
+
     // Special rule: If there are only 2 players and one has 0 cards, disable card selection
     if (gameState && gameState.players && gameState.players.length === 2) {
         const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
@@ -22,10 +35,9 @@ function toggleCardSelection(cardIndex) {
         }
     }
     
-    // Update display immediately and clear any phantom selections
+    // Update display immediately
     updateHandDisplay();
     updateActionsDisplay();
     
-    // Force refresh of card selection state
     console.log('Selected cards:', selectedCards);
 }

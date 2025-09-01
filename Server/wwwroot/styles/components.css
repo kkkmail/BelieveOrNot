@@ -89,15 +89,15 @@
     background: #e0a800;
 }
 
-/* Message Area - UPDATED: Made taller for 4 persistent messages */
+/* Message Area - UPDATED: 1.5x taller for 8 messages */
 .message-area {
     margin-top: 20px;
     padding: 15px;
     background: rgba(23, 162, 184, 0.1);
     border-radius: 10px;
     border-left: 4px solid #17a2b8;
-    min-height: 160px; /* Increased from 120px to fit 4 messages better */
-    max-height: 200px;
+    min-height: 240px; /* Increased from 160px (1.5x) */
+    max-height: 300px; /* Increased from 200px (1.5x) */
     overflow-y: auto;
     display: flex;
     flex-direction: column;

@@ -5,8 +5,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // First load the HTML content
     await loadHtmlContent();
     
-    // Set up event listeners for buttons
+    // Set up initial event listeners (setup form)
     setupEventListeners();
+    
+    // Set up game board event listeners after HTML is loaded
+    setupGameBoardEventListeners();
     
     // Then initialize the connection
     await initializeConnection();

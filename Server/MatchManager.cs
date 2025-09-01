@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 
 public class MatchManager : IMatchManager
 {
     private readonly ConcurrentDictionary<Guid, Match> _matches = new();
+    private readonly Random _random = new();
     
     public Match? GetMatch(Guid matchId)
     {
@@ -17,7 +18,7 @@ public class MatchManager : IMatchManager
             Settings = settings ?? new GameSettings(),
             Players = new List<Player>
             {
-                new Player { Name = playerName }
+                new Player { Name = playerName } // Creator is always first, never shuffled
             }
         };
         
@@ -34,8 +35,59 @@ public class MatchManager : IMatchManager
             throw new InvalidOperationException("Cannot join match in progress");
         }
         
-        match.Players.Add(new Player { Name = playerName });
+        // ENHANCEMENT: Handle duplicate names
+        var uniqueName = EnsureUniqueName(match, playerName);
+        
+        match.Players.Add(new Player { Name = uniqueName });
         return match;
+    }
+    
+    // NEW: Shuffle players (except creator) before new round
+    public void ShufflePlayersForNewRound(Match match)
+    {
+        if (match.Players.Count <= 2) return; // No need to shuffle with 2 or fewer players
+        
+        // Keep the creator (first player) in position, shuffle the rest
+        var creator = match.Players[0];
+        var otherPlayers = match.Players.Skip(1).ToList();
+        
+        // Shuffle other players
+        for (int i = otherPlayers.Count - 1; i > 0; i--)
+        {
+            int j = _random.Next(i + 1);
+            (otherPlayers[i], otherPlayers[j]) = (otherPlayers[j], otherPlayers[i]);
+        }
+        
+        // Rebuild players list with creator first
+        match.Players.Clear();
+        match.Players.Add(creator);
+        match.Players.AddRange(otherPlayers);
+        
+        Console.WriteLine($"Players shuffled for new round: {string.Join(", ", match.Players.Select(p => p.Name))}");
+    }
+    
+    // NEW: Ensure unique player names
+    private string EnsureUniqueName(Match match, string desiredName)
+    {
+        var existingNames = match.Players.Select(p => p.Name).ToHashSet();
+        
+        if (!existingNames.Contains(desiredName))
+        {
+            return desiredName; // Name is unique
+        }
+        
+        // Find next available number suffix
+        int counter = 2;
+        string uniqueName;
+        do
+        {
+            uniqueName = $"{desiredName} ({counter})";
+            counter++;
+        }
+        while (existingNames.Contains(uniqueName));
+        
+        Console.WriteLine($"Duplicate name '{desiredName}' changed to '{uniqueName}'");
+        return uniqueName;
     }
     
     public void RemoveMatch(Guid matchId)
