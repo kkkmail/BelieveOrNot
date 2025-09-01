@@ -272,36 +272,50 @@ public class GameEngine : IGameEngine
         // Calculate scores
         foreach (var player in match.Players)
         {
+            // Count cards by type
+            int regularCards = player.Hand.Count(c => !c.IsJoker);
+            int jokerCards = player.Hand.Count(c => c.IsJoker);
+
             var roundScore = 0;
 
-            // Points for remaining cards
-            foreach (var card in player.Hand)
-            {
-                if (card.IsJoker)
-                    roundScore += match.Settings.ScorePerJoker;
-                else
-                    roundScore += match.Settings.ScorePerCard;
-            }
+            // FIXED: Negative points for remaining cards (penalty)
+            roundScore += regularCards * match.Settings.ScorePerCard; // ScorePerCard is negative (like -1)
+            roundScore += jokerCards * match.Settings.ScorePerJoker; // ScorePerJoker is negative (like -3)
 
-            // Winner bonus
+            // Winner bonus (positive points)
             if (player.Hand.Count == 0)
             {
-                roundScore += match.Settings.WinnerBonus;
+                roundScore += match.Settings.WinnerBonus; // WinnerBonus is positive (like +5)
                 match.DealerIndex = match.Players.IndexOf(player); // Winner becomes next dealer
                 winners.Add(player);
             }
 
             player.Score += roundScore;
 
-            // Add to round results
+            // Create detailed result message
             if (player.Hand.Count == 0)
             {
-                roundResults.Add($"🏆 {player.Name}: {roundScore} points (Winner bonus + no cards)");
+                roundResults.Add(
+                    $"🏆 {player.Name}: +{roundScore} points (Winner bonus: +{match.Settings.WinnerBonus}, 0 cards)");
             }
             else
             {
-                roundResults.Add($"📊 {player.Name}: {roundScore} points ({player.Hand.Count} cards remaining)");
+                var cardPenalties = new List<string>();
+                if (regularCards > 0)
+                {
+                    cardPenalties.Add($"{regularCards} cards: {regularCards * match.Settings.ScorePerCard}");
+                }
+
+                if (jokerCards > 0)
+                {
+                    cardPenalties.Add($"{jokerCards} jokers: {jokerCards * match.Settings.ScorePerJoker}");
+                }
+
+                roundResults.Add($"📊 {player.Name}: {roundScore} points ({string.Join(", ", cardPenalties)})");
             }
+
+            Console.WriteLine(
+                $"Scoring debug - {player.Name}: Regular cards: {regularCards}, Jokers: {jokerCards}, Round score: {roundScore}, Total score: {player.Score}");
         }
 
         // Create round end message
@@ -323,8 +337,10 @@ public class GameEngine : IGameEngine
         // Add scoring details
         roundEndMessage += " Scoring: " + string.Join(", ", roundResults);
 
-        // Store the round end message (will be broadcast by the calling method)
+        // Store the round end message
         match.LastRoundEndMessage = roundEndMessage;
+
+        Console.WriteLine($"Round ended: {roundEndMessage}");
     }
 
     public GameStateDto SubmitMove(Match match, Guid playerId, SubmitMoveRequest request)

@@ -34,23 +34,17 @@ function updateGameDisplay() {
     // Update hand
     updateHandDisplay();
 
-    // Update actions
+    // Update actions (this handles start button display)
     updateActionsDisplay();
 
     // Update scores
     updateScoresDisplay();
 
-    // Show start button only for creator and when there are enough players
-    const startBtn = document.getElementById('startRoundBtn');
-    if (gameState.phase === 0 &&
-        gameState.players.length >= 2 &&
-        playerId &&
-        gameState.creatorPlayerId === playerId) {
-        startBtn.classList.remove('hidden');
-    } else {
-        startBtn.classList.add('hidden');
+    // REMOVED the old start button logic from here since it's now handled in updateActionsDisplay
+    
+    // Clear any lingering card selections after state update (but preserve valid selections)
+    // Only clear if game phase changed to non-active
+    if (gameState.phase !== 1) {
+        selectedCards = [];
     }
-
-    // Clear any lingering card selections after state update
-    selectedCards = [];
 }
