@@ -17,7 +17,7 @@ public class GameHub : Hub
         _matchManager = matchManager;
     }
 
-    // NEW: Method to broadcast messages to all players in a match
+    // Method to broadcast messages to all players in a match
     public async Task BroadcastMessage(Guid matchId, string message)
     {
         var match = _matchManager.GetMatch(matchId);
@@ -71,7 +71,11 @@ public class GameHub : Hub
             LastAction = $"🎮 {request.PlayerName} created the game!"
         };
 
-        // Broadcast to group
+        // FIXED: Broadcast game message to all players
+        var createMessage = $"🎮 {request.PlayerName} created the game!";
+        await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {createMessage}", "System");
+
+        // Also send state update
         await Clients.Group($"match:{match.Id}").SendAsync("StateUpdate", state, Guid.Empty);
         return state;
     }
@@ -85,11 +89,12 @@ public class GameHub : Hub
         var joiningPlayer = match.Players.Last();
         _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
 
-        // FIXED: Broadcast join message to all players using the same pattern as CreateOrJoinMatch
-        var joinMessage = $"{joiningPlayer.Name} joined the game!";
+        // FIXED: Broadcast join message to all players
+        var joinMessage = $"👋 {joiningPlayer.Name} joined the game!";
+        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {joinMessage}", "System");
 
-        // Send personalized states to all connections with the join message
-        await BroadcastPersonalizedStates(match, joinMessage);
+        // Send personalized states to all connections (without LastAction since we broadcasted separately)
+        await BroadcastPersonalizedStates(match, null);
 
         return match;
     }
@@ -106,10 +111,17 @@ public class GameHub : Hub
         }
 
         var playerName = match.Players.First(p => p.Id == requestingPlayerId).Name;
-        _gameEngine.StartNewRound(match);
+        var roundState = _gameEngine.StartNewRound(match);
 
-        // Send personalized states to all connections in the match with round start message
-        await BroadcastPersonalizedStates(match, $"🎯 {playerName} started Round {match.RoundNumber}!");
+        // FIXED: Extract and broadcast the round start message
+        var roundStartMessage = roundState.LastAction; // This contains the full round start message with disposal events
+        if (!string.IsNullOrEmpty(roundStartMessage))
+        {
+            await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {roundStartMessage}", "System");
+        }
+
+        // Send personalized states to all connections (without LastAction since we broadcasted separately)
+        await BroadcastPersonalizedStates(match, null);
     }
 
     public async Task<GameStateDto> SubmitMove(SubmitMoveRequest request)
@@ -133,8 +145,38 @@ public class GameHub : Hub
             var state = _gameEngine.SubmitMove(gameMatch, request.PlayerId, request);
             _processedCommands.TryAdd(request.ClientCmdId, request.MatchId);
 
-            // Send personalized states to all connections in the match
-            await BroadcastPersonalizedStates(gameMatch, state.LastAction);
+            // FIXED: Extract and broadcast the action message
+            var actionMessage = state.LastAction;
+            if (!string.IsNullOrEmpty(actionMessage))
+            {
+                // Add appropriate icons based on message content
+                var enhancedMessage = actionMessage;
+                if (actionMessage.Contains("challenges"))
+                {
+                    enhancedMessage = "⚔️ " + actionMessage;
+                }
+                else if (actionMessage.Contains("played") && actionMessage.Contains("card"))
+                {
+                    enhancedMessage = "🃏 " + actionMessage;
+                }
+                else if (actionMessage.Contains("disposed 4 of a kind"))
+                {
+                    enhancedMessage = "♠️♥️♦️♣️ " + actionMessage;
+                }
+                else if (actionMessage.Contains("Round") && actionMessage.Contains("ended"))
+                {
+                    enhancedMessage = "🏁 " + actionMessage;
+                }
+                else if (actionMessage.Contains("NO CARDS LEFT"))
+                {
+                    enhancedMessage = "🎯 " + actionMessage;
+                }
+
+                await Clients.Group($"match:{gameMatch.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {enhancedMessage}", "System");
+            }
+
+            // Send personalized states to all connections (without LastAction since we broadcasted separately)
+            await BroadcastPersonalizedStates(gameMatch, null);
 
             return state;
         }
@@ -146,9 +188,6 @@ public class GameHub : Hub
 
     private async Task BroadcastPersonalizedStates(Match match, string? lastAction = null)
     {
-        // Get all connections in this match group
-        var matchGroupName = $"match:{match.Id}";
-
         // Send personalized state to each connection based on their mapped player
         var tasks = _connectionToPlayer
             .Where(kvp => kvp.Value.MatchId == match.Id)

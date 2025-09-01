@@ -14,47 +14,21 @@ async function initializeConnection() {
         
         gameState = state;
         
-        // If there's a LastAction, show it as a game event
-        if (state.LastAction && state.LastAction.trim() !== '') {
-            console.log("Processing LastAction:", state.LastAction);
-            
-            // Parse and enhance event messages for better display
-            let eventMessage = state.LastAction;
-            
-            // Add appropriate icons based on message content
-            if (eventMessage.includes('joined the game')) {
-                eventMessage = '👋 ' + eventMessage;
-            } else if (eventMessage.includes('Round') && eventMessage.includes('started')) {
-                eventMessage = '🎯 ' + eventMessage;
-            } else if (eventMessage.includes('disposed 4 of a kind')) {
-                eventMessage = '♠️♥️♦️♣️ ' + eventMessage;
-            } else if (eventMessage.includes('challenges')) {
-                eventMessage = '⚔️ ' + eventMessage;
-            } else if (eventMessage.includes('Round') && eventMessage.includes('ended')) {
-                eventMessage = '🏁 ' + eventMessage;
-            } else if (eventMessage.includes('NO CARDS LEFT')) {
-                eventMessage = '🎯 ' + eventMessage;
-            }
-            
-            console.log("Processed event message:", eventMessage);
-            console.log("About to call showMessage...");
-            
-            // Call showMessage and see what happens
-            showMessage(eventMessage, 0, true);
-            
-            console.log("showMessage called");
-        } else {
-            console.log("No LastAction in state update");
-        }
+        // REMOVED: No longer processing LastAction here since messages are now broadcasted separately
+        // The LastAction processing has been moved to MessageBroadcast handler
         
         updateGameDisplay();
     });
 
-    // NEW: Listen for message broadcasts from other players
+    // Listen for message broadcasts from server (these are the real game messages)
     connection.on("MessageBroadcast", (message, senderName) => {
-        console.log("Message broadcast received:", message, "from:", senderName);
+        console.log("=== MESSAGE BROADCAST RECEIVED ===");
+        console.log("Message:", message);
+        console.log("Sender:", senderName);
+        console.log("================================");
         
         // Add the message to local history and display
+        // The message is already timestamped from the server
         addToEventHistory(message);
     });
 
