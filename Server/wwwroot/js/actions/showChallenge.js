@@ -36,12 +36,22 @@ function showChallenge() {
 
     console.log(`Showing ${cardsToShow} cards for challenge (last play count: ${lastPlayCount})`);
 
-    // Create challenge cards
+    // Reset selection
+    selectedChallengeIndex = -1;
+
+    // Create challenge cards with proper event handling
     for (let i = 0; i < cardsToShow; i++) {
         const cardElement = document.createElement('div');
         cardElement.className = 'challenge-card';
         cardElement.textContent = `Card ${i + 1}`;
-        cardElement.onclick = () => selectChallengeCard(i);
+        
+        // Use proper event listener instead of onclick to prevent violations
+        cardElement.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            selectChallengeCard(i);
+        });
+        
         challengeCards.appendChild(cardElement);
     }
 

@@ -89,17 +89,45 @@
     background: #e0a800;
 }
 
-/* Message Area */
+/* Message Area - UPDATED: Made taller for 4 persistent messages */
 .message-area {
     margin-top: 20px;
     padding: 15px;
     background: rgba(23, 162, 184, 0.1);
     border-radius: 10px;
     border-left: 4px solid #17a2b8;
-    min-height: 50px;
+    min-height: 160px; /* Increased from 120px to fit 4 messages better */
+    max-height: 200px;
+    overflow-y: auto;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+.message-area div {
+    margin: 2px 0;
+    padding: 2px 0;
+}
+
+.message-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.message-area::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 3px;
+}
+
+.message-area::-webkit-scrollbar-thumb {
+    background: rgba(23, 162, 184, 0.3);
+    border-radius: 3px;
+}
+
+.message-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(23, 162, 184, 0.5);
 }
 
 /* Rank Selector */

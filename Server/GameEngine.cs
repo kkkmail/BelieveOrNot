@@ -117,13 +117,44 @@ public class GameEngine : IGameEngine
 
     private void HandleChallengeAction(Match match, Player challenger, SubmitMoveRequest request, out string result)
     {
+        // Debug: Print entire table pile contents
+        Console.WriteLine("=== CHALLENGE DEBUG ===");
+        Console.WriteLine($"Total cards in pile: {match.TablePile.Count}");
+        Console.WriteLine($"Last play count: {match.LastPlayCardCount}");
+        Console.WriteLine($"Challenge pick index: {request.ChallengePickIndex!.Value}");
+
+        Console.WriteLine("Table pile contents:");
+        for (int i = 0; i < match.TablePile.Count; i++)
+        {
+            Console.WriteLine($"  Index {i}: {match.TablePile[i]}");
+        }
+
         // Find the card to flip (from last play)
         var cardIndex = match.TablePile.Count - match.LastPlayCardCount + request.ChallengePickIndex!.Value;
+        Console.WriteLine(
+            $"Calculated card index: {match.TablePile.Count} - {match.LastPlayCardCount} + {request.ChallengePickIndex!.Value} = {cardIndex}");
+
+        if (cardIndex < 0 || cardIndex >= match.TablePile.Count)
+        {
+            Console.WriteLine($"ERROR: Card index {cardIndex} is out of bounds!");
+            result = "Challenge failed: Invalid card selection";
+            return;
+        }
+
         var flippedCard = match.TablePile[cardIndex];
+        Console.WriteLine($"Flipped card: {flippedCard}");
+        Console.WriteLine($"Announced rank: {match.AnnouncedRank}");
 
         // Determine if challenge succeeded
         // FIXED: Jokers match any announced rank
         bool challengeHit = flippedCard.Rank == match.AnnouncedRank || flippedCard.IsJoker;
+        Console.WriteLine(
+            $"Challenge hit: {challengeHit} (card rank: {flippedCard.Rank}, announced: {match.AnnouncedRank}, is joker: {flippedCard.IsJoker})");
+
+        // Get the player who was challenged (the one who played last)
+        var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
+        var challengedPlayer = match.Players[prevPlayerIndex];
+        Console.WriteLine($"Challenger: {challenger.Name}, Challenged player: {challengedPlayer.Name}");
 
         // Determine who collects the pile
         Player collector;
@@ -133,20 +164,27 @@ public class GameEngine : IGameEngine
             collector = challenger;
             if (flippedCard.IsJoker)
             {
-                result = $"{challenger.Name} challenged and was wrong! {flippedCard} (Joker) matches any rank including {match.AnnouncedRank}";
+                result = $"CHALLENGE RESULT: {challenger.Name} challenged {challengedPlayer.Name} and was WRONG! " +
+                         $"Flipped card was {flippedCard} (Joker matches any rank including {match.AnnouncedRank}). " +
+                         $"{challenger.Name} collects the pile.";
             }
             else
             {
-                result = $"{challenger.Name} challenged and was wrong! {flippedCard} matched {match.AnnouncedRank}";
+                result = $"CHALLENGE RESULT: {challenger.Name} challenged {challengedPlayer.Name} and was WRONG! " +
+                         $"Flipped card was {flippedCard} which matched the announced rank {match.AnnouncedRank}. " +
+                         $"{challenger.Name} collects the pile.";
             }
         }
         else
         {
-            // Previous player was lying, they collect
-            var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
-            collector = match.Players[prevPlayerIndex];
-            result = $"{challenger.Name} challenged and was right! {flippedCard} didn't match {match.AnnouncedRank}";
+            // Challenger was right, challenged player collects
+            collector = challengedPlayer;
+            result = $"CHALLENGE RESULT: {challenger.Name} challenged {challengedPlayer.Name} and was RIGHT! " +
+                     $"Flipped card was {flippedCard} which did NOT match the announced rank {match.AnnouncedRank}. " +
+                     $"{challengedPlayer.Name} collects the pile.";
         }
+
+        Console.WriteLine($"Collector: {collector.Name}");
 
         // Collector takes all cards
         var collectedCount = match.TablePile.Count;
@@ -163,26 +201,27 @@ public class GameEngine : IGameEngine
         match.CurrentPlayerIndex = collectorIndex;
         AdvanceToNextActivePlayer(match);
 
-        result += $" {collector.Name} collected {collectedCount} cards";
+        Console.WriteLine($"Final result: {result}");
+        Console.WriteLine("=== END CHALLENGE DEBUG ===");
     }
 
     private void AdvanceToNextActivePlayer(Match match)
     {
         int attempts = 0;
         int maxAttempts = match.Players.Count;
-        
-        do 
+
+        do
         {
             match.CurrentPlayerIndex = (match.CurrentPlayerIndex + 1) % match.Players.Count;
             attempts++;
-            
+
             // If we've checked all players and none have cards, something is wrong
             if (attempts >= maxAttempts)
             {
                 // This should trigger round end - all players are out
                 break;
             }
-        } 
+        }
         while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
     }
 
@@ -324,7 +363,9 @@ public class GameEngine : IGameEngine
                 HandCount = p.Hand.Count,
                 Score = p.Score,
                 IsConnected = p.IsConnected
-            }).ToList()
+            }).ToList(),
+            DeckSize = match.Settings.DeckSize,
+            JokerCount = match.Settings.JokerCount,
         };
 
         // Include requesting player's hand

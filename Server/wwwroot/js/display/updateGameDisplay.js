@@ -25,6 +25,9 @@ function updateGameDisplay() {
     };
     document.getElementById('gamePhase').textContent = phaseText[gameState.phase] || 'Unknown';
 
+    // Update rank dropdown based on game settings
+    updateRankDropdown();
+
     // Update players display
     updatePlayersDisplay();
 

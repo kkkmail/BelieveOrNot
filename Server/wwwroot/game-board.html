@@ -37,20 +37,7 @@
         <div class="rank-selector hidden" id="rankSelector">
             <label for="declaredRank">Declare Rank:</label>
             <select id="declaredRank">
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="J">J</option>
-                <option value="Q">Q</option>
-                <option value="K">K</option>
-                <option value="A">A</option>
-                <option value="Joker">Joker</option>
+                <!-- Options will be populated dynamically by updateRankDropdown() -->
             </select>
         </div>
 
@@ -65,8 +52,8 @@
             <!-- Challenge cards will be populated here -->
         </div>
         <div>
-            <button class="btn btn-warning" onclick="submitChallenge()">Flip Selected Card</button>
-            <button class="btn btn-secondary" onclick="hideChallenge()">Cancel</button>
+            <button class="btn btn-warning" id="submitChallengeBtn">Flip Selected Card</button>
+            <button class="btn btn-secondary" id="hideChallengeBtn">Cancel</button>
         </div>
     </div>
 </div>

@@ -31,11 +31,9 @@ function updateHandDisplay() {
 
     handCount.textContent = sortedHand.length;
 
-    sortedHand.forEach((card, index) => {
-        // Find original index for selection tracking
-        const originalIndex = gameState.yourHand.findIndex(c =>
-            c.rank === card.rank && c.suit === card.suit);
-
+    sortedHand.forEach((card, sortedIndex) => {
+        // FIXED: Use the sorted index directly instead of trying to find original index
+        // This ensures each card (including identical jokers) gets a unique index
         const cardElement = document.createElement('div');
         cardElement.className = `card ${getSuitClass(card.suit)}`;
 
@@ -52,9 +50,10 @@ function updateHandDisplay() {
             `;
         }
 
-        cardElement.onclick = () => toggleCardSelection(originalIndex);
+        // FIXED: Use sortedIndex directly for selection tracking
+        cardElement.onclick = () => toggleCardSelection(sortedIndex);
 
-        if (selectedCards.includes(originalIndex)) {
+        if (selectedCards.includes(sortedIndex)) {
             cardElement.classList.add('selected');
         }
 
