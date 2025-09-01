@@ -24,17 +24,26 @@ function updateCardPileDisplay() {
         return;
     }
 
-    // Create visual stack of face-down cards with horizontal offset
+    // FIXED: Create visual stack of full-size cards with LEFT offset (growth direction)
     cardPile.innerHTML = '';
     
-    // Show all cards with slight horizontal offset (no limit of 5)
+    // Show exact number of cards with LEFT offset to simulate growth
+    const cardWidth = 90; // Same as hand cards
+    const cardHeight = 130;
+    const offsetX = 3; // Horizontal offset per card
+    
+    // Calculate starting position so the pile grows to the left
+    const startX = (pileCardCount - 1) * offsetX;
+    
     for (let i = 0; i < pileCardCount; i++) {
         const cardBack = document.createElement('div');
-        cardBack.className = 'card-back';
+        cardBack.className = 'card-back pile-card';
         cardBack.style.position = 'absolute';
-        cardBack.style.left = `${i * 3}px`; // Increased horizontal offset
+        cardBack.style.left = `${startX - (i * offsetX)}px`; // FIXED: Cards grow to the left
         cardBack.style.top = `${i * 1}px`; // Slight vertical offset
         cardBack.style.zIndex = i;
+        cardBack.style.width = `${cardWidth}px`; // FIXED: Same size as hand cards
+        cardBack.style.height = `${cardHeight}px`;
         
         cardPile.appendChild(cardBack);
     }
@@ -123,18 +132,28 @@ function handlePreviousCardClick(cardIndex) {
         return;
     }
     
-    // FIXED: This should be equivalent to clicking Challenge button + selecting this card
-    // 1. Set the selected challenge index
+    // FIXED: Auto-submit challenge immediately like clicking table card should
     selectedChallengeIndex = cardIndex;
     
-    // 2. Show the challenge area (same as clicking Challenge button)
-    showChallenge();
+    // Get previous player info for confirmation
+    const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+    const previousPlayer = gameState.players[previousPlayerIndex];
     
-    // 3. Update both displays to show the selection
-    updatePreviousPlayDisplay(); // Update table display
-    updateChallengeCardsSelection(); // Update challenge area display
+    const confirmed = confirm(
+        `Challenge ${previousPlayer?.name || 'previous player'}?\n` +
+        `You are challenging that card ${cardIndex + 1} is NOT a ${gameState.announcedRank}.`
+    );
     
-    console.log(`Challenge initiated for card ${cardIndex + 1}, challenge area shown`);
+    if (confirmed) {
+        // Submit challenge immediately
+        submitChallenge();
+    } else {
+        // Clear selection if cancelled
+        selectedChallengeIndex = -1;
+        updatePreviousPlayDisplay();
+    }
+    
+    console.log(`Direct challenge attempted for card ${cardIndex + 1}`);
 }
 
 // NEW: Function to update challenge area selection to match table selection

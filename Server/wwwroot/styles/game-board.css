@@ -157,9 +157,12 @@
 
 .card-pile {
     position: relative;
-    width: 100px; /* Wider to accommodate horizontal spread */
-    height: 110px;
+    width: 150px; /* FIXED: Wider to accommodate left-growing pile */
+    height: 140px; /* FIXED: Taller for full-size cards */
     margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .pile-count {

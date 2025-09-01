@@ -24,22 +24,22 @@
     <div class="table-display">
         <h3>Table</h3>
         
-        <!-- Card pile (face-down cards) -->
-        <div class="table-pile-section">
-            <div class="pile-label">Card Pile</div>
-            <div class="card-pile" id="cardPile">
-                <!-- Face-down card backs will be stacked here -->
-            </div>
-            <div class="pile-count" id="pileCountDisplay">0 cards</div>
-        </div>
-        
-        <!-- Previous player's cards (face-up, clickable) -->
+        <!-- FIXED: Previous player's cards on LEFT (we read from left to right) -->
         <div class="previous-play-section" id="previousPlaySection">
             <div class="play-label">Last Play</div>
             <div class="previous-play-cards" id="previousPlayCards">
                 <!-- Previous player's face-up cards will appear here -->
             </div>
             <div class="play-info" id="playInfoDisplay">No previous play</div>
+        </div>
+        
+        <!-- FIXED: Card pile on RIGHT -->
+        <div class="table-pile-section">
+            <div class="pile-label">Card Pile</div>
+            <div class="card-pile" id="cardPile">
+                <!-- Face-down card backs will be stacked here -->
+            </div>
+            <div class="pile-count" id="pileCountDisplay">0 cards</div>
         </div>
     </div>
     
