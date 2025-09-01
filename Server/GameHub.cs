@@ -5,7 +5,9 @@ public class GameHub : Hub
 {
     private readonly IGameEngine _gameEngine;
     private readonly IMatchManager _matchManager;
+
     private readonly ConcurrentDictionary<Guid, Guid> _processedCommands = new();
+
     // Track connection to player mapping
     private static readonly ConcurrentDictionary<string, (Guid MatchId, Guid PlayerId)> _connectionToPlayer = new();
 
@@ -65,26 +67,12 @@ public class GameHub : Hub
         var joiningPlayer = match.Players.Last();
         _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
 
-        var state = new GameStateDto
-        {
-            MatchId = match.Id,
-            Phase = match.Phase,
-            Players = match.Players.Select(p => new PlayerStateDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                HandCount = p.Hand.Count,
-                Score = p.Score,
-                IsConnected = p.IsConnected
-            }).ToList(),
-            CreatorPlayerId = match.Players[0].Id,
-            DeckSize = match.Settings.DeckSize,
-            JokerCount = match.Settings.JokerCount,
-            LastAction = $"👋 {playerName} joined the game!"
-        };
+        // FIXED: Broadcast join message to all players using the same pattern as CreateOrJoinMatch
+        var joinMessage = $"{joiningPlayer.Name} joined the game!";
 
-        // Broadcast to group
-        await Clients.Group($"match:{matchId}").SendAsync("StateUpdate", state, Guid.Empty);
+        // Send personalized states to all connections with the join message
+        await BroadcastPersonalizedStates(match, joinMessage);
+
         return match;
     }
 

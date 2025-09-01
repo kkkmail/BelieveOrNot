@@ -14,7 +14,26 @@ async function initializeConnection() {
         // If there's a LastAction, show it as a game event
         if (state.LastAction && state.LastAction.trim() !== '') {
             console.log("Broadcasting game event:", state.LastAction);
-            showMessage(state.LastAction, 0, true); // Show as game event
+            
+            // Parse and enhance event messages for better display
+            let eventMessage = state.LastAction;
+            
+            // Add appropriate icons based on message content
+            if (eventMessage.includes('joined the game')) {
+                eventMessage = '👋 ' + eventMessage;
+            } else if (eventMessage.includes('Round') && eventMessage.includes('started')) {
+                eventMessage = '🎯 ' + eventMessage;
+            } else if (eventMessage.includes('disposed 4 of a kind')) {
+                eventMessage = '♠️♥️♦️♣️ ' + eventMessage;
+            } else if (eventMessage.includes('challenges')) {
+                eventMessage = '⚔️ ' + eventMessage;
+            } else if (eventMessage.includes('Round') && eventMessage.includes('ended')) {
+                eventMessage = '🏁 ' + eventMessage;
+            } else if (eventMessage.includes('NO CARDS LEFT')) {
+                eventMessage = '🎯 ' + eventMessage;
+            }
+            
+            showMessage(eventMessage, 0, true); // Show as persistent game event
         }
         
         updateGameDisplay();

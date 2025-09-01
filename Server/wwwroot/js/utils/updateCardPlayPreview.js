@@ -29,6 +29,12 @@ function updateCardPlayPreview() {
 
     if (!previewArea) return;
 
+    // FIXED: Hide when round ends
+    if (gameState && gameState.phase === 2) { // RoundEnd
+        previewArea.style.display = 'none';
+        return;
+    }
+
     if (selectedCards.length === 0) {
         previewArea.style.display = 'none';
         return;
@@ -69,7 +75,7 @@ function updateCardPlayPreview() {
 
     const cardNames = cardsToPlay.map(card => {
         if (card.rank === 'Joker') {
-            return '🃏 Joker';
+            return 'Joker';
         } else {
             const suitSymbol = getSuitSymbol(card.suit);
             return `${card.rank}${suitSymbol}`;
