@@ -4,12 +4,15 @@ function updatePlayersDisplay() {
 
     if (!gameState.players) return;
 
+    // FIXED: Only show current turn during active gameplay (Phase 1: InProgress)
+    const isActiveRound = gameState.phase === 1;
+
     gameState.players.forEach((player, index) => {
         const playerCard = document.createElement('div');
         playerCard.className = 'player-card';
         
-        // Add current turn highlighting with blinking effect
-        if (index === gameState.currentPlayerIndex) {
+        // FIXED: Add current turn highlighting with blinking effect ONLY during active rounds
+        if (isActiveRound && index === gameState.currentPlayerIndex) {
             playerCard.classList.add('current-turn');
         }
 
@@ -34,12 +37,17 @@ function updatePlayersDisplay() {
             playerNameDisplay += ` ${markers.join(' ')}`;
         }
 
+        // FIXED: Only show turn indicator during active rounds
+        const turnIndicator = (isActiveRound && index === gameState.currentPlayerIndex) 
+            ? '<div class="turn-indicator">🎯 Current Turn</div>' 
+            : '';
+
         playerCard.innerHTML = `
             <h3>${playerNameDisplay}</h3>
             <div class="player-stats">
                 <div>Cards: ${player.handCount}</div>
                 <div>Score: ${player.score}</div>
-                ${index === gameState.currentPlayerIndex ? '<div class="turn-indicator">🎯 Current Turn</div>' : ''}
+                ${turnIndicator}
             </div>
         `;
 
