@@ -27,17 +27,16 @@ function updateCardPileDisplay() {
     // Clear pile
     cardPile.innerHTML = '';
     
-    // FIXED: Wait for next frame to ensure container is rendered with correct width
+    // FIXED: Wait for container to render and get accurate width
     requestAnimationFrame(() => {
-        // Get actual container width for spacing calculation
         const containerRect = cardPile.getBoundingClientRect();
-        const containerWidth = Math.max(containerRect.width - 20, 200); // Account for padding
+        const containerWidth = containerRect.width - 10; // FIXED: Account for padding properly
         const cardWidth = 90;
         
         console.log('Container width:', containerWidth, 'Card width:', cardWidth);
         
-        // FIXED: Calculate total cards that could potentially be in the deck
-        let totalCardsInDeck = 52; // Default deck size
+        // Calculate total cards in deck
+        let totalCardsInDeck = 52;
         if (gameState.deckSize || gameState.DeckSize) {
             totalCardsInDeck = gameState.deckSize || gameState.DeckSize;
         }
@@ -45,35 +44,35 @@ function updateCardPileDisplay() {
             totalCardsInDeck += (gameState.jokerCount || gameState.JokerCount);
         }
         
-        // Max cards in pile = total deck - 2 (minimum needed elsewhere)
         const maxPossiblePileCards = Math.max(totalCardsInDeck - 2, pileCardCount);
         
-        // FIXED: Calculate spacing to spread cards across available width
-        let cardSpacing = 8; // Minimum reasonable spacing
-        if (maxPossiblePileCards > 1 && containerWidth > cardWidth) {
-            const totalWidthForSpacing = containerWidth - cardWidth; // Space available for spreading
-            cardSpacing = Math.max(totalWidthForSpacing / (maxPossiblePileCards - 1), 6);
-            cardSpacing = Math.min(cardSpacing, 25); // Maximum reasonable spacing
+        // FIXED: Calculate spacing based on maxPossiblePileCards for consistency
+        let cardSpacing = 4; // Minimum spacing
+        if (maxPossiblePileCards > 1) {
+            // Available space for spacing = container width - width of last card
+            const availableWidth = containerWidth - cardWidth;
+            if (availableWidth > 0) {
+                cardSpacing = availableWidth / (maxPossiblePileCards - 1); // FIXED: Use maxPossiblePileCards
+                cardSpacing = Math.max(cardSpacing, 2); // Minimum 2px
+                cardSpacing = Math.min(cardSpacing, 15); // Maximum 15px
+            }
         }
         
         console.log('Pile: ' + pileCardCount + '/' + maxPossiblePileCards + ' cards, spacing: ' + cardSpacing.toFixed(1) + 'px');
         
-        // Create cards with proper spacing and black borders
+        // Create cards with corrected spacing
         for (let i = 0; i < pileCardCount; i++) {
             const cardBack = document.createElement('div');
-            // Use exact same classes as hand cards for black borders
             cardBack.className = 'card';
             cardBack.style.position = 'absolute';
-            cardBack.style.left = (i * cardSpacing) + 'px';
-            cardBack.style.top = '5px'; // Small top margin
+            cardBack.style.left = (i * cardSpacing) + 'px'; // FIXED: Use actual calculated spacing
+            cardBack.style.top = '5px';
             cardBack.style.zIndex = i.toString();
             cardBack.style.width = cardWidth + 'px';
             cardBack.style.height = '130px';
             
-            // Light card back with suit symbols - same style as defined in CSS
             cardBack.style.background = 'radial-gradient(circle at 30% 30%, rgba(116, 185, 255, 0.4) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(187, 143, 206, 0.4) 0%, transparent 50%), linear-gradient(135deg, #9bb0c1 0%, #8299b5 50%, #9bb0c1 100%)';
             
-            // Add suit symbols
             cardBack.innerHTML = '<div style="color: #34495e; opacity: 0.7; font-size: 20px; letter-spacing: 3px; text-shadow: 1px 1px 1px rgba(255,255,255,0.3);">♠♥♦♣</div>';
             
             cardPile.appendChild(cardBack);

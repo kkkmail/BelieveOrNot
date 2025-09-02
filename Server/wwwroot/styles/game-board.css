@@ -1,4 +1,4 @@
-/* Game Board Styles - Updated layout with last play on right */
+/* Game Board Styles - FIXED Layout */
 .game-board {
     background: rgba(255,255,255,0.95);
     padding: 30px;
@@ -121,7 +121,7 @@
     color: #666;
 }
 
-/* Updated table area layout */
+/* FIXED: Table area layout - Table header on top */
 .table-area {
     text-align: center;
     margin-bottom: 30px;
@@ -131,75 +131,96 @@
     border: 3px dashed #28a745;
 }
 
-.table-display {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+.table-area h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.5em;
 }
 
-/* Card pile section - LEFT SIDE */
+/* LAYOUT FIX: Changed from space-between to flex-start, reduced gaps */
+.table-display {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    margin-bottom: 20px;
+    position: relative;
+    min-height: 180px;
+    width: 100%;
+}
+
+/* LAYOUT FIX: Last Play section - made smaller and tight to left */
+.previous-play-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 200px; /* FIXED: Smaller width, just enough for 3 cards */
+    flex-shrink: 0;
+    margin-left: 0; /* FIXED: Tight to left edge */
+    margin-right: 5px; /* FIXED: Minimal gap to separator */
+}
+
+/* LAYOUT FIX: Real vertical separator line element */
+.table-separator {
+    width: 3px;
+    background: #28a745;
+    margin: 10px 5px; /* FIXED: Small margins around separator */
+    flex-shrink: 0;
+    border-radius: 2px;
+    align-self: stretch;
+}
+
+/* LAYOUT FIX: Card pile section - uses all remaining space with minimal margins */
 .table-pile-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     flex: 1;
+    margin-left: 5px; /* FIXED: Minimal margin */
+    margin-right: 0; /* FIXED: No right margin */
 }
 
+.play-label,
 .pile-label {
     font-weight: bold;
     color: #333;
     font-size: 16px;
-}
-
-.card-pile {
-    position: relative;
-    width: 150px; /* FIXED: Wider to accommodate left-growing pile */
-    height: 140px; /* FIXED: Taller for full-size cards */
-    margin: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.pile-count {
-    font-size: 14px;
-    color: #666;
-    font-weight: 600;
-}
-
-/* Previous play section - RIGHT SIDE */
-.previous-play-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-}
-
-.play-label {
-    font-weight: bold;
-    color: #333;
-    font-size: 16px;
+    margin-bottom: 10px;
 }
 
 .previous-play-cards {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
     justify-content: center;
-    min-height: 130px; /* Match hand card height */
+    min-height: 130px;
     align-items: center;
+    width: 100%;
 }
 
-.play-info {
+.play-info,
+.pile-count {
     font-size: 14px;
     color: #666;
     font-weight: 600;
     text-align: center;
+    margin-top: 10px;
+}
+
+/* LAYOUT FIX: Card pile container - full width with smaller padding */
+.card-pile {
+    position: relative;
+    width: 100%; /* FIXED: Full width of section */
+    height: 140px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: visible;
+    border: 2px dashed #28a745; /* FIXED: Visual container border */
+    border-radius: 8px;
+    padding: 5px; /* FIXED: Smaller padding */
+    background: rgba(40, 167, 69, 0.05);
 }
 
 .hand-area {
