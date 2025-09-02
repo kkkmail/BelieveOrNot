@@ -19,28 +19,35 @@ function updateCardPileDisplay() {
     
     pileCountDisplay.textContent = `${pileCardCount} cards`;
     
-    if (pileCardCount === 0) {
-        cardPile.innerHTML = '<div style="color: #999; font-style: italic; margin-top: 40px;">Empty</div>';
+    if (pileCardCount <= 2) {
+        // Not enough cards to show spreading
+        cardPile.innerHTML = '<div style="color: #999; font-style: italic; margin-top: 40px;">Too few to spread</div>';
         return;
     }
 
-    // FIXED: Create visual stack with ONLY horizontal offset (no diagonal)
+    // FIXED: Use all available space dynamically
     cardPile.innerHTML = '';
     
-    // Show exact number of cards with LEFT offset to simulate growth
-    const cardWidth = 90; // Same as hand cards
+    const cardWidth = 90;
     const cardHeight = 130;
-    const offsetX = 3; // Horizontal offset per card
+    const containerWidth = 200; // Available space for pile (adjust based on your layout)
     
-    // Calculate starting position so the pile grows to the left
-    const startX = (pileCardCount - 1) * offsetX;
+    // Calculate dynamic offset to use all space
+    const cardsToSpread = pileCardCount - 2; // Reserve 2 cards worth of space
+    const availableSpreadWidth = containerWidth - cardWidth;
+    const dynamicOffset = cardsToSpread > 0 ? availableSpreadWidth / cardsToSpread : 0;
+    
+    // Limit offset to reasonable range
+    const finalOffset = Math.min(Math.max(dynamicOffset, 2), 15);
+    
+    console.log(`Pile: ${pileCardCount} cards, spread: ${cardsToSpread}, offset: ${finalOffset}px`);
     
     for (let i = 0; i < pileCardCount; i++) {
         const cardBack = document.createElement('div');
         cardBack.className = 'card-back pile-card';
         cardBack.style.position = 'absolute';
-        cardBack.style.left = `${startX - (i * offsetX)}px`; // Cards grow to the left
-        cardBack.style.top = '0px'; // FIXED: No vertical offset - purely horizontal
+        cardBack.style.left = `${i * finalOffset}px`; // Dynamic spacing
+        cardBack.style.top = '0px'; // No vertical offset
         cardBack.style.zIndex = i;
         cardBack.style.width = `${cardWidth}px`;
         cardBack.style.height = `${cardHeight}px`;
@@ -93,7 +100,11 @@ function updatePreviousPlayDisplay() {
             handlePreviousCardClick(i);
         });
         
-        // Show selection if this card is currently selected for challenge
+        // FIXED: Show selection if this card is currently selected for challenge
+        // Check both direct table selection AND challenge area selection
+        const challengeArea = document.getElementById('challengeArea');
+        const isChallengeAreaVisible = challengeArea && !challengeArea.classList.contains('hidden');
+        
         if (selectedChallengeIndex === i) {
             cardElement.classList.add('challenge-selected');
         }
@@ -124,9 +135,7 @@ function handlePreviousCardClick(cardIndex) {
         return;
     }
     
-    // FIXED: Challenge logic - can challenge when:
-    // 1. It's our turn (normal challenge)
-    // 2. OR in 2-player game when opponent has 0 cards
+    // Challenge logic - can challenge when it's our turn OR 2-player special case
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     const isMyTurn = currentPlayer && currentPlayer.id === playerId;
     
@@ -134,7 +143,6 @@ function handlePreviousCardClick(cardIndex) {
     const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
     const is2PlayerWithZeroCards = gameState.players.length === 2 && playersWithNoCards.length > 0;
     
-    // FIXED: Can challenge when it IS our turn, OR 2-player special case
     const canChallenge = isMyTurn || is2PlayerWithZeroCards;
     
     console.log("Challenge check:", {
@@ -151,37 +159,9 @@ function handlePreviousCardClick(cardIndex) {
         return;
     }
     
-    // FIXED: Auto-submit challenge immediately like clicking table card should
+    // FIXED: Show challenge area first, then auto-select this card
     selectedChallengeIndex = cardIndex;
+    showChallenge(); // This will sync the challenge area with our selection
     
-    // Get previous player info for confirmation
-    const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
-    const previousPlayer = gameState.players[previousPlayerIndex];
-    
-    const confirmed = confirm(
-        `Challenge ${previousPlayer?.name || 'previous player'}?\n` +
-        `You are challenging that card ${cardIndex + 1} is NOT a ${gameState.announcedRank}.`
-    );
-    
-    if (confirmed) {
-        // Submit challenge immediately
-        submitChallenge();
-    } else {
-        // Clear selection if cancelled
-        selectedChallengeIndex = -1;
-        updatePreviousPlayDisplay();
-    }
-    
-    console.log(`Direct challenge attempted for card ${cardIndex + 1}`);
-}
-
-// NEW: Function to update challenge area selection to match table selection
-function updateChallengeCardsSelection() {
-    const challengeCards = document.querySelectorAll('.challenge-card');
-    challengeCards.forEach((card, i) => {
-        card.classList.remove('selected');
-        if (i === selectedChallengeIndex) {
-            card.classList.add('selected');
-        }
-    });
+    console.log(`Challenge area shown with card ${cardIndex + 1} pre-selected`);
 }

@@ -1,11 +1,11 @@
 function toggleCardSelection(cardIndex) {
-    // FIXED: Allow card selection during active game phase OR when it's not our turn (pre-selection)
+    // Allow card selection during active game phase OR when it's not our turn (pre-selection)
     if (gameState && gameState.phase === 2) { // RoundEnd
         console.log("Card selection disabled: Round has ended");
         return; // Don't show message, just silently ignore
     }
 
-    // FIXED: Allow selection during game setup or when not our turn (for pre-selection)
+    // Allow selection during game setup or when not our turn (for pre-selection)
     if (!gameState || (gameState.phase !== 1 && gameState.phase !== 0)) {
         console.log("Card selection disabled: Invalid game phase");
         return;
@@ -35,10 +35,13 @@ function toggleCardSelection(cardIndex) {
         }
     }
     
+    // FIXED: Clear "played" flag when selection changes
+    window.cardsJustPlayed = false;
+    
     // Update display immediately
     updateHandDisplay();
     updateActionsDisplay();
-    updateCardPlayPreview(); // NEW: Show what will be played
+    updateCardPlayPreview(); // This will now show "Will play" again
     
     console.log('Selected cards:', selectedCards);
 }

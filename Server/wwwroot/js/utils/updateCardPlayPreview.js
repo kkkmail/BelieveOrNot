@@ -29,7 +29,7 @@ function updateCardPlayPreview() {
 
     if (!previewArea) return;
 
-    // FIXED: Hide when round ends
+    // Hide when round ends
     if (gameState && gameState.phase === 2) { // RoundEnd
         previewArea.style.display = 'none';
         return;
@@ -82,9 +82,12 @@ function updateCardPlayPreview() {
         }
     });
 
+    // FIXED: Check if cards were just played (use global flag)
+    const actionText = window.cardsJustPlayed ? 'Played in order' : 'Will play in order';
+    
     previewArea.innerHTML = `
         <div style="color: #007bff;">
-            Will play in order: ${cardNames.join(' → ')}
+            ${actionText}: ${cardNames.join(' → ')}
             ${cardsToPlay.length === 1 ? ' (1 card)' : ` (${cardsToPlay.length} cards)`}
         </div>
     `;

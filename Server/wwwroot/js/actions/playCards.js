@@ -38,6 +38,10 @@ async function playCards() {
     console.log("Playing cards:", cardsToPlay.map(c => `${c.rank} of ${c.suit}`));
 
     try {
+        // FIXED: Set flag to show "Played" instead of "Will play"
+        window.cardsJustPlayed = true;
+        updateCardPlayPreview();
+
         await connection.invoke("SubmitMove", {
             matchId: gameState.matchId,
             clientCmdId: generateGuid(),
@@ -47,7 +51,7 @@ async function playCards() {
             declaredRank: declaredRank
         });
 
-        // CRITICAL FIX: Clear selected cards immediately after successful play
+        // Clear selected cards immediately after successful play
         selectedCards = [];
         console.log("Selected cards cleared after play");
         
@@ -57,5 +61,9 @@ async function playCards() {
     } catch (err) {
         console.error("Failed to play cards:", err);
         alert("Failed to play cards: " + err);
+        
+        // FIXED: Clear flag if play failed
+        window.cardsJustPlayed = false;
+        updateCardPlayPreview();
     }
 }
