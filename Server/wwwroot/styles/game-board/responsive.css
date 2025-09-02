@@ -1,0 +1,16 @@
+@media (max-width: 768px) {
+    .table-display {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .table-pile-section,
+    .previous-play-section {
+        flex: none;
+    }
+    
+    .card-pile {
+        width: 80px;
+    }
+}

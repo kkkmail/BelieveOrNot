@@ -1,0 +1,11 @@
+.hand-area {
+    margin-top: 30px;
+}
+
+.hand-cards {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
