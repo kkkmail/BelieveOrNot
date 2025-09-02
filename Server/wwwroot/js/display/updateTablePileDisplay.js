@@ -19,38 +19,65 @@ function updateCardPileDisplay() {
     
     pileCountDisplay.textContent = `${pileCardCount} cards`;
     
-    if (pileCardCount <= 2) {
-        // Not enough cards to show spreading
-        cardPile.innerHTML = '<div style="color: #999; font-style: italic; margin-top: 40px;">Too few to spread</div>';
+    if (pileCardCount === 0) {
+        cardPile.innerHTML = '<div style="color: #999; font-style: italic; margin-top: 40px;">Empty</div>';
         return;
     }
 
-    // FIXED: Use all available space dynamically
+    // Clear pile
     cardPile.innerHTML = '';
     
+    // FIXED: Get actual container width for spacing calculation
+    const containerRect = cardPile.getBoundingClientRect();
+    const containerWidth = Math.max(containerRect.width, 200); // Fallback minimum
     const cardWidth = 90;
-    const cardHeight = 130;
-    const containerWidth = 200; // Available space for pile (adjust based on your layout)
     
-    // Calculate dynamic offset to use all space
-    const cardsToSpread = pileCardCount - 2; // Reserve 2 cards worth of space
-    const availableSpreadWidth = containerWidth - cardWidth;
-    const dynamicOffset = cardsToSpread > 0 ? availableSpreadWidth / cardsToSpread : 0;
+    // FIXED: Calculate total cards that could potentially be in play
+    let totalCardsInDeck = 52; // Default deck size
+    if (gameState.deckSize || gameState.DeckSize) {
+        totalCardsInDeck = gameState.deckSize || gameState.DeckSize;
+    }
+    if (gameState.jokerCount || gameState.JokerCount) {
+        totalCardsInDeck += (gameState.jokerCount || gameState.JokerCount);
+    }
     
-    // Limit offset to reasonable range
-    const finalOffset = Math.min(Math.max(dynamicOffset, 2), 15);
+    // Max cards in pile = total deck - 2 (minimum needed elsewhere)
+    const maxPossiblePileCards = Math.max(totalCardsInDeck - 2, pileCardCount);
     
-    console.log(`Pile: ${pileCardCount} cards, spread: ${cardsToSpread}, offset: ${finalOffset}px`);
+    // FIXED: Calculate spacing to fill available width
+    let cardSpacing = 5; // Minimum spacing
+    if (maxPossiblePileCards > 1) {
+        const totalWidthNeeded = cardWidth; // Space for last card
+        const availableForSpacing = containerWidth - totalWidthNeeded;
+        cardSpacing = Math.max(availableForSpacing / (maxPossiblePileCards - 1), 3);
+        cardSpacing = Math.min(cardSpacing, 20); // Maximum reasonable spacing
+    }
     
+    console.log(`Pile: ${pileCardCount}/${maxPossiblePileCards} cards, spacing: ${cardSpacing.toFixed(1)}px, container: ${containerWidth.toFixed(0)}px`);
+    
+    // Create cards with proper black borders like hand cards
     for (let i = 0; i < pileCardCount; i++) {
         const cardBack = document.createElement('div');
-        cardBack.className = 'card-back pile-card';
+        // FIXED: Use exact same classes as hand cards for black borders
+        cardBack.className = 'card';
         cardBack.style.position = 'absolute';
-        cardBack.style.left = `${i * finalOffset}px`; // Dynamic spacing
-        cardBack.style.top = '0px'; // No vertical offset
+        cardBack.style.left = `${i * cardSpacing}px`;
+        cardBack.style.top = '0px';
         cardBack.style.zIndex = i;
         cardBack.style.width = `${cardWidth}px`;
-        cardBack.style.height = `${cardHeight}px`;
+        cardBack.style.height = '130px';
+        
+        // FIXED: Light card back with suit symbols - same style as defined in CSS
+        cardBack.style.background = `
+            radial-gradient(circle at 30% 30%, rgba(116, 185, 255, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 70% 70%, rgba(187, 143, 206, 0.4) 0%, transparent 50%),
+            linear-gradient(135deg, #9bb0c1 0%, #8299b5 50%, #9bb0c1 100%)
+        `;
+        
+        // Add suit symbols
+        cardBack.innerHTML = `
+            <div style="color: #34495e; opacity: 0.7; font-size: 20px; letter-spacing: 3px; text-shadow: 1px 1px 1px rgba(255,255,255,0.3);">♠♥♦♣</div>
+        `;
         
         cardPile.appendChild(cardBack);
     }
@@ -114,7 +141,7 @@ function updatePreviousPlayDisplay() {
 }
 
 function handlePreviousCardClick(cardIndex) {
-    console.log(`Previous play card ${cardIndex + 1} clicked - triggering challenge`);
+    console.log('Previous play card ' + (cardIndex + 1) + ' clicked - showing challenge interface');
     
     // Check if we can challenge
     if (!gameState || gameState.phase !== 1) {
@@ -159,9 +186,12 @@ function handlePreviousCardClick(cardIndex) {
         return;
     }
     
-    // FIXED: Show challenge area first, then auto-select this card
+    // FIXED: This is equivalent to clicking Challenge button + selecting this card
+    // 1. Set the selected challenge index
     selectedChallengeIndex = cardIndex;
-    showChallenge(); // This will sync the challenge area with our selection
     
-    console.log(`Challenge area shown with card ${cardIndex + 1} pre-selected`);
+    // 2. Show the challenge area (same as clicking Challenge button)
+    showChallenge(); // This will create identical cards and show the selected one
+    
+    console.log('Challenge interface shown with card ' + (cardIndex + 1) + ' pre-selected');
 }

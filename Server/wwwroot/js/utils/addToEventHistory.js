@@ -13,33 +13,13 @@ function addToEventHistory(event) {
         const timestamp = parts[0];
         const message = parts.slice(1).join(': ');
         
-        // FIXED: Apply message formatting enhancements
-        let enhancedMessage = message;
-        
-        // Apply challenge message formatting
-        if (message.includes('challenges') || message.includes('Challenged card was')) {
-            enhancedMessage = formatChallengeMessage(message);
-        }
-        
-        // Apply disposal message formatting
-        if (message.includes('disposed 4 of a kind')) {
-            enhancedMessage = formatDisposalMessage(message);
-        }
+        // FIXED: Apply comprehensive message formatting
+        const enhancedMessage = formatGameMessage(message);
         
         timestampedEvent = `${timestamp}: ${enhancedMessage}`;
     } else {
         // Add timestamp to event using consistent formatting
-        let enhancedEvent = event;
-        
-        // Apply message formatting enhancements
-        if (event.includes('challenges') || event.includes('Challenged card was')) {
-            enhancedEvent = formatChallengeMessage(event);
-        }
-        
-        if (event.includes('disposed 4 of a kind')) {
-            enhancedEvent = formatDisposalMessage(event);
-        }
-        
+        const enhancedEvent = formatGameMessage(event);
         timestampedEvent = `${getCurrentTime()}: ${enhancedEvent}`;
     }
     

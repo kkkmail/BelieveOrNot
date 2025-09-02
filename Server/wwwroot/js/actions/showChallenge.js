@@ -5,7 +5,6 @@ function showChallenge() {
     challengeArea.classList.remove('hidden');
     challengeCards.innerHTML = '';
 
-    // Debug: Log the game state to understand what data we have
     console.log("Challenge - Game State:", {
         tablePileCount: gameState.tablePileCount,
         lastPlayCardCount: gameState.lastPlayCardCount,
@@ -18,14 +17,11 @@ function showChallenge() {
     // Determine how many cards to show for challenge
     let cardsToShow;
     
-    // Fixed: Use the correct property name from C# (LastPlayCardCount)
     const lastPlayCount = gameState.lastPlayCardCount || gameState.LastPlayCardCount;
     
     if (lastPlayCount && lastPlayCount > 0) {
-        // Use LastPlayCardCount if available from server
         cardsToShow = Math.min(lastPlayCount, 3);
     } else if (gameState.tablePileCount > 0) {
-        // Fallback: This should not happen, but if LastPlayCardCount is missing
         console.error("LastPlayCardCount not available! This is a server issue.");
         cardsToShow = Math.min(gameState.tablePileCount, 3);
     } else {
@@ -35,20 +31,25 @@ function showChallenge() {
         return;
     }
 
-    console.log(`Showing ${cardsToShow} cards for challenge (last play count: ${lastPlayCount})`);
+    console.log("Showing " + cardsToShow + " cards for challenge (last play count: " + lastPlayCount + ")");
 
-    // Create challenge cards with proper event handling
+    const announcedRank = gameState.announcedRank || 'Unknown';
+
+    // FIXED: Create challenge cards that look EXACTLY like table cards
     for (let i = 0; i < cardsToShow; i++) {
         const cardElement = document.createElement('div');
-        cardElement.className = 'challenge-card';
-        cardElement.textContent = `Card ${i + 1}`;
+        cardElement.className = 'card previous-play-card'; // EXACT same classes as table cards
+        cardElement.style.cursor = 'pointer';
         
-        // FIXED: Check if this card is already selected (from table click)
+        // EXACT same content as table cards (? rank + announced rank)
+        cardElement.innerHTML = '<div class="rank">?</div><div class="suit">' + announcedRank + '</div>';
+        
+        // Check if this card is already selected
         if (selectedChallengeIndex === i) {
-            cardElement.classList.add('selected');
+            cardElement.classList.add('challenge-selected');
         }
         
-        // Use proper event listener instead of onclick to prevent violations
+        // Add click handler
         cardElement.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
@@ -61,9 +62,9 @@ function showChallenge() {
     // Show instruction
     const instruction = challengeArea.querySelector('h3');
     if (instruction) {
-        instruction.textContent = `Choose a card to flip from the last play (${cardsToShow} cards):`;
+        instruction.textContent = 'Choose a card to flip from the last play (' + cardsToShow + ' cards):';
     }
     
-    // FIXED: Update table display to show current selection
+    // Update table display to show current selection
     updatePreviousPlayDisplay();
 }
