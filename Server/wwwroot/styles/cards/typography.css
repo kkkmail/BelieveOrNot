@@ -1,0 +1,17 @@
+/* Much larger font sizing with proper spacing */
+.card .rank {
+    font-weight: bold;
+    margin-bottom: 8px; /* FIXED: More space between rank and suit */
+    line-height: 1;
+    text-align: center;
+    /* SUBSTANTIALLY LARGER rank font */
+    font-size: min(max(3.5vw, 36px), 48px); /* Much bigger than before */
+}
+
+.card .suit {
+    line-height: 1;
+    text-align: center;
+    margin-top: 4px; /* FIXED: Additional space from rank */
+    /* Slightly larger suit font */
+    font-size: min(max(2.5vw, 24px), 32px); /* Bigger than before */
+}

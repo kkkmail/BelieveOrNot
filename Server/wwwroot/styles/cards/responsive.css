@@ -1,0 +1,43 @@
+@media (max-width: 768px) {
+    .card {
+        width: 80px;
+        height: 115px;
+    }
+    
+    .card .rank {
+        font-size: min(max(5vw, 30px), 40px); /* Still very large on mobile */
+    }
+    
+    .card .suit {
+        font-size: min(max(3.5vw, 22px), 28px); /* Larger suit on mobile */
+    }
+    
+    .card-back {
+        width: 60px;
+        height: 85px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        width: 70px;
+        height: 100px;
+    }
+    
+    .card .rank {
+        font-size: min(max(6vw, 26px), 34px); /* Large even on small phones */
+    }
+    
+    .card .suit {
+        font-size: min(max(4.5vw, 20px), 24px); /* Larger suit on small phones */
+    }
+    
+    .card-back {
+        width: 50px;
+        height: 70px;
+    }
+    
+    .card-back::before {
+        font-size: 12px;
+    }
+}

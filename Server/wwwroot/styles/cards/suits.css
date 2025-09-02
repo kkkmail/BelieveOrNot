@@ -1,0 +1,16 @@
+/* Color classes for suits */
+.card.hearts {
+    color: #dc3545;
+}
+
+.card.diamonds {
+    color: #dc3545;
+}
+
+.card.clubs {
+    color: #333;
+}
+
+.card.spades {
+    color: #333;
+}

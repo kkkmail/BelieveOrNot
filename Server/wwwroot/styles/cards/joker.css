@@ -1,0 +1,16 @@
+.card.joker {
+    background: linear-gradient(45deg, #ff6b6b, #feca57);
+    color: white;
+    border-color: #ff6b6b;
+}
+
+.card.joker .rank {
+    font-size: min(max(4vw, 48px), 64px); /* FIXED: SUBSTANTIALLY LARGER joker icon */
+    margin-bottom: 12px; /* FIXED: More space between icon and text */
+}
+
+.card.joker .suit {
+    font-size: min(max(1.8vw, 18px), 24px); /* Smaller for "JOKER" text */
+    font-weight: 600;
+    margin-top: 8px; /* FIXED: More space from icon */
+}
