@@ -143,7 +143,7 @@
     justify-content: flex-start;
     align-items: flex-start;
     gap: 0;
-    margin-bottom: 10px; /* FIXED: Reduced from 20px */
+    margin-bottom: 5px; /* FIXED: Reduced from 10px */
     position: relative;
     min-height: 180px;
     width: 100%;
@@ -154,23 +154,21 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px; /* FIXED: Reduced from 10px */
-    width: 300px; /* FIXED: Increased from 200px to fit 3 cards */
+    gap: 2px; /* FIXED: Reduced from 5px */
+    width: 300px;
     flex-shrink: 0;
     margin-left: 0;
-    margin-right: 10px; /* FIXED: Small gap to pile section */
+    margin-right: 5px; /* FIXED: Reduced from 10px */
 }
-
-/* REMOVED: Vertical separator line - no longer needed */
 
 /* LAYOUT FIX: Card pile section - uses remaining space, aligned vertically */
 .table-pile-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px; /* FIXED: Reduced from 10px to match last play */
+    gap: 2px; /* FIXED: Reduced from 5px to match last play */
     flex: 1;
-    margin-left: 0; /* FIXED: No left margin */
+    margin-left: 0;
     margin-right: 0;
 }
 
@@ -179,9 +177,10 @@
     font-weight: bold;
     color: #333;
     font-size: 16px;
-    margin-bottom: 5px; /* FIXED: Reduced from 10px */
+    margin-bottom: 2px; /* FIXED: Reduced from 5px */
 }
 
+/* FIXED: Last Play cards - shift down slightly to align with middle-aligned pile */
 .previous-play-cards {
     display: flex;
     gap: 8px;
@@ -189,6 +188,7 @@
     min-height: 130px;
     align-items: center;
     width: 100%;
+    margin-top: 7px; /* FIXED: Tiny shift down to match pile vertical center */
 }
 
 .play-info,
@@ -197,23 +197,23 @@
     color: #666;
     font-weight: 600;
     text-align: center;
-    margin-top: 5px; /* FIXED: Reduced from 10px */
+    margin-top: 2px; /* FIXED: Reduced from 5px */
 }
 
-/* LAYOUT FIX: Card pile container - vertically aligned with last play cards */
+/* LAYOUT FIX: Card pile container - vertically centered alignment */
 .card-pile {
     position: relative;
     width: 100%;
     height: 140px;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: center; /* FIXED: Center alignment creates tiny margins top/bottom */
     overflow: visible;
     border: 2px dashed #28a745;
     border-radius: 8px;
     padding: 5px;
     background: rgba(40, 167, 69, 0.05);
-    margin-top: 0; /* FIXED: Ensure vertical alignment */
+    margin-top: 0;
 }
 
 .hand-area {
