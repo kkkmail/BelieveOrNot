@@ -1,4 +1,4 @@
-/* Game Board Styles - FIXED Layout */
+/* Game Board Styles - FINAL Layout with 10px margins */
 .game-board {
     background: rgba(255,255,255,0.95);
     padding: 30px;
@@ -121,52 +121,50 @@
     color: #666;
 }
 
-/* FIXED: Table area layout - Table header on top */
+/* FINAL: Table area layout - 10px margins */
 .table-area {
     text-align: center;
-    margin-bottom: 30px;
-    padding: 30px;
+    margin-bottom: 10px; /* FINAL: 10px margin */
+    padding: 10px; /* FINAL: 10px padding */
     background: rgba(0,100,0,0.1);
     border-radius: 15px;
     border: 3px dashed #28a745;
 }
 
 .table-area h3 {
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
     color: #333;
     font-size: 1.5em;
 }
 
-/* LAYOUT FIX: Changed from space-between to flex-start, reduced gaps */
 .table-display {
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     gap: 0;
-    margin-bottom: 5px; /* FIXED: Reduced from 10px */
+    margin-bottom: 5px;
     position: relative;
     min-height: 180px;
     width: 100%;
 }
 
-/* LAYOUT FIX: Last Play section - made larger to fit 3 cards properly */
+/* FINAL: Last Play section - 300px width, 10px right margin */
 .previous-play-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px; /* FIXED: Reduced from 5px */
+    gap: 2px;
     width: 300px;
     flex-shrink: 0;
     margin-left: 0;
-    margin-right: 5px; /* FIXED: Reduced from 10px */
+    margin-right: 10px; /* FINAL: 10px separation */
 }
 
-/* LAYOUT FIX: Card pile section - uses remaining space, aligned vertically */
 .table-pile-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px; /* FIXED: Reduced from 5px to match last play */
+    gap: 2px;
     flex: 1;
     margin-left: 0;
     margin-right: 0;
@@ -177,10 +175,10 @@
     font-weight: bold;
     color: #333;
     font-size: 16px;
-    margin-bottom: 2px; /* FIXED: Reduced from 5px */
+    margin-bottom: 2px;
 }
 
-/* FIXED: Last Play cards - shift down slightly to align with middle-aligned pile */
+/* Last Play cards - shifted down to align with centered pile */
 .previous-play-cards {
     display: flex;
     gap: 8px;
@@ -188,7 +186,20 @@
     min-height: 130px;
     align-items: center;
     width: 100%;
-    margin-top: 7px; /* FIXED: Tiny shift down to match pile vertical center */
+    margin-top: 7px;
+}
+
+/* Empty state styling for last play - center both horizontally and vertically */
+.previous-play-cards:empty::after {
+    content: "No previous play";
+    color: #999;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin-top: 0;
 }
 
 .play-info,
@@ -197,23 +208,35 @@
     color: #666;
     font-weight: 600;
     text-align: center;
-    margin-top: 2px; /* FIXED: Reduced from 5px */
+    margin-top: 2px;
 }
 
-/* LAYOUT FIX: Card pile container - vertically centered alignment */
+/* Card pile container - vertically centered */
 .card-pile {
     position: relative;
     width: 100%;
     height: 140px;
     display: flex;
     justify-content: flex-start;
-    align-items: center; /* FIXED: Center alignment creates tiny margins top/bottom */
+    align-items: center;
     overflow: visible;
     border: 2px dashed #28a745;
     border-radius: 8px;
     padding: 5px;
     background: rgba(40, 167, 69, 0.05);
     margin-top: 0;
+}
+
+/* Empty state styling for card pile - center both horizontally and vertically */
+.card-pile:empty::after {
+    content: "Empty";
+    color: #999;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 .hand-area {
@@ -251,7 +274,6 @@
     margin: 15px 0;
 }
 
-/* FIXED: Challenge cards now look exactly like table cards */
 .challenge-card-display {
     cursor: pointer;
     transition: all 0.2s;
