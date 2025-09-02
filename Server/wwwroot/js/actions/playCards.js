@@ -1,4 +1,10 @@
-async function playCards() {
+import {connection, gameState, playerId, selectedCards, setSelectedCards} from "../core/variables.js";
+import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
+import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
+import {updateHandDisplay} from "../display/updateHandDisplay.js";
+import {generateGuid} from "../utils/generateGuid.js";
+
+export async function playCards() {
     if (selectedCards.length === 0) {
         alert('Please select cards to play');
         return;
@@ -28,7 +34,7 @@ async function playCards() {
     // If opening turn, get declared rank and validate
     if (!gameState.announcedRank) {
         declaredRank = document.getElementById('declaredRank').value;
-        
+
         if (!declaredRank || declaredRank === '') {
             alert('Please choose a rank from the dropdown before playing cards.');
             return;
@@ -52,16 +58,17 @@ async function playCards() {
         });
 
         // Clear selected cards immediately after successful play
-        selectedCards = [];
+        setSelectedCards([]);
+
         console.log("Selected cards cleared after play");
-        
+
         // Update displays to reflect cleared selection
         updateHandDisplay();
         updateActionsDisplay();
     } catch (err) {
         console.error("Failed to play cards:", err);
         alert("Failed to play cards: " + err);
-        
+
         // FIXED: Clear flag if play failed
         window.cardsJustPlayed = false;
         updateCardPlayPreview();

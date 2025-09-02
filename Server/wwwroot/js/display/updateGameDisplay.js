@@ -1,4 +1,12 @@
-function updateGameDisplay() {
+import {gameState, setSelectedCards} from "../core/variables.js";
+import {updateScoresDisplay} from "./updateScoresDisplay.js";
+import {updateActionsDisplay} from "./updateActionsDisplay.js";
+import {updateHandDisplay} from "./updateHandDisplay.js";
+import {updatePlayersDisplay} from "./updatePlayersDisplay.js";
+import {updateRankDropdown} from "../utils/updateRankDropdown.js";
+import {updateTablePileDisplay} from "./updateTablePileDisplay.js";
+
+export function updateGameDisplay() {
     if (!gameState) return;
 
     // Update basic game info
@@ -41,10 +49,10 @@ function updateGameDisplay() {
     updateScoresDisplay();
 
     // REMOVED the old start button logic from here since it's now handled in updateActionsDisplay
-    
+
     // Clear any lingering card selections after state update (but preserve valid selections)
     // Only clear if game phase changed to non-active
     if (gameState.phase !== 1) {
-        selectedCards = [];
+        setSelectedCards([]);
     }
 }

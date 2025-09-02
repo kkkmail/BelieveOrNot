@@ -1,4 +1,7 @@
-function updateCardPlayPreview() {
+import {getSuitSymbol} from "../cards/getSuitSymbol.js";
+import {gameState, selectedCards} from "../core/variables.js";
+
+export function updateCardPlayPreview() {
     // Find or create preview area
     let previewArea = document.getElementById('cardPlayPreview');
     if (!previewArea) {
@@ -20,7 +23,7 @@ function updateCardPlayPreview() {
                 align-items: center;
                 justify-content: center;
             `;
-            
+
             // Insert before actions area
             const actionsArea = document.getElementById('actionsArea');
             handArea.insertBefore(previewArea, actionsArea);
@@ -67,7 +70,7 @@ function updateCardPlayPreview() {
     });
 
     const cardsToPlay = selectedCards.map(index => sortedHand[index]).filter(card => card);
-    
+
     if (cardsToPlay.length === 0) {
         previewArea.innerHTML = 'Invalid selection';
         return;
@@ -84,7 +87,7 @@ function updateCardPlayPreview() {
 
     // FIXED: Check if cards were just played (use global flag)
     const actionText = window.cardsJustPlayed ? 'Played in order' : 'Will play in order';
-    
+
     previewArea.innerHTML = `
         <div style="color: #007bff;">
             ${actionText}: ${cardNames.join(' → ')}

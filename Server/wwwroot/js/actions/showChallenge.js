@@ -1,4 +1,10 @@
-function showChallenge() {
+import {gameState} from "../core/variables.js";
+import {selectedChallengeIndex} from "../core/variables.js";
+import {hideChallenge} from "./hideChallenge.js";
+import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
+import {selectChallengeCard} from "./selectChallengeCard.js";
+
+export function showChallenge() {
     const challengeArea = document.getElementById('challengeArea');
     const challengeCards = document.getElementById('challengeCards');
 
@@ -16,9 +22,9 @@ function showChallenge() {
 
     // Determine how many cards to show for challenge
     let cardsToShow;
-    
+
     const lastPlayCount = gameState.lastPlayCardCount || gameState.LastPlayCardCount;
-    
+
     if (lastPlayCount && lastPlayCount > 0) {
         cardsToShow = Math.min(lastPlayCount, 3);
     } else if (gameState.tablePileCount > 0) {
@@ -40,22 +46,22 @@ function showChallenge() {
         const cardElement = document.createElement('div');
         cardElement.className = 'card previous-play-card'; // EXACT same classes as table cards
         cardElement.style.cursor = 'pointer';
-        
+
         // EXACT same content as table cards (? rank + announced rank)
         cardElement.innerHTML = '<div class="rank">?</div><div class="suit">' + announcedRank + '</div>';
-        
+
         // Check if this card is already selected
         if (selectedChallengeIndex === i) {
             cardElement.classList.add('challenge-selected');
         }
-        
+
         // Add click handler
         cardElement.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
             selectChallengeCard(i);
         });
-        
+
         challengeCards.appendChild(cardElement);
     }
 
@@ -64,7 +70,7 @@ function showChallenge() {
     if (instruction) {
         instruction.textContent = 'Choose a card to flip from the last play (' + cardsToShow + ' cards):';
     }
-    
+
     // Update table display to show current selection
     updatePreviousPlayDisplay();
 }

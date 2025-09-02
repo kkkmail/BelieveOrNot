@@ -1,4 +1,4 @@
-function getSuitSymbol(suit) {
+export function getSuitSymbol(suit) {
     switch(suit) {
         case 'Hearts': return '♥️';
         case 'Diamonds': return '♦️';

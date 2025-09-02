@@ -34,48 +34,61 @@
     </div>
 
     <!-- JavaScript Files -->
-    <script src="js/core/variables.js"></script>
-    <script src="js/core/initializeConnection.js"></script>
-    <script src="js/core/updateConnectionStatus.js"></script>
 
-    <script src="js/game/createMatch.js"></script>
-    <script src="js/game/joinMatch.js"></script>
-    <script src="js/game/startRound.js"></script>
-    <script src="js/game/showGameBoard.js"></script>
+    <script type="module" src="js/initialization.js"></script>
 
-    <script src="js/display/updateGameDisplay.js"></script>
-    <script src="js/display/updateTablePileDisplay.js"></script>
-    <script src="js/display/updatePlayersDisplay.js"></script>
-    <script src="js/display/updateHandDisplay.js"></script>
-    <script src="js/display/updateActionsDisplay.js"></script>
-    <script src="js/display/updateScoresDisplay.js"></script>
+    <script type="module" src="js/actions/hideChallenge.js"></script>
+    <script type="module" src="js/actions/playCards.js"></script>
+    <script type="module" src="js/actions/selectChallengeCard.js"></script>
+    <script type="module" src="js/actions/showChallenge.js"></script>
+    <script type="module" src="js/actions/submitChallenge.js"></script>
 
-    <script src="js/utils/updateRankDropdown.js"></script>
+    <script type="module" src="js/cards/getSuitClass.js"></script>
+    <script type="module" src="js/cards/getSuitSymbol.js"></script>
+    <script type="module" src="js/cards/toggleCardSelection.js"></script>
 
-    <script src="js/cards/getSuitClass.js"></script>
-    <script src="js/cards/getSuitSymbol.js"></script>
-    <script src="js/cards/toggleCardSelection.js"></script>
+    <script type="module" src="js/core/initializeConnection.js"></script>
+    <script type="module" src="js/core/updateConnectionStatus.js"></script>
+    <script type="module" src="js/core/variables.js"></script>
 
-    <script src="js/actions/playCards.js"></script>
-    <script src="js/actions/showChallenge.js"></script>
-    <script src="js/actions/hideChallenge.js"></script>
-    <script src="js/actions/selectChallengeCard.js"></script>
-    <script src="js/actions/submitChallenge.js"></script>
+    <script type="module" src="js/display/handlePreviousCardClick.js"></script>
+    <script type="module" src="js/display/updateActionsDisplay.js"></script>
+    <script type="module" src="js/display/updateCardPileDisplay.js"></script>
+    <script type="module" src="js/display/updateGameDisplay.js"></script>
+    <script type="module" src="js/display/updateHandDisplay.js"></script>
+    <script type="module" src="js/display/updatePlayersDisplay.js"></script>
+    <script type="module" src="js/display/updateScoresDisplay.js"></script>
+    <script type="module" src="js/display/updatePreviousPlayDisplay.js"></script>
+    <script type="module" src="js/display/updateTablePileDisplay.js"></script>
 
-    <script src="js/utils/showMessage.js"></script>
-    <script src="js/utils/broadcastMessage.js"></script>
-    <script src="js/utils/addToEventHistory.js"></script>
-    <script src="js/utils/showEventHistory.js"></script>
-    <script src="js/utils/updateRankDropdown.js"></script>
-    <script src="js/utils/updateCardPlayPreview.js"></script>
-    <script src="js/utils/testMessageSystem.js"></script>
-    <script src="js/utils/generateGuid.js"></script>
-    <script src="js/utils/loadHtmlContent.js"></script>
-    <script src="js/utils/setupEventListeners.js"></script>
-    <script src="js/utils/copyMatchId.js"></script>
-    <script src="js/utils/formatCardMessage.js"></script>
-    <script src="js/utils/formatTime.js"></script>
+    <script type="module" src="js/game/createMatch.js"></script>
+    <script type="module" src="js/game/joinMatch.js"></script>
+    <script type="module" src="js/game/showGameBoard.js"></script>
+    <script type="module" src="js/game/startRound.js"></script>
 
-    <script src="js/initialization.js"></script>
+    <script type="module" src="js/utils/addToEventHistory.js"></script>
+    <script type="module" src="js/utils/broadcastMessage.js"></script>
+    <script type="module" src="js/utils/copyMatchId.js"></script>
+    <script type="module" src="js/utils/formatCardForMessage.js"></script>
+    <script type="module" src="js/utils/formatGameMessage.js"></script>
+    <script type="module" src="js/utils/formatPlayerName.js"></script>
+    <script type="module" src="js/utils/formatRankForMessage.js"></script>
+    <script type="module" src="js/utils/formatTime.js"></script>
+    <script type="module" src="js/utils/generateGuid.js"></script>
+    <script type="module" src="js/utils/getCurrentTime.js"></script>
+    <script type="module" src="js/utils/loadHtmlContent.js"></script>
+    <script type="module" src="js/utils/setupChallengeButtons.js"></script>
+    <script type="module" src="js/utils/setupCopyButton.js"></script>
+    <script type="module" src="js/utils/setupFormButtons.js"></script>
+    <script type="module" src="js/utils/setupGameButtons.js"></script>
+    <script type="module" src="js/utils/showEventHistory.js"></script>
+    <script type="module" src="js/utils/showMessage.js"></script>
+    <script type="module" src="js/utils/testBroadcastMessage.js"></script>
+    <script type="module" src="js/utils/testMessageSystem.js"></script>
+    <script type="module" src="js/utils/updateCardPlayPreview.js"></script>
+    <script type="module" src="js/utils/updateRankDropdown.js"></script>
+    <script type="module" src="js/utils/setupEventListeners.js"></script>
+    <script type="module" src="js/utils/setupGameBoardEventListeners.js"></script>
+
 </body>
 </html>

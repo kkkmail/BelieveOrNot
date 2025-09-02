@@ -1,4 +1,6 @@
-function updateActionsDisplay() {
+import {gameState, playerId, selectedCards, setSelectedCards} from "../core/variables.js";
+
+export function updateActionsDisplay() {
     const playBtn = document.getElementById('playBtn');
     const challengeBtn = document.getElementById('challengeBtn');
     const rankSelector = document.getElementById('rankSelector');
@@ -46,7 +48,7 @@ function updateActionsDisplay() {
 
     if (gameState.phase === 2) { // RoundEnd
         console.log("Phase 2 - Round ended");
-        selectedCards = [];
+        setSelectedCards([]);
         if (playerId && gameState.creatorPlayerId === playerId && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
             startRoundBtn.textContent = 'Start New Round';
@@ -112,7 +114,7 @@ function updateActionsDisplay() {
         }
     } else {
         console.log("Normal turn - announced rank exists:", gameState.announcedRank);
-        
+
         if (is2PlayerWithZeroCards) {
             console.log("2-player special case - showing challenge only");
             if (gameState.tablePileCount > 0 && challengeBtn) {
@@ -123,7 +125,7 @@ function updateActionsDisplay() {
             }
         } else {
             console.log("Normal turn logic");
-            
+
             if (selectedCards.length > 0) {
                 console.log("Showing play button for normal turn");
                 if (playBtn) {
@@ -134,12 +136,12 @@ function updateActionsDisplay() {
             } else {
                 console.log("No cards selected, not showing play button");
             }
-            
+
             if (gameState.tablePileCount > 0) {
                 console.log("Showing challenge button");
                 const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
                 const previousPlayer = gameState.players[previousPlayerIndex];
-                
+
                 if (challengeBtn) {
                     challengeBtn.classList.remove('hidden');
                     challengeBtn.textContent = `Challenge ${previousPlayer.name}`;

@@ -1,4 +1,8 @@
-async function createMatch() {
+import {showMessage} from "../utils/showMessage.js";
+import {showGameBoard} from "./showGameBoard.js";
+import {connection, playerId, currentMatch, setCurrentMatch, setPlayerId} from "../core/variables.js";
+
+export async function createMatch() {
     const playerName = document.getElementById('playerName').value.trim();
     if (!playerName) {
         alert('Please enter your name');
@@ -17,14 +21,14 @@ async function createMatch() {
             settings: settings
         });
 
-        currentMatch = result;
-        
+        setCurrentMatch(result);
+
         // FIXED: Creator is always the first player, so use index 0
         if (result.players && result.players.length > 0) {
             const ourPlayer = result.players[0]; // Creator is always first
-            playerId = ourPlayer.id;
+            setPlayerId(ourPlayer.id);
             console.log("Set playerId to:", playerId, "for creator:", ourPlayer.name);
-            
+
             // Creator name shouldn't change, but check just in case
             if (ourPlayer.name !== playerName) {
                 console.log(`Creator name changed from "${playerName}" to "${ourPlayer.name}"`);

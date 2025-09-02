@@ -1,4 +1,9 @@
-function toggleCardSelection(cardIndex) {
+import {gameState, selectedCards} from "../core/variables.js";
+import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
+import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
+import {updateHandDisplay} from "../display/updateHandDisplay.js";
+
+export function toggleCardSelection(cardIndex) {
     // Allow card selection during active game phase OR when it's not our turn (pre-selection)
     if (gameState && gameState.phase === 2) { // RoundEnd
         console.log("Card selection disabled: Round has ended");
@@ -34,14 +39,14 @@ function toggleCardSelection(cardIndex) {
             return;
         }
     }
-    
+
     // FIXED: Clear "played" flag when selection changes
     window.cardsJustPlayed = false;
-    
+
     // Update display immediately
     updateHandDisplay();
     updateActionsDisplay();
     updateCardPlayPreview(); // This will now show "Will play" again
-    
+
     console.log('Selected cards:', selectedCards);
 }

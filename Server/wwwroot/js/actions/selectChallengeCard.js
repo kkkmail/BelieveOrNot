@@ -1,4 +1,7 @@
-function selectChallengeCard(index) {
+import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
+import {selectedChallengeIndex} from "../core/variables.js";
+
+export function selectChallengeCard(index) {
     // Set the selected challenge index
     selectedChallengeIndex = index;
 
@@ -10,9 +13,9 @@ function selectChallengeCard(index) {
             card.classList.add('selected');
         }
     });
-    
+
     // FIXED: Also update the table display to show the selection
     updatePreviousPlayDisplay();
-    
+
     console.log(`Selected challenge card at index: ${index} (synced with table display)`);
 }

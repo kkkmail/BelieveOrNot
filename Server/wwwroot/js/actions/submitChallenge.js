@@ -1,6 +1,10 @@
-async function submitChallenge() {
+import {connection, gameState, playerId, selectedChallengeIndex, setSelectedChallengeIndex} from "../core/variables.js";
+import {hideChallenge} from "./hideChallenge.js";
+import {generateGuid} from "../utils/generateGuid.js";
+
+export async function submitChallenge() {
     console.log("submitChallenge called, selectedChallengeIndex:", selectedChallengeIndex);
-    
+
     if (selectedChallengeIndex === -1) {
         alert('Please select a card to flip');
         return;
@@ -9,7 +13,7 @@ async function submitChallenge() {
     // Show confirmation dialog
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     const isMyTurn = currentPlayer && currentPlayer.id === playerId;
-    const targetPlayer = isMyTurn 
+    const targetPlayer = isMyTurn
         ? gameState.players[(gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length]
         : currentPlayer;
 
@@ -40,14 +44,14 @@ async function submitChallenge() {
             action: 1, // Challenge
             challengePickIndex: selectedChallengeIndex
         };
-        
+
         console.log("Challenge request:", challengeRequest);
 
         await connection.invoke("SubmitMove", challengeRequest);
 
         console.log("Challenge submitted successfully");
         hideChallenge();
-        selectedChallengeIndex = -1;
+        setSelectedChallengeIndex(-1);
     } catch (err) {
         console.error("Failed to challenge:", err);
         alert("Failed to challenge: " + err.message || err);

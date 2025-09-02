@@ -1,39 +1,34 @@
-async function initializeConnection() {
+import { setConnection, setGameState } from "./variables.js";
+import { updateConnectionStatus } from "./updateConnectionStatus.js";
+import { updateGameDisplay } from "../display/updateGameDisplay.js";
+import { addToEventHistory } from "../utils/addToEventHistory.js";
+
+export async function initializeConnection() {
     const serverUrl = "http://localhost:5000/game";
 
-    connection = new signalR.HubConnectionBuilder()
+    const s = globalThis.signalR || window.signalR;
+    if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }
+
+    const hub = new s.HubConnectionBuilder()
         .withUrl(serverUrl)
         .withAutomaticReconnect()
         .build();
 
-    connection.on("StateUpdate", (state, clientCmdIdEcho) => {
-        console.log("=== STATE UPDATE RECEIVED ===");
-        console.log("Full state:", state);
-        console.log("LastAction:", state.LastAction);
-        console.log("===========================");
-        
-        gameState = state;
-        
-        // REMOVED: No longer processing LastAction here since messages are now broadcasted separately
-        // The LastAction processing has been moved to MessageBroadcast handler
-        
+    setConnection(hub);
+
+    hub.on("StateUpdate", (state, clientCmdIdEcho) => {
+        console.log("=== STATE UPDATE RECEIVED ===", state);
+        setGameState(state);
         updateGameDisplay();
     });
 
-    // Listen for message broadcasts from server (these are the real game messages)
-    connection.on("MessageBroadcast", (message, senderName) => {
-        console.log("=== MESSAGE BROADCAST RECEIVED ===");
-        console.log("Message:", message);
-        console.log("Sender:", senderName);
-        console.log("================================");
-        
-        // Add the message to local history and display
-        // The message is already timestamped from the server
+    hub.on("MessageBroadcast", (message, senderName) => {
+        console.log("=== MESSAGE BROADCAST RECEIVED ===", message, senderName);
         addToEventHistory(message);
     });
 
     try {
-        await connection.start();
+        await hub.start();
         updateConnectionStatus("connected");
         console.log("SignalR Connected");
     } catch (err) {

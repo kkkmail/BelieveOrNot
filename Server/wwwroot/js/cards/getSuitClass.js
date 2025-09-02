@@ -1,4 +1,4 @@
-function getSuitClass(suit) {
+export function getSuitClass(suit) {
     if (suit === 'Hearts') return 'hearts';
     if (suit === 'Diamonds') return 'diamonds';
     if (suit === 'Clubs') return 'clubs';
