@@ -99,7 +99,7 @@
     background: rgba(40, 167, 69, 0.05);
     margin-top: 0;
 }
-/* Empty state styling for card pile - center both horizontally and vertically */
+/* FIXED: Empty state styling for card pile - perfectly aligned with "No previous play" */
 .card-pile:empty::after {
     content: "Empty";
     color: #999;
@@ -107,6 +107,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    margin: 0;
 }
