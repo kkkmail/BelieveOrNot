@@ -20,3 +20,6 @@ export function setSelectedChallengeIndex(v) {
 
 export let playerId = null;
 export function setPlayerId(v) { playerId = v; }
+
+export let clientId = null; // NEW: Persistent client ID
+export function setClientId(v) { clientId = v; }

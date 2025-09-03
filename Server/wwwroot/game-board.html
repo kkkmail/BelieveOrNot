@@ -33,8 +33,6 @@
             <div class="play-info" id="playInfoDisplay">No previous play</div>
         </div>
         
-        <!-- REMOVED: Vertical separator line -->
-        
         <!-- Card Pile section - RIGHT, uses remaining space -->
         <div class="table-pile-section">
             <div class="pile-label">Card Pile</div>
@@ -45,7 +43,12 @@
         </div>
     </div>
     
-    <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
+    <!-- Game Management Buttons -->
+    <div class="game-management">
+        <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
+        <button class="btn btn-warning hidden" id="endRoundBtn">End Round</button>
+        <button class="btn btn-danger hidden" id="endGameBtn">End Game</button>
+    </div>
 </div>
 
 <!-- Hand Area -->

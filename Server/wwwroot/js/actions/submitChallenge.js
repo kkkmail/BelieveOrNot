@@ -1,6 +1,8 @@
+// js/actions/submitChallenge.js
 import {connection, gameState, playerId, selectedChallengeIndex, setSelectedChallengeIndex} from "../core/variables.js";
 import {hideChallenge} from "./hideChallenge.js";
 import {generateGuid} from "../utils/generateGuid.js";
+import {customConfirm} from "../utils/customConfirm.js";
 
 export async function submitChallenge() {
     console.log("submitChallenge called, selectedChallengeIndex:", selectedChallengeIndex);
@@ -10,7 +12,7 @@ export async function submitChallenge() {
         return;
     }
 
-    // Show confirmation dialog
+    // Get challenge details for confirmation dialog
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
     const isMyTurn = currentPlayer && currentPlayer.id === playerId;
     const targetPlayer = isMyTurn
@@ -24,17 +26,19 @@ export async function submitChallenge() {
         announcedRank: gameState.announcedRank
     });
 
-    const confirmed = confirm(
-        `Are you sure you want to challenge ${targetPlayer?.name || 'the previous player'}?\n` +
-        `You are challenging that card ${selectedChallengeIndex + 1} is NOT a ${gameState.announcedRank}.`
+    // FIXED: Show confirmation dialog BEFORE sending challenge
+    const confirmed = await customConfirm(
+        `Are you sure you want to challenge ${targetPlayer?.name || 'the previous player'}?\n\n` +
+        `You are challenging that card ${selectedChallengeIndex + 1} is NOT a ${gameState.announcedRank}.`,
+        'Challenge Player'
     );
 
     if (!confirmed) {
         console.log("Challenge cancelled by user");
-        return;
+        return; // User cancelled, don't send challenge
     }
 
-    console.log("Sending challenge to server...");
+    console.log("User confirmed challenge, sending to server...");
 
     try {
         const challengeRequest = {

@@ -1,6 +1,8 @@
+// js/game/createMatch.js
 import {showMessage} from "../utils/showMessage.js";
 import {showGameBoard} from "./showGameBoard.js";
-import {connection, playerId, currentMatch, setCurrentMatch, setPlayerId} from "../core/variables.js";
+import {connection, playerId, currentMatch, setCurrentMatch, setPlayerId, clientId} from "../core/variables.js";
+import {setMatchIdInUrl} from "../utils/urlManager.js";
 
 export async function createMatch() {
     const playerName = document.getElementById('playerName').value.trim();
@@ -18,12 +20,13 @@ export async function createMatch() {
     try {
         const result = await connection.invoke("CreateOrJoinMatch", {
             playerName: playerName,
-            settings: settings
+            settings: settings,
+            clientId: clientId // Include client ID for reconnection
         });
 
         setCurrentMatch(result);
 
-        // FIXED: Creator is always the first player, so use index 0
+        // Creator is always the first player, so use index 0
         if (result.players && result.players.length > 0) {
             const ourPlayer = result.players[0]; // Creator is always first
             setPlayerId(ourPlayer.id);
@@ -37,8 +40,11 @@ export async function createMatch() {
             console.error("No players found in match result");
         }
 
+        // Set match ID in URL for easy sharing and reconnection
+        setMatchIdInUrl(result.matchId);
+
         showGameBoard();
-        showMessage(`Game created! Share the Match ID with others to join.`);
+        showMessage(`Game created! Share the URL or Match ID with others to join.`);
 
         // Show start button if enough players
         if (result.players && result.players.length >= 2) {

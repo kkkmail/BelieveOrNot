@@ -34,8 +34,16 @@
 
     <div class="form-group">
         <label for="matchId">Match ID to Join:</label>
-        <input type="text" id="matchId" placeholder="Enter match ID">
+        <input type="text" id="matchId" placeholder="Enter match ID or share URL">
     </div>
 
     <button class="btn btn-secondary" id="joinMatchBtn">Join Existing Game</button>
+    
+    <!-- URL sharing info -->
+    <div id="urlInfo" style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 6px; font-size: 14px; text-align: center; display: none;">
+        <p style="margin: 0; color: #1976d2;">
+            <strong>💡 Tip:</strong> You can share the game URL directly with other players!<br>
+            The match ID will be automatically filled from the URL.
+        </p>
+    </div>
 </div>
