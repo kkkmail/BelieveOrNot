@@ -41,13 +41,13 @@ export function showChallenge() {
 
     const announcedRank = gameState.announcedRank || 'Unknown';
 
-    // FIXED: Create challenge cards that look EXACTLY like table cards
+    // FIXED: Create challenge cards with proper classes and event handlers
     for (let i = 0; i < cardsToShow; i++) {
         const cardElement = document.createElement('div');
-        cardElement.className = 'card previous-play-card'; // EXACT same classes as table cards
+        cardElement.className = 'card challenge-card-display'; // Use proper class
         cardElement.style.cursor = 'pointer';
 
-        // EXACT same content as table cards (? rank + announced rank)
+        // Same content as table cards (? rank + announced rank)
         cardElement.innerHTML = '<div class="rank">?</div><div class="suit">' + announcedRank + '</div>';
 
         // Check if this card is already selected
@@ -55,10 +55,11 @@ export function showChallenge() {
             cardElement.classList.add('challenge-selected');
         }
 
-        // Add click handler
+        // Add click handler - FIXED to work properly
         cardElement.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
+            console.log("Challenge card clicked:", i);
             selectChallengeCard(i);
         });
 

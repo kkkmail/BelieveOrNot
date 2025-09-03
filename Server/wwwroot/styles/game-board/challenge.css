@@ -29,6 +29,7 @@
     transform: scale(1.1);
     box-shadow: 0 6px 15px rgba(220,53,69,0.4);
 }
+
 /* Legacy challenge card styles for compatibility */
 .challenge-card {
     width: 90px;
@@ -50,7 +51,7 @@
     background: #ffeaa7;
 }
 
-.challenge-card.selected {
+.challenge-card.challenge-selected {
     border-color: #dc3545;
     background: #f8d7da;
     transform: scale(1.1);
