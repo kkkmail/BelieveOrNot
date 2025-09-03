@@ -1,4 +1,6 @@
 // js/utils/showFinalResults.js
+import {clearMatchIdFromUrl} from "./urlManager.js";
+
 export function showFinalResults(results) {
     console.log("Showing final results:", results);
     
@@ -111,56 +113,79 @@ export function showFinalResults(results) {
     
     scoresSection.appendChild(scoresTable);
     
-    // Copy button for results
-    const copySection = document.createElement('div');
-    copySection.style.cssText = `
-        margin-top: 20px;
-        text-align: center;
+    // Buttons section
+    const buttonsSection = document.createElement('div');
+    buttonsSection.style.cssText = `
+        margin-top: 25px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
     `;
     
+    // NEW: Start New Game button (available to all players)
+    const newGameButton = document.createElement('button');
+    newGameButton.style.cssText = `
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background 0.2s;
+        flex: 1;
+        min-width: 140px;
+        max-width: 180px;
+    `;
+    newGameButton.textContent = '🎮 Start New Game';
+    newGameButton.addEventListener('click', () => startNewGame());
+    
+    // Copy Results button
     const copyButton = document.createElement('button');
     copyButton.style.cssText = `
         background: #17a2b8;
         color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 12px 20px;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
-        margin-right: 10px;
         transition: background 0.2s;
+        flex: 1;
+        min-width: 120px;
+        max-width: 160px;
     `;
-    copyButton.textContent = 'Copy Results';
+    copyButton.textContent = '📋 Copy Results';
     copyButton.addEventListener('click', () => copyResults(results));
     
+    // Close button  
     const closeButton = document.createElement('button');
     closeButton.style.cssText = `
         background: #6c757d;
         color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 12px 20px;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
         transition: background 0.2s;
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
     `;
     closeButton.textContent = 'Close';
-    closeButton.addEventListener('click', () => {
-        overlay.style.opacity = '0';
-        setTimeout(() => {
-            if (document.body.contains(overlay)) {
-                document.body.removeChild(overlay);
-            }
-        }, 300);
-    });
+    closeButton.addEventListener('click', () => closeResults());
     
-    copySection.appendChild(copyButton);
-    copySection.appendChild(closeButton);
+    buttonsSection.appendChild(newGameButton);
+    buttonsSection.appendChild(copyButton);
+    buttonsSection.appendChild(closeButton);
     
     // Assemble the panel
     body.appendChild(winnerSection);
     body.appendChild(scoresSection);
-    body.appendChild(copySection);
+    body.appendChild(buttonsSection);
     
     resultsPanel.appendChild(header);
     resultsPanel.appendChild(body);
@@ -178,10 +203,30 @@ export function showFinalResults(results) {
     const handleEsc = (e) => {
         if (e.key === 'Escape') {
             document.removeEventListener('keydown', handleEsc);
-            closeButton.click();
+            closeResults();
         }
     };
     document.addEventListener('keydown', handleEsc);
+    
+    // Internal functions
+    function closeResults() {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
+        }, 300);
+    }
+    
+    function startNewGame() {
+        console.log("Starting new game - returning to main page");
+        
+        // Clear match ID from URL
+        clearMatchIdFromUrl();
+        
+        // Reload the page to start fresh
+        window.location.reload();
+    }
 }
 
 function copyResults(results) {

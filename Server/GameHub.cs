@@ -18,7 +18,25 @@ public class GameHub : Hub
         _matchManager = matchManager;
     }
 
-    // NEW: Reconnection method
+    // Method to broadcast messages to all players in a match
+    public async Task BroadcastMessage(Guid matchId, string message)
+    {
+        var match = _matchManager.GetMatch(matchId);
+        if (match == null) throw new HubException("Match not found");
+
+        // Find the requesting player
+        var connectionInfo = _connectionToPlayer.FirstOrDefault(kvp => kvp.Key == Context.ConnectionId);
+        if (connectionInfo.Key == null) throw new HubException("Player not found");
+
+        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == connectionInfo.Value.PlayerId);
+        if (requestingPlayer == null) throw new HubException("Player not in match");
+
+        // Broadcast the message to all players in the match
+        var timestampedMessage = $"{DateTime.Now:HH:mm:ss}: {message}";
+        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", timestampedMessage, requestingPlayer.Name);
+    }
+
+    // Reconnection method
     public async Task<ReconnectionResponse> ReconnectToMatch(string matchIdString, string clientId)
     {
         if (!Guid.TryParse(matchIdString, out var matchId))
@@ -71,8 +89,8 @@ public class GameHub : Hub
         // Map connection to player
         _connectionToPlayer[Context.ConnectionId] = (matchId, player.Id);
 
-        // Broadcast reconnection message
-        var reconnectionMessage = $"🔄 {player.Name} reconnected to the game!";
+        // Broadcast reconnection message using structured formatting
+        var reconnectionMessage = MessageFormatter.ConnectionEvent(player.Name, true);
         await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {reconnectionMessage}", "System");
 
         // Send personalized states to all connections
@@ -95,15 +113,11 @@ public class GameHub : Hub
         try
         {
             // Try to create new match
-            match = _matchManager.CreateMatch(request.PlayerName, request.Settings);
+            match = _matchManager.CreateMatch(request.PlayerName, request.Settings, request.ClientId ?? string.Empty);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{match.Id}");
 
-            // Set client ID for the creator
-            var creator = match.Players[0];
-            creator.ClientId = request.ClientId ?? string.Empty;
-
             // Map this connection to the creator player
-            _connectionToPlayer[Context.ConnectionId] = (match.Id, creator.Id);
+            _connectionToPlayer[Context.ConnectionId] = (match.Id, match.Players[0].Id);
         }
         catch
         {
@@ -125,11 +139,11 @@ public class GameHub : Hub
             CreatorPlayerId = match.Players[0].Id,
             DeckSize = match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount,
-            LastAction = $"🎮 {request.PlayerName} created the game!"
+            LastAction = MessageFormatter.JoinEvent(request.PlayerName, true)
         };
 
-        // Broadcast game message to all players
-        var createMessage = $"🎮 {request.PlayerName} created the game!";
+        // Broadcast game message to all players using structured formatting
+        var createMessage = MessageFormatter.JoinEvent(request.PlayerName, true);
         await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {createMessage}", "System");
 
         // Also send state update
@@ -164,8 +178,8 @@ public class GameHub : Hub
             var joiningPlayer = match.Players.Last();
             _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
 
-            // Broadcast join message to all players
-            var joinMessage = $"👋 {joiningPlayer.Name} joined the game!";
+            // Broadcast join message to all players using structured formatting
+            var joinMessage = MessageFormatter.JoinEvent(joiningPlayer.Name, false);
             await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {joinMessage}", "System");
 
             // Send personalized states to all connections
@@ -185,7 +199,7 @@ public class GameHub : Hub
         }
     }
 
-    // NEW: End round method (creator only)
+    // End round method (creator only)
     public async Task EndRound(Guid matchId, Guid requestingPlayerId)
     {
         var match = _matchManager.GetMatch(matchId);
@@ -217,13 +231,13 @@ public class GameHub : Hub
             player.Hand.Clear();
         }
 
-        var endMessage = $"🛑 {playerName} ended the round. No scores were calculated.";
+        var endMessage = $"🛑 {MessageFormatter.FormatPlayer(playerName)} ended the round. No scores were calculated.";
         await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {endMessage}", "System");
 
         await BroadcastPersonalizedStates(match, null);
     }
 
-    // NEW: End game method (creator only)
+    // End game method (creator only)
     public async Task EndGame(Guid matchId, Guid requestingPlayerId)
     {
         var match = _matchManager.GetMatch(matchId);
@@ -255,18 +269,7 @@ public class GameHub : Hub
         var resultsLines = sortedPlayers.Select((p, index) => 
             $"{index + 1}. {p.Name}: {p.Score} points").ToList();
 
-        string winnerText;
-        if (winners.Count == 1)
-        {
-            winnerText = $"🏆 {winners[0].Name} wins with {winners[0].Score} points!";
-        }
-        else
-        {
-            var winnerNames = string.Join(", ", winners.Select(w => w.Name));
-            winnerText = $"🏆 Tie game! Winners: {winnerNames} with {winners[0].Score} points each!";
-        }
-
-        var endMessage = $"🎯 {playerName} ended the game. {winnerText}";
+        var endMessage = MessageFormatter.GameEnd(playerName, winners.Select(w => w.Name).ToList(), winners[0].Score);
         await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {endMessage}", "System");
 
         // Send final results
@@ -274,30 +277,14 @@ public class GameHub : Hub
         {
             Winners = winners.Select(w => w.Name).ToList(),
             FinalScores = resultsLines,
-            WinnerText = winnerText
+            WinnerText = winners.Count == 1 
+                ? $"🏆 {winners[0].Name} wins with {winners[0].Score} points!"
+                : $"🏆 Tie game! Winners: {string.Join(", ", winners.Select(w => w.Name))} with {winners[0].Score} points each!"
         });
 
         // Mark game as ended
         match.Phase = GamePhase.GameEnd;
         await BroadcastPersonalizedStates(match, null);
-    }
-
-    // Method to broadcast messages to all players in a match
-    public async Task BroadcastMessage(Guid matchId, string message)
-    {
-        var match = _matchManager.GetMatch(matchId);
-        if (match == null) throw new HubException("Match not found");
-
-        // Find the requesting player
-        var connectionInfo = _connectionToPlayer.FirstOrDefault(kvp => kvp.Key == Context.ConnectionId);
-        if (connectionInfo.Key == null) throw new HubException("Player not found");
-
-        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == connectionInfo.Value.PlayerId);
-        if (requestingPlayer == null) throw new HubException("Player not in match");
-
-        // Broadcast the message to all players in the match
-        var timestampedMessage = $"{DateTime.Now:HH:mm:ss}: {message}";
-        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", timestampedMessage, requestingPlayer.Name);
     }
 
     public async Task StartRound(Guid matchId, Guid requestingPlayerId)
@@ -434,8 +421,8 @@ public class GameHub : Hub
                     player.IsConnected = false;
                     player.LastSeen = DateTime.UtcNow;
                     
-                    // Broadcast disconnection message
-                    var disconnectionMessage = $"⚠️ {player.Name} disconnected";
+                    // Broadcast disconnection message using structured formatting
+                    var disconnectionMessage = MessageFormatter.ConnectionEvent(player.Name, false);
                     await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {disconnectionMessage}", "System");
                     
                     // Update states for remaining players

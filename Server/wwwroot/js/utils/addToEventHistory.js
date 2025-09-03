@@ -1,4 +1,4 @@
-import {formatGameMessage} from "./formatGameMessage.js";
+// js/utils/addToEventHistory.js
 import {getCurrentTime} from "./getCurrentTime.js";
 import {showEventHistory} from "./showEventHistory.js";
 
@@ -12,19 +12,11 @@ export function addToEventHistory(event) {
     // Check if the event already has a timestamp (format: "HH:MM:SS: message")
     let timestampedEvent;
     if (event.match(/^\d{1,2}:\d{2}:\d{2}:/)) {
-        // Message already has timestamp from server - enhance the message content
-        const parts = event.split(': ');
-        const timestamp = parts[0];
-        const message = parts.slice(1).join(': ');
-
-        // FIXED: Apply comprehensive message formatting
-        const enhancedMessage = formatGameMessage(message);
-
-        timestampedEvent = `${timestamp}: ${enhancedMessage}`;
+        // Message already has timestamp from server - use as-is (it's already HTML formatted)
+        timestampedEvent = event;
     } else {
-        // Add timestamp to event using consistent formatting
-        const enhancedEvent = formatGameMessage(event);
-        timestampedEvent = `${getCurrentTime()}: ${enhancedEvent}`;
+        // Add timestamp to event (event is already HTML formatted from server)
+        timestampedEvent = `${getCurrentTime()}: ${event}`;
     }
 
     window.gameEventHistory.push(timestampedEvent);
