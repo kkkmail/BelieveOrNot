@@ -1,4 +1,9 @@
-function updateHandDisplay() {
+import {gameState, selectedCards} from "../core/variables.js";
+import {toggleCardSelection} from "../cards/toggleCardSelection.js";
+import {getSuitSymbol} from "../cards/getSuitSymbol.js";
+import {getSuitClass} from "../cards/getSuitClass.js";
+
+export function updateHandDisplay() {
     const handCards = document.getElementById('handCards');
     const handCount = document.getElementById('handCount');
     handCards.innerHTML = '';

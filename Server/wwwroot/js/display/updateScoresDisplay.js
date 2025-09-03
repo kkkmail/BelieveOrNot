@@ -1,4 +1,6 @@
-function updateScoresDisplay() {
+import {gameState} from "../core/variables.js";
+
+export function updateScoresDisplay() {
     const scoreTable = document.getElementById('scoreTable');
     scoreTable.innerHTML = '';
 

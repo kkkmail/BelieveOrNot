@@ -1,5 +1,7 @@
 // Start a new round
-async function startRound() {
+import {connection, currentMatch, playerId} from "../core/variables.js";
+
+export async function startRound() {
     if (!currentMatch || !playerId) {
         alert('Cannot start round: match or player not found');
         return;

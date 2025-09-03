@@ -1,0 +1,40 @@
+/* Game Management Styles */
+.game-management {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+/* Creator-only buttons styling */
+.game-management .btn {
+    font-size: 14px;
+    padding: 8px 16px;
+    min-width: 120px;
+}
+
+@media (max-width: 768px) {
+    .game-management {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .game-management .btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}

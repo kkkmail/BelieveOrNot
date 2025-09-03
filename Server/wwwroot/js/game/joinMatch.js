@@ -1,35 +1,65 @@
-async function joinMatch() {
+// js/game/joinMatch.js
+import {playerId, connection, setCurrentMatch, setPlayerId, clientId} from "../core/variables.js";
+import {showMessage} from "../utils/showMessage.js";
+import {showGameBoard} from "./showGameBoard.js";
+import {setMatchIdInUrl} from "../utils/urlManager.js";
+import {customAlert} from "../utils/customAlert.js";
+
+export async function joinMatch() {
     const playerName = document.getElementById('playerName').value.trim();
     const matchId = document.getElementById('matchId').value.trim();
 
     if (!playerName || !matchId) {
-        alert('Please enter your name and match ID');
+        await customAlert('Please enter your name and match ID');
         return;
     }
 
     try {
-        const result = await connection.invoke("JoinExistingMatch", matchId, playerName);
-        currentMatch = result;
+        const result = await connection.invoke("JoinExistingMatch", matchId, playerName, clientId);
         
-        // FIXED: Find our player by looking for the most recently added player
-        // This works because we're the last player to join
-        if (result.players && result.players.length > 0) {
-            const ourPlayer = result.players[result.players.length - 1]; // Last player added
-            playerId = ourPlayer.id;
-            console.log("Set playerId to:", playerId, "for player:", ourPlayer.name);
+        if (result.success) {
+            setCurrentMatch(result.match);
+            setPlayerId(result.playerId);
             
-            if (ourPlayer.name !== playerName) {
-                console.log(`Name changed from "${playerName}" to "${ourPlayer.name}" due to duplicate`);
-                showMessage(`Your name was changed to "${ourPlayer.name}" because "${playerName}" was already taken.`, 5000);
-            }
-        } else {
-            console.error("No players found in match result");
-        }
+            console.log("Set playerId to:", playerId, "for player:", result.assignedName);
 
-        showGameBoard();
-        showMessage(`Joined game! Waiting for other players.`);
+            if (result.assignedName !== playerName) {
+                console.log(`Name changed from "${playerName}" to "${result.assignedName}" due to duplicate`);
+                
+                // Format the message with HTML styling
+                const originalName = `<span style="font-weight: bold; font-style: italic;">${playerName}</span>`;
+                const newName = `<span style="font-weight: bold; font-style: italic;">${result.assignedName}</span>`;
+                
+                await customAlert(
+                    `Your name was changed to ${newName} because ${originalName} was already taken.`,
+                    'Name Changed'
+                );
+            }
+
+            // Set match ID in URL for reconnection
+            setMatchIdInUrl(matchId);
+
+            showGameBoard();
+            showMessage(`Joined game! Waiting for other players.`);
+        } else {
+            await customAlert("Failed to join match: " + result.message);
+        }
     } catch (err) {
         console.error("Failed to join match:", err);
-        alert("Failed to join match: " + err);
+        
+        let errorMessage = "Failed to join match";
+        if (err.message) {
+            if (err.message.includes("already started")) {
+                errorMessage = "This game has already started and new players cannot join.";
+            } else if (err.message.includes("not found")) {
+                errorMessage = "The game you're trying to join no longer exists or has ended.";
+            } else if (err.message.includes("Invalid match ID")) {
+                errorMessage = "Invalid match ID format. Please check the match ID and try again.";
+            } else {
+                errorMessage = err.message;
+            }
+        }
+        
+        await customAlert(errorMessage, 'Join Failed');
     }
 }

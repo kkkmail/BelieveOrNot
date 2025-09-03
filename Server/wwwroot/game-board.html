@@ -21,10 +21,10 @@
 
 <!-- Table Area -->
 <div class="table-area">
+    <h3>Table</h3>
+    
     <div class="table-display">
-        <h3>Table</h3>
-        
-        <!-- FIXED: Previous player's cards on LEFT (we read from left to right) -->
+        <!-- Last Play section - LEFT, space for 3 cards -->
         <div class="previous-play-section" id="previousPlaySection">
             <div class="play-label">Last Play</div>
             <div class="previous-play-cards" id="previousPlayCards">
@@ -33,7 +33,7 @@
             <div class="play-info" id="playInfoDisplay">No previous play</div>
         </div>
         
-        <!-- FIXED: Card pile on RIGHT -->
+        <!-- Card Pile section - RIGHT, uses remaining space -->
         <div class="table-pile-section">
             <div class="pile-label">Card Pile</div>
             <div class="card-pile" id="cardPile">
@@ -43,7 +43,12 @@
         </div>
     </div>
     
-    <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
+    <!-- Game Management Buttons -->
+    <div class="game-management">
+        <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
+        <button class="btn btn-warning hidden" id="endRoundBtn">End Round</button>
+        <button class="btn btn-danger hidden" id="endGameBtn">End Game</button>
+    </div>
 </div>
 
 <!-- Hand Area -->

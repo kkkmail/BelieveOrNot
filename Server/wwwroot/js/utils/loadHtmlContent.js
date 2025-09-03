@@ -1,5 +1,5 @@
 // Load HTML content from external files
-async function loadHtmlContent() {
+export async function loadHtmlContent() {
     try {
         // Load setup form
         const setupResponse = await fetch('setup-form.html');

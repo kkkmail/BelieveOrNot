@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<link rel="stylesheet" href="styles/cards/back.css">
+<link rel="stylesheet" href="styles/cards/base.css">
+<link rel="stylesheet" href="styles/cards/joker.css">
+<link rel="stylesheet" href="styles/cards/previous-play.css">
+<link rel="stylesheet" href="styles/cards/responsive.css">
+<link rel="stylesheet" href="styles/cards/suits.css">
+<link rel="stylesheet" href="styles/cards/typography.css">
+
+<link rel="stylesheet" href="styles/components/buttons.css">
+<link rel="stylesheet" href="styles/components/forms.css">
+<link rel="stylesheet" href="styles/components/messages.css">
+<link rel="stylesheet" href="styles/components/rank-selector.css">
+
+<link rel="stylesheet" href="styles/game-board/actions.css">
+<link rel="stylesheet" href="styles/game-board/animations.css">
+<link rel="stylesheet" href="styles/game-board/challenge.css">
+<link rel="stylesheet" href="styles/game-board/core.css">
+<link rel="stylesheet" href="styles/game-board/hand.css">
+<link rel="stylesheet" href="styles/game-board/management.css">
+<link rel="stylesheet" href="styles/game-board/players.css">
+<link rel="stylesheet" href="styles/game-board/responsive.css">
+<link rel="stylesheet" href="styles/game-board/scoring.css">
+<link rel="stylesheet" href="styles/game-board/status.css">
+<link rel="stylesheet" href="styles/game-board/table.css">

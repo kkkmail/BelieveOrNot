@@ -1,41 +1,76 @@
-async function initializeConnection() {
+// js/core/initializeConnection.js
+import { setConnection, setGameState, setClientId } from "./variables.js";
+import { updateConnectionStatus } from "./updateConnectionStatus.js";
+import { updateGameDisplay } from "../display/updateGameDisplay.js";
+import { addToEventHistory } from "../utils/addToEventHistory.js";
+import { getOrCreateClientId } from "../utils/clientIdUtils.js";
+import { attemptReconnection, handleDisconnection, handleReconnection } from "../utils/reconnectionHandler.js";
+import { showFinalResults } from "../utils/showFinalResults.js";
+
+export async function initializeConnection() {
     const serverUrl = "http://localhost:5000/game";
 
-    connection = new signalR.HubConnectionBuilder()
+    // Get or create persistent client ID
+    const persistentClientId = getOrCreateClientId();
+    setClientId(persistentClientId);
+    console.log("Using client ID:", persistentClientId);
+
+    const s = globalThis.signalR || window.signalR;
+    if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }
+
+    const hub = new s.HubConnectionBuilder()
         .withUrl(serverUrl)
         .withAutomaticReconnect()
         .build();
 
-    connection.on("StateUpdate", (state, clientCmdIdEcho) => {
-        console.log("=== STATE UPDATE RECEIVED ===");
-        console.log("Full state:", state);
-        console.log("LastAction:", state.LastAction);
-        console.log("===========================");
-        
-        gameState = state;
-        
-        // REMOVED: No longer processing LastAction here since messages are now broadcasted separately
-        // The LastAction processing has been moved to MessageBroadcast handler
-        
+    setConnection(hub);
+
+    hub.on("StateUpdate", (state, clientCmdIdEcho) => {
+        console.log("=== STATE UPDATE RECEIVED ===", state);
+        setGameState(state);
         updateGameDisplay();
     });
 
-    // Listen for message broadcasts from server (these are the real game messages)
-    connection.on("MessageBroadcast", (message, senderName) => {
-        console.log("=== MESSAGE BROADCAST RECEIVED ===");
-        console.log("Message:", message);
-        console.log("Sender:", senderName);
-        console.log("================================");
-        
-        // Add the message to local history and display
-        // The message is already timestamped from the server
+    hub.on("MessageBroadcast", (message, senderName) => {
+        console.log("=== MESSAGE BROADCAST RECEIVED ===", message, senderName);
         addToEventHistory(message);
     });
 
+    // NEW: Handle game end results
+    hub.on("GameEnded", (results) => {
+        console.log("=== GAME ENDED ===", results);
+        showFinalResults(results);
+    });
+
+    // Handle connection events
+    hub.onreconnecting((error) => {
+        console.log("Connection lost, attempting to reconnect...", error);
+        updateConnectionStatus("disconnected");
+        handleDisconnection();
+    });
+
+    hub.onreconnected((connectionId) => {
+        console.log("Connection restored!", connectionId);
+        updateConnectionStatus("connected");
+        handleReconnection();
+    });
+
+    hub.onclose((error) => {
+        console.log("Connection closed", error);
+        updateConnectionStatus("disconnected");
+        handleDisconnection();
+    });
+
     try {
-        await connection.start();
+        await hub.start();
         updateConnectionStatus("connected");
         console.log("SignalR Connected");
+
+        // Attempt reconnection if match ID is in URL
+        const reconnected = await attemptReconnection();
+        if (!reconnected) {
+            console.log("No reconnection needed or failed, showing setup form");
+        }
     } catch (err) {
         console.error("Connection failed:", err);
         updateConnectionStatus("disconnected");

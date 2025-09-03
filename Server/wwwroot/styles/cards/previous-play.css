@@ -1,0 +1,18 @@
+/* Previous player cards - same size as hand cards */
+.previous-play-card {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.previous-play-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255,193,7,0.4);
+    border-color: #ffc107;
+}
+
+.previous-play-card.challenge-selected {
+    border-color: #dc3545;
+    background: #f8d7da;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(220,53,69,0.4);
+}

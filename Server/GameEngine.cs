@@ -1,3 +1,4 @@
+// Server/GameEngine.cs
 public class GameEngine : IGameEngine
 {
     private readonly Random _random = new();
@@ -16,7 +17,7 @@ public class GameEngine : IGameEngine
             throw new InvalidOperationException("Need at least 2 players to start a round");
         }
 
-        // FIXED: Shuffle players (except creator) at the beginning of each new round
+        // Shuffle players (except creator) at the beginning of each new round
         _matchManager.ShufflePlayersForNewRound(match);
 
         var deck = DeckBuilder.BuildDeck(match.Settings.DeckSize, match.Settings.JokerCount);
@@ -48,7 +49,7 @@ public class GameEngine : IGameEngine
         match.Phase = GamePhase.InProgress;
         match.RoundNumber++;
 
-        var roundStartMessage = $"🎯 Round {match.RoundNumber} started!";
+        var roundStartMessage = $"🎯 Round {MessageFormatter.FormatCount(match.RoundNumber)} started!";
         if (disposalEvents.Any())
         {
             roundStartMessage += " " + string.Join(" ", disposalEvents);
@@ -59,7 +60,6 @@ public class GameEngine : IGameEngine
         return state;
     }
 
-    // ... rest of the methods remain the same as in the previous artifact
     public GameStateDto CreateGameStateDtoForPlayer(Match match, Guid playerId)
     {
         return CreateGameStateDto(match, playerId);
@@ -117,13 +117,15 @@ public class GameEngine : IGameEngine
 
         var disposalEvents = AutoDisposeFourOfAKind(player);
 
+        // Use structured message formatting
         if (player.Hand.Count == 0)
         {
-            result = $"{player.Name} played {request.Cards!.Count} card(s) claiming {match.AnnouncedRank} and has NO CARDS LEFT! Game continues.";
+            result = MessageFormatter.CardPlay(player.Name, request.Cards!.Count, match.AnnouncedRank!) + 
+                    $" and has {MessageFormatter.FormatCount(0)} CARDS LEFT! Game continues.";
         }
         else
         {
-            result = $"{player.Name} played {request.Cards!.Count} card(s) claiming {match.AnnouncedRank}.";
+            result = MessageFormatter.CardPlay(player.Name, request.Cards!.Count, match.AnnouncedRank!);
         }
 
         if (disposalEvents.Any())
@@ -142,7 +144,8 @@ public class GameEngine : IGameEngine
         var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
         var challengedPlayer = match.Players[prevPlayerIndex];
 
-        var challengeDetails = $"{challenger.Name} challenges {challengedPlayer.Name} (card {request.ChallengePickIndex!.Value + 1} of {match.LastPlayCardCount}).";
+        // Use structured message formatting
+        var challengeDetails = MessageFormatter.Challenge(challenger.Name, challengedPlayer.Name, request.ChallengePickIndex!.Value, match.LastPlayCardCount);
 
         bool challengeHit = flippedCard.Rank == match.AnnouncedRank || flippedCard.IsJoker;
 
@@ -152,19 +155,12 @@ public class GameEngine : IGameEngine
         if (challengeHit)
         {
             collector = challenger;
-            if (flippedCard.IsJoker)
-            {
-                challengeResult = $"Challenged card was {flippedCard} (Joker matches {match.AnnouncedRank}). {challenger.Name} was wrong and collects all cards.";
-            }
-            else
-            {
-                challengeResult = $"Challenged card was {flippedCard} (matches {match.AnnouncedRank}). {challenger.Name} was wrong and collects all cards.";
-            }
+            challengeResult = MessageFormatter.ChallengeResult(flippedCard, match.AnnouncedRank!, challenger.Name, challengedPlayer.Name, true);
         }
         else
         {
             collector = challengedPlayer;
-            challengeResult = $"Challenged card was {flippedCard} (does not match {match.AnnouncedRank}). {challenger.Name} was right, {challengedPlayer.Name} collects all cards.";
+            challengeResult = MessageFormatter.ChallengeResult(flippedCard, match.AnnouncedRank!, challenger.Name, challengedPlayer.Name, false);
         }
 
         var collectedCount = match.TablePile.Count;
@@ -214,7 +210,8 @@ public class GameEngine : IGameEngine
             {
                 player.Hand.Remove(card);
             }
-            disposalEvents.Add($"{player.Name} disposed 4 of a kind: {group.Key}s.");
+            // Use structured message formatting
+            disposalEvents.Add(MessageFormatter.Disposal(player.Name, group.Key));
         }
 
         return disposalEvents;
@@ -271,41 +268,25 @@ public class GameEngine : IGameEngine
 
             player.Score += roundScore;
 
-            if (player.Hand.Count == 0)
-            {
-                roundResults.Add($"{player.Name}: +{roundScore} points (Winner bonus: +{match.Settings.WinnerBonus}, 0 cards)");
-            }
-            else
-            {
-                var cardPenalties = new List<string>();
-                if (regularCards > 0)
-                {
-                    cardPenalties.Add($"{regularCards} cards: {regularCardPenalty}");
-                }
-                if (jokerCards > 0)
-                {
-                    cardPenalties.Add($"{jokerCards} jokers: {jokerCardPenalty}");
-                }
-                roundResults.Add($"{player.Name}: {roundScore} points ({string.Join(", ", cardPenalties)})");
-            }
+            // Use structured message formatting
+            var scoreMessage = MessageFormatter.ScoreResult(
+                player.Name, 
+                roundScore, 
+                player.Hand.Count == 0, 
+                match.Settings.WinnerBonus, 
+                regularCards, 
+                jokerCards, 
+                regularCardPenalty, 
+                jokerCardPenalty);
+            
+            roundResults.Add(scoreMessage);
         }
 
-        string roundEndMessage;
-        if (winners.Count == 1)
-        {
-            roundEndMessage = $"🏁 Round {match.RoundNumber} ended! {winners[0].Name} wins!";
-        }
-        else if (winners.Count > 1)
-        {
-            var winnerNames = string.Join(", ", winners.Select(w => w.Name));
-            roundEndMessage = $"🏁 Round {match.RoundNumber} ended! Winners: {winnerNames}";
-        }
-        else
-        {
-            roundEndMessage = $"🏁 Round {match.RoundNumber} ended!";
-        }
-
+        // Use structured message formatting for round end
+        var winnerNames = winners.Select(w => w.Name).ToList();
+        var roundEndMessage = MessageFormatter.RoundEnd(match.RoundNumber, winnerNames);
         roundEndMessage += " Scoring: " + string.Join(", ", roundResults);
+        
         match.LastRoundEndMessage = roundEndMessage;
 
         Console.WriteLine($"Round ended: {roundEndMessage}");
@@ -325,13 +306,14 @@ public class GameEngine : IGameEngine
             var currentPlayer = match.Players[match.CurrentPlayerIndex];
             if (currentPlayer.Id != playerId) return false;
 
-            if (match.Players.Count == 2)
+            // If only 1 active player remains (others have 0 cards), they cannot play more cards
+            var activePlayers = match.Players.Where(p => p.Hand.Count > 0).ToList();
+            var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
+
+            if (activePlayers.Count == 1 && playersWithNoCards.Any())
             {
-                var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
-                if (playersWithNoCards.Any())
-                {
-                    return false;
-                }
+                Console.WriteLine($"VALIDATION: Only 1 active player remaining ({player.Name}) - blocking play action");
+                return false; // Cannot play cards when you're the last active player
             }
 
             if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)

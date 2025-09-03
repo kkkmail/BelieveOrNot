@@ -1,3 +1,4 @@
+// Server/GameHub.cs
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
 
@@ -35,6 +36,76 @@ public class GameHub : Hub
         await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", timestampedMessage, requestingPlayer.Name);
     }
 
+    // Reconnection method
+    public async Task<ReconnectionResponse> ReconnectToMatch(string matchIdString, string clientId)
+    {
+        if (!Guid.TryParse(matchIdString, out var matchId))
+        {
+            return new ReconnectionResponse 
+            { 
+                Success = false, 
+                Message = "Invalid match ID format." 
+            };
+        }
+
+        var match = _matchManager.GetMatch(matchId);
+        if (match == null)
+        {
+            return new ReconnectionResponse 
+            { 
+                Success = false, 
+                Message = "The game you were trying to rejoin no longer exists or has ended." 
+            };
+        }
+
+        // Find player by client ID
+        var player = match.Players.FirstOrDefault(p => p.ClientId == clientId);
+        if (player == null)
+        {
+            // Check if game has started and new players can't join
+            if (match.Phase != GamePhase.WaitingForPlayers)
+            {
+                return new ReconnectionResponse 
+                { 
+                    Success = false, 
+                    Message = "This game has already started and new players cannot join." 
+                };
+            }
+            
+            return new ReconnectionResponse 
+            { 
+                Success = false, 
+                Message = "You were not found in this game. You can try joining with your name instead." 
+            };
+        }
+
+        // Mark player as connected and update last seen
+        player.IsConnected = true;
+        player.LastSeen = DateTime.UtcNow;
+
+        // Add to SignalR group
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
+        
+        // Map connection to player
+        _connectionToPlayer[Context.ConnectionId] = (matchId, player.Id);
+
+        // Broadcast reconnection message using structured formatting
+        var reconnectionMessage = MessageFormatter.ConnectionEvent(player.Name, true);
+        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {reconnectionMessage}", "System");
+
+        // Send personalized states to all connections
+        await BroadcastPersonalizedStates(match, null);
+
+        return new ReconnectionResponse
+        {
+            Success = true,
+            Message = "Successfully reconnected!",
+            Match = match,
+            GameState = _gameEngine.CreateGameStateDtoForPlayer(match, player.Id),
+            PlayerId = player.Id
+        };
+    }
+
     public async Task<GameStateDto> CreateOrJoinMatch(CreateMatchRequest request)
     {
         Match match;
@@ -42,7 +113,7 @@ public class GameHub : Hub
         try
         {
             // Try to create new match
-            match = _matchManager.CreateMatch(request.PlayerName, request.Settings);
+            match = _matchManager.CreateMatch(request.PlayerName, request.Settings, request.ClientId ?? string.Empty);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{match.Id}");
 
             // Map this connection to the creator player
@@ -68,11 +139,11 @@ public class GameHub : Hub
             CreatorPlayerId = match.Players[0].Id,
             DeckSize = match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount,
-            LastAction = $"🎮 {request.PlayerName} created the game!"
+            LastAction = MessageFormatter.JoinEvent(request.PlayerName, true)
         };
 
-        // FIXED: Broadcast game message to all players
-        var createMessage = $"🎮 {request.PlayerName} created the game!";
+        // Broadcast game message to all players using structured formatting
+        var createMessage = MessageFormatter.JoinEvent(request.PlayerName, true);
         await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {createMessage}", "System");
 
         // Also send state update
@@ -80,23 +151,140 @@ public class GameHub : Hub
         return state;
     }
 
-    public async Task<Match> JoinExistingMatch(Guid matchId, string playerName)
+    public async Task<JoinMatchResponse> JoinExistingMatch(string matchIdString, string playerName, string clientId = "")
     {
-        var match = _matchManager.JoinMatch(matchId, playerName);
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
+        if (!Guid.TryParse(matchIdString, out var matchId))
+        {
+            throw new HubException("Invalid match ID format.");
+        }
 
-        // Map this connection to the joining player
-        var joiningPlayer = match.Players.Last();
-        _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
+        var match = _matchManager.GetMatch(matchId);
+        if (match == null)
+        {
+            throw new HubException("The game you're trying to join no longer exists or has ended.");
+        }
 
-        // FIXED: Broadcast join message to all players
-        var joinMessage = $"👋 {joiningPlayer.Name} joined the game!";
-        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {joinMessage}", "System");
+        if (match.Phase != GamePhase.WaitingForPlayers)
+        {
+            throw new HubException("This game has already started and new players cannot join.");
+        }
 
-        // Send personalized states to all connections (without LastAction since we broadcasted separately)
+        try
+        {
+            match = _matchManager.JoinMatch(matchId, playerName, clientId);
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
+
+            // Map this connection to the joining player
+            var joiningPlayer = match.Players.Last();
+            _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
+
+            // Broadcast join message to all players using structured formatting
+            var joinMessage = MessageFormatter.JoinEvent(joiningPlayer.Name, false);
+            await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {joinMessage}", "System");
+
+            // Send personalized states to all connections
+            await BroadcastPersonalizedStates(match, null);
+
+            return new JoinMatchResponse
+            {
+                Success = true,
+                Match = match,
+                PlayerId = joiningPlayer.Id,
+                AssignedName = joiningPlayer.Name
+            };
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new HubException(ex.Message);
+        }
+    }
+
+    // End round method (creator only)
+    public async Task EndRound(Guid matchId, Guid requestingPlayerId)
+    {
+        var match = _matchManager.GetMatch(matchId);
+        if (match == null) throw new HubException("Match not found");
+
+        // Check if requesting player is the creator
+        if (requestingPlayerId != match.Players[0].Id)
+        {
+            throw new HubException("Only the match creator can end the round");
+        }
+
+        if (match.Phase != GamePhase.InProgress)
+        {
+            throw new HubException("No round is currently in progress");
+        }
+
+        var playerName = match.Players.First(p => p.Id == requestingPlayerId).Name;
+
+        // Reset match state
+        match.Phase = GamePhase.WaitingForPlayers;
+        match.TablePile.Clear();
+        match.AnnouncedRank = null;
+        match.LastPlayCardCount = 0;
+        match.CurrentPlayerIndex = 0;
+
+        // Clear all hands
+        foreach (var player in match.Players)
+        {
+            player.Hand.Clear();
+        }
+
+        var endMessage = $"🛑 {MessageFormatter.FormatPlayer(playerName)} ended the round. No scores were calculated.";
+        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {endMessage}", "System");
+
         await BroadcastPersonalizedStates(match, null);
+    }
 
-        return match;
+    // End game method (creator only)
+    public async Task EndGame(Guid matchId, Guid requestingPlayerId)
+    {
+        var match = _matchManager.GetMatch(matchId);
+        if (match == null) throw new HubException("Match not found");
+
+        // Check if requesting player is the creator
+        if (requestingPlayerId != match.Players[0].Id)
+        {
+            throw new HubException("Only the match creator can end the game");
+        }
+
+        if (match.Phase == GamePhase.InProgress)
+        {
+            throw new HubException("Cannot end game while a round is in progress. End the round first.");
+        }
+
+        var playerName = match.Players.First(p => p.Id == requestingPlayerId).Name;
+
+        // Calculate final results
+        var sortedPlayers = match.Players
+            .OrderByDescending(p => p.Score)
+            .ThenBy(p => p.Name)
+            .ToList();
+
+        var winners = sortedPlayers
+            .Where(p => p.Score == sortedPlayers[0].Score)
+            .ToList();
+
+        var resultsLines = sortedPlayers.Select((p, index) => 
+            $"{index + 1}. {p.Name}: {p.Score} points").ToList();
+
+        var endMessage = MessageFormatter.GameEnd(playerName, winners.Select(w => w.Name).ToList(), winners[0].Score);
+        await Clients.Group($"match:{matchId}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {endMessage}", "System");
+
+        // Send final results
+        await Clients.Group($"match:{matchId}").SendAsync("GameEnded", new
+        {
+            Winners = winners.Select(w => w.Name).ToList(),
+            FinalScores = resultsLines,
+            WinnerText = winners.Count == 1 
+                ? $"🏆 {winners[0].Name} wins with {winners[0].Score} points!"
+                : $"🏆 Tie game! Winners: {string.Join(", ", winners.Select(w => w.Name))} with {winners[0].Score} points each!"
+        });
+
+        // Mark game as ended
+        match.Phase = GamePhase.GameEnd;
+        await BroadcastPersonalizedStates(match, null);
     }
 
     public async Task StartRound(Guid matchId, Guid requestingPlayerId)
@@ -113,14 +301,14 @@ public class GameHub : Hub
         var playerName = match.Players.First(p => p.Id == requestingPlayerId).Name;
         var roundState = _gameEngine.StartNewRound(match);
 
-        // FIXED: Extract and broadcast the round start message
-        var roundStartMessage = roundState.LastAction; // This contains the full round start message with disposal events
+        // Extract and broadcast the round start message
+        var roundStartMessage = roundState.LastAction;
         if (!string.IsNullOrEmpty(roundStartMessage))
         {
             await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {roundStartMessage}", "System");
         }
 
-        // Send personalized states to all connections (without LastAction since we broadcasted separately)
+        // Send personalized states to all connections
         await BroadcastPersonalizedStates(match, null);
     }
 
@@ -145,7 +333,7 @@ public class GameHub : Hub
             var state = _gameEngine.SubmitMove(gameMatch, request.PlayerId, request);
             _processedCommands.TryAdd(request.ClientCmdId, request.MatchId);
 
-            // FIXED: Extract and broadcast the action message
+            // Extract and broadcast the action message
             var actionMessage = state.LastAction;
             if (!string.IsNullOrEmpty(actionMessage))
             {
@@ -175,7 +363,7 @@ public class GameHub : Hub
                 await Clients.Group($"match:{gameMatch.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {enhancedMessage}", "System");
             }
 
-            // Send personalized states to all connections (without LastAction since we broadcasted separately)
+            // Send personalized states to all connections
             await BroadcastPersonalizedStates(gameMatch, null);
 
             return state;
@@ -211,9 +399,47 @@ public class GameHub : Hub
         await Task.WhenAll(tasks);
     }
 
+    public override async Task OnConnectedAsync()
+    {
+        Console.WriteLine($"Client connected: {Context.ConnectionId}");
+        await base.OnConnectedAsync();
+    }
+
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _connectionToPlayer.TryRemove(Context.ConnectionId, out _);
+        Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
+        
+        // Find the player associated with this connection
+        if (_connectionToPlayer.TryRemove(Context.ConnectionId, out var connectionInfo))
+        {
+            var match = _matchManager.GetMatch(connectionInfo.MatchId);
+            if (match != null)
+            {
+                var player = match.Players.FirstOrDefault(p => p.Id == connectionInfo.PlayerId);
+                if (player != null)
+                {
+                    player.IsConnected = false;
+                    player.LastSeen = DateTime.UtcNow;
+                    
+                    // Broadcast disconnection message using structured formatting
+                    var disconnectionMessage = MessageFormatter.ConnectionEvent(player.Name, false);
+                    await Clients.Group($"match:{match.Id}").SendAsync("MessageBroadcast", $"{DateTime.Now:HH:mm:ss}: {disconnectionMessage}", "System");
+                    
+                    // Update states for remaining players
+                    await BroadcastPersonalizedStates(match, null);
+                }
+            }
+        }
+        
         await base.OnDisconnectedAsync(exception);
     }
+}
+
+// Helper response classes
+public class JoinMatchResponse
+{
+    public bool Success { get; set; }
+    public Match? Match { get; set; }
+    public Guid? PlayerId { get; set; }
+    public string AssignedName { get; set; } = string.Empty;
 }

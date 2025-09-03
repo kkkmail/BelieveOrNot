@@ -1,6 +1,8 @@
-function updateRankDropdown() {
+import {gameState} from "../core/variables.js";
+
+export function updateRankDropdown() {
     const declaredRankSelect = document.getElementById('declaredRank');
-    
+
     if (!declaredRankSelect) return;
 
     // Clear existing options
@@ -16,7 +18,7 @@ function updateRankDropdown() {
     // Determine available ranks based on deck size (with fallback)
     let availableRanks = [];
     const deckSize = gameState?.deckSize || gameState?.DeckSize || 52; // Fallback to 52
-    
+
     if (deckSize === 32) {
         availableRanks = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     } else if (deckSize === 36) {

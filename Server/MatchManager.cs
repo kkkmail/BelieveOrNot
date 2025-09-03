@@ -1,3 +1,4 @@
+// Server/MatchManager.cs
 using System.Collections.Concurrent;
 
 public class MatchManager : IMatchManager
@@ -11,14 +12,18 @@ public class MatchManager : IMatchManager
         return match;
     }
     
-    public Match CreateMatch(string playerName, GameSettings? settings = null)
+    public Match CreateMatch(string playerName, GameSettings? settings = null, string clientId = "")
     {
         var match = new Match
         {
             Settings = settings ?? new GameSettings(),
             Players = new List<Player>
             {
-                new Player { Name = playerName } // Creator is always first, never shuffled
+                new Player { 
+                    Name = playerName,
+                    ClientId = clientId,
+                    LastSeen = DateTime.UtcNow
+                } // Creator is always first, never shuffled
             }
         };
         
@@ -26,7 +31,7 @@ public class MatchManager : IMatchManager
         return match;
     }
     
-    public Match JoinMatch(Guid matchId, string playerName)
+    public Match JoinMatch(Guid matchId, string playerName, string clientId = "")
     {
         var match = GetMatch(matchId) ?? throw new InvalidOperationException("Match not found");
         
@@ -38,7 +43,12 @@ public class MatchManager : IMatchManager
         // Handle duplicate names
         var uniqueName = EnsureUniqueName(match, playerName);
         
-        match.Players.Add(new Player { Name = uniqueName });
+        match.Players.Add(new Player { 
+            Name = uniqueName,
+            ClientId = clientId,
+            LastSeen = DateTime.UtcNow
+        });
+        
         return match;
     }
     

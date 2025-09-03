@@ -1,22 +1,39 @@
-function toggleCardSelection(cardIndex) {
-    // FIXED: Allow card selection during active game phase OR when it's not our turn (pre-selection)
+// js/cards/toggleCardSelection.js
+import {gameState, selectedCards, playerId} from "../core/variables.js";
+import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
+import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
+import {updateHandDisplay} from "../display/updateHandDisplay.js";
+import {showMessage} from "../utils/showMessage.js";
+
+export function toggleCardSelection(cardIndex) {
+    // Allow card selection during active game phase OR when it's not our turn (pre-selection)
     if (gameState && gameState.phase === 2) { // RoundEnd
         console.log("Card selection disabled: Round has ended");
         return; // Don't show message, just silently ignore
     }
 
-    // FIXED: Allow selection during game setup or when not our turn (for pre-selection)
+    // Allow selection during game setup or when not our turn (for pre-selection)
     if (!gameState || (gameState.phase !== 1 && gameState.phase !== 0)) {
         console.log("Card selection disabled: Invalid game phase");
         return;
     }
 
-    // Special rule: If there are only 2 players and one has 0 cards, disable card selection
-    if (gameState && gameState.players && gameState.players.length === 2 && gameState.phase === 1) {
+    // If only 1 active player remains (others have 0 cards), disable card selection
+    if (gameState && gameState.players && gameState.phase === 1) {
+        const activePlayers = gameState.players.filter(p => p.handCount > 0);
         const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
-        if (playersWithNoCards.length > 0) {
-            // One player has 0 cards - the other can only challenge, not play
-            console.log("Card selection disabled: 2-player game with one player having 0 cards");
+        
+        if (activePlayers.length === 1 && playersWithNoCards.length > 0) {
+            // Only one active player left - they can only challenge, not play cards
+            console.log("Card selection disabled: Only 1 active player remaining");
+            
+            // Format finished player names with HTML styling
+            const finishedPlayerNames = playersWithNoCards
+                .map(p => `<span style="font-weight: bold; font-style: italic;">${p.name}</span>`)
+                .join(', ');
+            
+            // Show message to explain why they can't select cards
+            showMessage(`You can only challenge now - ${finishedPlayerNames} finished the round!`, 0, false);
             return;
         }
     }
@@ -34,11 +51,14 @@ function toggleCardSelection(cardIndex) {
             return;
         }
     }
-    
+
+    // Clear "played" flag when selection changes
+    window.cardsJustPlayed = false;
+
     // Update display immediately
     updateHandDisplay();
     updateActionsDisplay();
-    updateCardPlayPreview(); // NEW: Show what will be played
-    
+    updateCardPlayPreview(); // This will now show "Will play" again
+
     console.log('Selected cards:', selectedCards);
 }

@@ -1,7 +1,9 @@
-async function copyMatchId() {
+import {showMessage} from "./showMessage.js";
+
+export async function copyMatchId() {
     const matchIdInput = document.getElementById('displayMatchId');
     const copyBtn = document.getElementById('copyMatchIdBtn');
-    
+
     if (!matchIdInput || !matchIdInput.value) {
         alert('No match ID to copy');
         return;
@@ -16,7 +18,7 @@ async function copyMatchId() {
             matchIdInput.select();
             matchIdInput.setSelectionRange(0, 99999); // For mobile devices
             document.execCommand('copy');
-            
+
             // Clear selection
             window.getSelection().removeAllRanges();
         }
@@ -24,7 +26,7 @@ async function copyMatchId() {
         // Provide visual feedback
         const originalText = copyBtn.textContent;
         const originalTitle = copyBtn.title;
-        
+
         copyBtn.textContent = '✓';
         copyBtn.title = 'Copied!';
         copyBtn.style.background = '#28a745';
@@ -42,11 +44,11 @@ async function copyMatchId() {
         console.log('Match ID copied to clipboard:', matchIdInput.value);
     } catch (err) {
         console.error('Failed to copy match ID:', err);
-        
+
         // Fallback: select the text so user can manually copy
         matchIdInput.select();
         matchIdInput.setSelectionRange(0, 99999);
-        
+
         alert('Please manually copy the selected Match ID (Ctrl+C or Cmd+C)');
     }
 }
