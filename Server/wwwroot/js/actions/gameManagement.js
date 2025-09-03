@@ -19,7 +19,7 @@ export async function endRound() {
     }
 
     const confirmed = await customConfirm(
-        'Are you sure you want to end the current round?\n\n' +
+        'Are you sure you want to end the current round?<br><br>' +
         'This will cancel the round without calculating any scores. ' +
         'All players will return to the lobby.',
         'End Round'
@@ -54,15 +54,19 @@ export async function endGame() {
         return;
     }
 
-    // Show current scores in confirmation
+    // Show current scores in confirmation with HTML formatting
     const currentScores = gameState.players
         .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
-        .map((p, i) => `${i + 1}. ${p.name}: ${p.score} points`)
-        .join('\n');
+        .map((p, i) => {
+            const formattedName = `<span style="font-weight: bold; font-style: italic;">${p.name}</span>`;
+            const formattedScore = `<span style="font-weight: bold; color: ${p.score >= 0 ? '#28a745' : '#dc3545'};">${p.score}</span>`;
+            return `${i + 1}. ${formattedName}: ${formattedScore} points`;
+        })
+        .join('<br>');
 
     const confirmed = await customConfirm(
-        'Are you sure you want to end the game?\n\n' +
-        'Current standings:\n' + currentScores + '\n\n' +
+        'Are you sure you want to end the game?<br><br>' +
+        '<strong>Current standings:</strong><br>' + currentScores + '<br><br>' +
         'Final results will be calculated and displayed.',
         'End Game'
     );

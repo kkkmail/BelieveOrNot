@@ -1,23 +1,32 @@
+// js/actions/playCards.js
 import {connection, gameState, playerId, selectedCards, setSelectedCards} from "../core/variables.js";
 import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {updateHandDisplay} from "../display/updateHandDisplay.js";
 import {generateGuid} from "../utils/generateGuid.js";
+import {customAlert} from "../utils/customAlert.js";
 
 export async function playCards() {
     if (selectedCards.length === 0) {
-        alert('Please select cards to play');
+        await customAlert('Please select cards to play');
         return;
     }
 
-    // FIXED: Additional validation - if only 1 active player remains, they can only challenge
+    // Additional validation - if only 1 active player remains, they can only challenge
     if (gameState && gameState.players) {
         const activePlayers = gameState.players.filter(p => p.handCount > 0);
         const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
         
         if (activePlayers.length === 1 && playersWithNoCards.length > 0) {
-            const finishedPlayerNames = playersWithNoCards.map(p => p.name).join(', ');
-            alert(`You cannot play more cards! ${finishedPlayerNames} finished the round. You can only challenge now.`);
+            // Format player names with HTML styling
+            const finishedPlayerNames = playersWithNoCards
+                .map(p => `<span style="font-weight: bold; font-style: italic;">${p.name}</span>`)
+                .join(', ');
+            
+            await customAlert(
+                `You cannot play more cards! ${finishedPlayerNames} finished the round. You can only challenge now.`,
+                'Cannot Play Cards'
+            );
             
             // Clear selected cards and update display
             setSelectedCards([]);
@@ -54,7 +63,7 @@ export async function playCards() {
         declaredRank = document.getElementById('declaredRank').value;
 
         if (!declaredRank || declaredRank === '') {
-            alert('Please choose a rank from the dropdown before playing cards.');
+            await customAlert('Please choose a rank from the dropdown before playing cards.');
             return;
         }
     }
@@ -62,7 +71,7 @@ export async function playCards() {
     console.log("Playing cards:", cardsToPlay.map(c => `${c.rank} of ${c.suit}`));
 
     try {
-        // FIXED: Set flag to show "Played" instead of "Will play"
+        // Set flag to show "Played" instead of "Will play"
         window.cardsJustPlayed = true;
         updateCardPlayPreview();
 
@@ -85,9 +94,9 @@ export async function playCards() {
         updateActionsDisplay();
     } catch (err) {
         console.error("Failed to play cards:", err);
-        alert("Failed to play cards: " + err);
+        await customAlert("Failed to play cards: " + err, 'Play Failed');
 
-        // FIXED: Clear flag if play failed
+        // Clear flag if play failed
         window.cardsJustPlayed = false;
         updateCardPlayPreview();
     }

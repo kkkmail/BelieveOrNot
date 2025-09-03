@@ -1,3 +1,4 @@
+// js/utils/showMessage.js
 import {addToEventHistory} from "./addToEventHistory.js";
 import {broadcastMessage} from "./broadcastMessage.js";
 import {connection, gameState} from "../core/variables.js";
@@ -12,8 +13,8 @@ export function showMessage(message, duration = 0, isGameEvent = true, shouldBro
         return; // Don't show locally since broadcast will echo back
     }
 
-    // ALL messages are now treated as game events (persistent)
-    // No more temporary disappearing messages
+    // All messages are treated as game events (persistent)
+    // Message is already HTML formatted if it came from server
     console.log("Adding message to persistent history:", message);
     addToEventHistory(message);
 }

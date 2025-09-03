@@ -26,10 +26,15 @@ export async function submitChallenge() {
         announcedRank: gameState.announcedRank
     });
 
-    // FIXED: Show confirmation dialog BEFORE sending challenge
+    // Format player name and rank with proper HTML styling for confirmation dialog
+    const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${targetPlayer?.name || 'the previous player'}</span>`;
+    const formattedRank = `<span style="font-weight: bold; font-size: 1.3em;">${gameState.announcedRank}</span>`;
+    const formattedCardNumber = `<span style="font-weight: bold;">${selectedChallengeIndex + 1}</span>`;
+
+    // Show confirmation dialog with HTML formatting
     const confirmed = await customConfirm(
-        `Are you sure you want to challenge ${targetPlayer?.name || 'the previous player'}?\n\n` +
-        `You are challenging that card ${selectedChallengeIndex + 1} is NOT a ${gameState.announcedRank}.`,
+        `Are you sure you want to challenge ${formattedPlayerName}?\n\n` +
+        `You are challenging that card ${formattedCardNumber} is NOT a ${formattedRank}.`,
         'Challenge Player'
     );
 

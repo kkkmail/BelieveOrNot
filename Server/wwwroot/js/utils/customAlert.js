@@ -1,4 +1,5 @@
-// Simple replacement for ugly alert() popups
+// js/utils/customAlert.js
+// Simple replacement for ugly alert() popups - now supports HTML content
 export function customAlert(message, title = 'Believe Or Not') {
     return new Promise((resolve) => {
         // Create overlay
@@ -15,13 +16,17 @@ export function customAlert(message, title = 'Believe Or Not') {
                     </h3>
                 </div>
                 <div class="custom-alert-body">
-                    <p class="custom-alert-message">${message}</p>
+                    <div class="custom-alert-message"></div>
                 </div>
                 <div class="custom-alert-footer">
                     <button class="custom-alert-button" data-action="ok">OK</button>
                 </div>
             </div>
         `;
+        
+        // Set message content using innerHTML to support HTML formatting
+        const messageDiv = overlay.querySelector('.custom-alert-message');
+        messageDiv.innerHTML = message; // This allows HTML formatting
         
         // Add to page
         document.body.appendChild(overlay);

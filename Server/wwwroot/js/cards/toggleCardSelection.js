@@ -1,3 +1,4 @@
+// js/cards/toggleCardSelection.js
 import {gameState, selectedCards, playerId} from "../core/variables.js";
 import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
@@ -17,7 +18,7 @@ export function toggleCardSelection(cardIndex) {
         return;
     }
 
-    // FIXED: If only 1 active player remains (others have 0 cards), disable card selection
+    // If only 1 active player remains (others have 0 cards), disable card selection
     if (gameState && gameState.players && gameState.phase === 1) {
         const activePlayers = gameState.players.filter(p => p.handCount > 0);
         const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
@@ -26,8 +27,12 @@ export function toggleCardSelection(cardIndex) {
             // Only one active player left - they can only challenge, not play cards
             console.log("Card selection disabled: Only 1 active player remaining");
             
+            // Format finished player names with HTML styling
+            const finishedPlayerNames = playersWithNoCards
+                .map(p => `<span style="font-weight: bold; font-style: italic;">${p.name}</span>`)
+                .join(', ');
+            
             // Show message to explain why they can't select cards
-            const finishedPlayerNames = playersWithNoCards.map(p => p.name).join(', ');
             showMessage(`You can only challenge now - ${finishedPlayerNames} finished the round!`, 0, false);
             return;
         }
@@ -47,7 +52,7 @@ export function toggleCardSelection(cardIndex) {
         }
     }
 
-    // FIXED: Clear "played" flag when selection changes
+    // Clear "played" flag when selection changes
     window.cardsJustPlayed = false;
 
     // Update display immediately

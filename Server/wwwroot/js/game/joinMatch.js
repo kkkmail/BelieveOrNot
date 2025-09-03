@@ -3,13 +3,14 @@ import {playerId, connection, setCurrentMatch, setPlayerId, clientId} from "../c
 import {showMessage} from "../utils/showMessage.js";
 import {showGameBoard} from "./showGameBoard.js";
 import {setMatchIdInUrl} from "../utils/urlManager.js";
+import {customAlert} from "../utils/customAlert.js";
 
 export async function joinMatch() {
     const playerName = document.getElementById('playerName').value.trim();
     const matchId = document.getElementById('matchId').value.trim();
 
     if (!playerName || !matchId) {
-        alert('Please enter your name and match ID');
+        await customAlert('Please enter your name and match ID');
         return;
     }
 
@@ -24,7 +25,15 @@ export async function joinMatch() {
 
             if (result.assignedName !== playerName) {
                 console.log(`Name changed from "${playerName}" to "${result.assignedName}" due to duplicate`);
-                showMessage(`Your name was changed to "${result.assignedName}" because "${playerName}" was already taken.`, 5000);
+                
+                // Format the message with HTML styling
+                const originalName = `<span style="font-weight: bold; font-style: italic;">${playerName}</span>`;
+                const newName = `<span style="font-weight: bold; font-style: italic;">${result.assignedName}</span>`;
+                
+                await customAlert(
+                    `Your name was changed to ${newName} because ${originalName} was already taken.`,
+                    'Name Changed'
+                );
             }
 
             // Set match ID in URL for reconnection
@@ -33,7 +42,7 @@ export async function joinMatch() {
             showGameBoard();
             showMessage(`Joined game! Waiting for other players.`);
         } else {
-            alert("Failed to join match: " + result.message);
+            await customAlert("Failed to join match: " + result.message);
         }
     } catch (err) {
         console.error("Failed to join match:", err);
@@ -51,6 +60,6 @@ export async function joinMatch() {
             }
         }
         
-        alert(errorMessage);
+        await customAlert(errorMessage, 'Join Failed');
     }
 }

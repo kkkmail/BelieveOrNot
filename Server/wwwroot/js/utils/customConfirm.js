@@ -1,4 +1,5 @@
-// Simple replacement for ugly confirm() popups
+// js/utils/customConfirm.js
+// Simple replacement for ugly confirm() popups - now supports HTML content
 export function customConfirm(message, title = 'Believe Or Not') {
     return new Promise((resolve) => {
         // Create overlay
@@ -15,7 +16,7 @@ export function customConfirm(message, title = 'Believe Or Not') {
                     </h3>
                 </div>
                 <div class="custom-confirm-body">
-                    <p class="custom-confirm-message">${message}</p>
+                    <div class="custom-confirm-message"></div>
                 </div>
                 <div class="custom-confirm-footer">
                     <button class="custom-confirm-button cancel" data-action="cancel">Cancel</button>
@@ -23,6 +24,10 @@ export function customConfirm(message, title = 'Believe Or Not') {
                 </div>
             </div>
         `;
+        
+        // Set message content using innerHTML to support HTML formatting
+        const messageDiv = overlay.querySelector('.custom-confirm-message');
+        messageDiv.innerHTML = message; // This allows HTML formatting
         
         // Add to page
         document.body.appendChild(overlay);
