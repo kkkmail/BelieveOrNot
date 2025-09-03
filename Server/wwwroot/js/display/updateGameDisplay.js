@@ -13,7 +13,9 @@ export function updateGameDisplay() {
     document.getElementById('roundNumber').textContent = gameState.roundNumber;
     document.getElementById('announcedRank').textContent = gameState.announcedRank || '-';
     document.getElementById('tablePileCount').textContent = gameState.tablePileCount;
-    document.getElementById('displayMatchId').value = gameState.matchId;
+
+    // Remove hyphens from match ID for easier reading/sharing
+    document.getElementById('displayMatchId').value = gameState.matchId.replace(/-/g, '');
 
     // Update table pile display
     updateTablePileDisplay();
