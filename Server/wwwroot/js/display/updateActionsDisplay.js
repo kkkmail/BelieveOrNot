@@ -83,19 +83,44 @@ export function updateActionsDisplay() {
         return;
     }
 
-    // Special 2-player rule
+    // FIXED: Check if there are players with cards remaining (active players)
+    const activePlayers = gameState.players.filter(p => p.handCount > 0);
     const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
-    const is2PlayerWithZeroCards = gameState.players.length === 2 && playersWithNoCards.length > 0;
-
-    console.log("2-player check:", {
-        playerCount: gameState.players.length,
+    
+    console.log("Player status check:", {
+        totalPlayers: gameState.players.length,
+        activePlayers: activePlayers.length,
         playersWithNoCards: playersWithNoCards.length,
-        is2PlayerWithZeroCards: is2PlayerWithZeroCards
+        activePlayerNames: activePlayers.map(p => p.name),
+        finishedPlayerNames: playersWithNoCards.map(p => p.name)
     });
 
+    // FIXED: If only 1 active player remains and there are finished players, only challenges allowed
+    if (activePlayers.length === 1 && playersWithNoCards.length > 0) {
+        console.log("Only 1 active player remains - only challenge allowed");
+        
+        // Clear any selected cards since they can't be played
+        if (selectedCards.length > 0) {
+            setSelectedCards([]);
+            console.log("Cleared selected cards - only challenges allowed");
+        }
+        
+        // Only show challenge if there are cards on the table to challenge
+        if (gameState.tablePileCount > 0 && challengeBtn) {
+            challengeBtn.classList.remove('hidden');
+            // Find the last player who played (should be one of the finished players)
+            const lastPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+            const lastPlayer = gameState.players[lastPlayerIndex];
+            challengeBtn.textContent = `Challenge ${lastPlayer.name}`;
+            console.log("Challenge button shown for last active player");
+        }
+        return; // Exit early, don't show any play buttons
+    }
+
+    // Normal game logic (not 2-player with zero cards)
     if (!gameState.announcedRank) {
         console.log("Opening turn - no announced rank");
-        if (selectedCards.length > 0 && !is2PlayerWithZeroCards) {
+        if (selectedCards.length > 0) {
             console.log("Showing play button and rank selector");
             if (rankSelector) {
                 rankSelector.classList.remove('hidden');
@@ -107,46 +132,31 @@ export function updateActionsDisplay() {
                 console.log("Play button shown with text:", playBtn.textContent);
             }
         } else {
-            console.log("Not showing play button:", {
-                selectedCardsLength: selectedCards.length,
-                is2PlayerWithZeroCards: is2PlayerWithZeroCards
-            });
+            console.log("No cards selected for opening turn");
         }
     } else {
         console.log("Normal turn - announced rank exists:", gameState.announcedRank);
 
-        if (is2PlayerWithZeroCards) {
-            console.log("2-player special case - showing challenge only");
-            if (gameState.tablePileCount > 0 && challengeBtn) {
-                challengeBtn.classList.remove('hidden');
-                const opponentWithZeroCards = playersWithNoCards[0];
-                challengeBtn.textContent = `Challenge ${opponentWithZeroCards.name}`;
-                console.log("Challenge button shown");
+        if (selectedCards.length > 0) {
+            console.log("Showing play button for normal turn");
+            if (playBtn) {
+                playBtn.classList.remove('hidden');
+                playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
+                console.log("Play button shown with text:", playBtn.textContent);
             }
         } else {
-            console.log("Normal turn logic");
+            console.log("No cards selected, not showing play button");
+        }
 
-            if (selectedCards.length > 0) {
-                console.log("Showing play button for normal turn");
-                if (playBtn) {
-                    playBtn.classList.remove('hidden');
-                    playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
-                    console.log("Play button shown with text:", playBtn.textContent);
-                }
-            } else {
-                console.log("No cards selected, not showing play button");
-            }
+        if (gameState.tablePileCount > 0) {
+            console.log("Showing challenge button");
+            const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+            const previousPlayer = gameState.players[previousPlayerIndex];
 
-            if (gameState.tablePileCount > 0) {
-                console.log("Showing challenge button");
-                const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
-                const previousPlayer = gameState.players[previousPlayerIndex];
-
-                if (challengeBtn) {
-                    challengeBtn.classList.remove('hidden');
-                    challengeBtn.textContent = `Challenge ${previousPlayer.name}`;
-                    console.log("Challenge button shown");
-                }
+            if (challengeBtn) {
+                challengeBtn.classList.remove('hidden');
+                challengeBtn.textContent = `Challenge ${previousPlayer.name}`;
+                console.log("Challenge button shown");
             }
         }
     }

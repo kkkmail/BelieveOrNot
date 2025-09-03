@@ -10,6 +10,24 @@ export async function playCards() {
         return;
     }
 
+    // FIXED: Additional validation - if only 1 active player remains, they can only challenge
+    if (gameState && gameState.players) {
+        const activePlayers = gameState.players.filter(p => p.handCount > 0);
+        const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
+        
+        if (activePlayers.length === 1 && playersWithNoCards.length > 0) {
+            const finishedPlayerNames = playersWithNoCards.map(p => p.name).join(', ');
+            alert(`You cannot play more cards! ${finishedPlayerNames} finished the round. You can only challenge now.`);
+            
+            // Clear selected cards and update display
+            setSelectedCards([]);
+            updateHandDisplay();
+            updateActionsDisplay();
+            updateCardPlayPreview();
+            return;
+        }
+    }
+
     // Get the actual card objects from sorted display
     const sortedHand = [...gameState.yourHand].sort((a, b) => {
         if (a.rank === 'Joker' && b.rank !== 'Joker') return -1;

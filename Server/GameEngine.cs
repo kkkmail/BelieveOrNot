@@ -325,13 +325,14 @@ public class GameEngine : IGameEngine
             var currentPlayer = match.Players[match.CurrentPlayerIndex];
             if (currentPlayer.Id != playerId) return false;
 
-            if (match.Players.Count == 2)
+            // FIXED: If only 1 active player remains (others have 0 cards), they cannot play more cards
+            var activePlayers = match.Players.Where(p => p.Hand.Count > 0).ToList();
+            var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
+
+            if (activePlayers.Count == 1 && playersWithNoCards.Any())
             {
-                var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
-                if (playersWithNoCards.Any())
-                {
-                    return false;
-                }
+                Console.WriteLine($"VALIDATION: Only 1 active player remaining ({player.Name}) - blocking play action");
+                return false; // Cannot play cards when you're the last active player
             }
 
             if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)
