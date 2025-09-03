@@ -4,12 +4,16 @@ import {setupEventListeners} from "./utils/setupEventListeners.js";
 import {setupGameBoardEventListeners} from "./utils/setupGameBoardEventListeners.js";
 import {initializeConnection} from "./core/initializeConnection.js";
 import {initCustomAlert} from "./utils/initCustomAlert.js";
+import {initCustomConfirm} from "./utils/initCustomConfirm.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("DOM loaded, starting initialization...");
 
     // Initialize custom alert to replace ugly system alerts
     initCustomAlert();
+
+    // Initialize custom confirm to replace ugly system confirms
+    initCustomConfirm();
 
     // First load the HTML content
     await loadHtmlContent();
