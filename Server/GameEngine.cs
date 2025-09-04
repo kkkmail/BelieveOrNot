@@ -148,6 +148,11 @@ public class GameEngine : IGameEngine
         Player collector = challengerWasRight ? challengedPlayer : challenger;
         
         var collectedCount = match.TablePile.Count;
+        
+        // FIXED: Store the announced rank and last play count BEFORE clearing them
+        var currentAnnouncedRank = match.AnnouncedRank ?? "Unknown";
+        var currentLastPlayCount = match.LastPlayCardCount;
+        
         collector.Hand.AddRange(match.TablePile);
         match.TablePile.Clear();
         match.AnnouncedRank = null;
@@ -160,13 +165,14 @@ public class GameEngine : IGameEngine
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = collectorIndex;
 
+        // FIXED: Use the stored values instead of the cleared ones
         var challengeEvent = GameEventFactory.CreateChallengeEvent(
             challenger.Name,
             challengedPlayer.Name,
             request.ChallengePickIndex!.Value,
-            match.LastPlayCardCount,
+            currentLastPlayCount, // Use stored value instead of match.LastPlayCardCount (which is now 0)
             revealedCard,
-            match.AnnouncedRank ?? "Unknown",
+            currentAnnouncedRank, // Use stored value instead of match.AnnouncedRank (which is now null)
             isMatch,
             collector.Name,
             collectedCount
