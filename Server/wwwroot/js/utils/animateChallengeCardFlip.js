@@ -63,14 +63,14 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                 font-size: 48px;
                 font-weight: bold;
                 color: ${isMatch ? '#28a745' : '#dc3545'};
-                background: rgba(255, 255, 255, 0.9);
+                background: transparent;
                 border-radius: 50%;
                 width: 60px;
                 height: 60px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
                 opacity: 0;
                 transition: opacity ${CONFIG.CHALLENGE_RESULT_FADE_DURATION}ms ease;
                 z-index: 10;
