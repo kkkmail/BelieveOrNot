@@ -1,8 +1,12 @@
 // js/utils/addToEventHistory.js
 import {getCurrentTime} from "./getCurrentTime.js";
 import {showEventHistory} from "./showEventHistory.js";
+import {handleChallengeResult} from "../actions/submitChallenge.js";
 
-export function addToEventHistory(event) {
+export async function addToEventHistory(event) {
+    console.log("=== ADD TO EVENT HISTORY ===");
+    console.log("Raw event:", event);
+    
     if (!window.gameEventHistory) {
         window.gameEventHistory = [];
         // Add the welcome message as the first event if history is empty
@@ -19,13 +23,50 @@ export function addToEventHistory(event) {
         timestampedEvent = `${getCurrentTime()}: ${event}`;
     }
 
-    window.gameEventHistory.push(timestampedEvent);
+    // Check if this is a challenge result message and trigger animation
+    const isChallengeMessage = event.includes('challenges');
+    const hasResultInfo = event.includes('Challenged card was');
+    
+    console.log("Challenge detection:", {
+        isChallengeMessage,
+        hasResultInfo,
+        shouldAnimate: isChallengeMessage && hasResultInfo
+    });
 
-    // Keep last 8 messages
-    if (window.gameEventHistory.length > 8) {
-        window.gameEventHistory.shift();
+    if (isChallengeMessage && hasResultInfo) {
+        console.log("🎯 DETECTED CHALLENGE RESULT MESSAGE - triggering animation");
+        console.log("Full message for animation:", event);
+        
+        // Trigger animation before adding to history (with small delay to ensure UI is ready)
+        setTimeout(async () => {
+            console.log("Calling handleChallengeResult...");
+            await handleChallengeResult(event);
+            console.log("handleChallengeResult completed");
+        }, 100);
+        
+        // Add a small delay before showing the message to let animation start
+        setTimeout(() => {
+            window.gameEventHistory.push(timestampedEvent);
+
+            // Keep last 8 messages
+            if (window.gameEventHistory.length > 8) {
+                window.gameEventHistory.shift();
+            }
+
+            console.log("Event history updated (after animation):", window.gameEventHistory.length, "messages");
+            showEventHistory();
+        }, 200);
+    } else {
+        // Regular message processing
+        console.log("Regular message processing");
+        window.gameEventHistory.push(timestampedEvent);
+
+        // Keep last 8 messages
+        if (window.gameEventHistory.length > 8) {
+            window.gameEventHistory.shift();
+        }
+
+        console.log("Event history updated:", window.gameEventHistory.length, "messages");
+        showEventHistory();
     }
-
-    console.log("Event history updated:", window.gameEventHistory);
-    showEventHistory();
 }
