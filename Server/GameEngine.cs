@@ -4,7 +4,6 @@ public class GameEngine : IGameEngine
     private readonly Random _random = new();
     private readonly IMatchManager _matchManager;
 
-    // Constructor for dependency injection
     public GameEngine(IMatchManager matchManager)
     {
         _matchManager = matchManager;
@@ -17,7 +16,6 @@ public class GameEngine : IGameEngine
             throw new InvalidOperationException("Need at least 2 players to start a round");
         }
 
-        // Shuffle players (except creator) at the beginning of each new round
         _matchManager.ShufflePlayersForNewRound(match);
 
         var deck = DeckBuilder.BuildDeck(match.Settings.DeckSize, match.Settings.JokerCount);
@@ -38,25 +36,23 @@ public class GameEngine : IGameEngine
             match.Players[playerIndex].Hand.Add(deck[cardIndex]);
         }
 
-        var disposalEvents = new List<string>();
+        var disposalMessages = new List<string>();
         foreach (var player in match.Players)
         {
             var disposedRanks = AutoDisposeFourOfAKind(player);
-            disposalEvents.AddRange(disposedRanks);
+            foreach (var rank in disposedRanks)
+            {
+                var disposalEvent = GameEventFactory.CreateDisposalEvent(player.Name, rank);
+                disposalMessages.Add(disposalEvent.DisplayMessage);
+            }
         }
 
         match.CurrentPlayerIndex = (match.DealerIndex + 1) % match.Players.Count;
         match.Phase = GamePhase.InProgress;
         match.RoundNumber++;
 
-        var roundStartMessage = $"🎯 Round {MessageFormatter.FormatCount(match.RoundNumber)} started!";
-        if (disposalEvents.Any())
-        {
-            roundStartMessage += " " + string.Join(" ", disposalEvents);
-        }
-
         var state = CreateGameStateDto(match, Guid.Empty);
-        state.LastAction = roundStartMessage;
+        state.Event = GameEventFactory.CreateRoundStartEvent(match.RoundNumber, disposalMessages);
         return state;
     }
 
@@ -73,24 +69,22 @@ public class GameEngine : IGameEngine
         }
 
         var player = match.Players.First(p => p.Id == playerId);
-        var result = string.Empty;
 
-        if (request.Action == ActionType.Play)
+        GameEventDto gameEvent = request.Action switch
         {
-            HandlePlayAction(match, player, request, out result);
-        }
-        else if (request.Action == ActionType.Challenge)
-        {
-            HandleChallengeAction(match, player, request, out result);
-        }
+            ActionType.Play => HandlePlayAction(match, player, request),
+            ActionType.Challenge => HandleChallengeAction(match, player, request),
+            _ => throw new InvalidOperationException($"Unknown action type: {request.Action}")
+        };
 
         var state = CreateGameStateDto(match, playerId);
-        state.LastAction = result;
+        state.Event = gameEvent;
         return state;
     }
 
-    private void HandlePlayAction(Match match, Player player, SubmitMoveRequest request, out string result)
+    private GameEventDto HandlePlayAction(Match match, Player player, SubmitMoveRequest request)
     {
+        // Remove cards from player's hand
         var cardsToRemove = new List<Card>();
         foreach (var requestedCard in request.Cards!)
         {
@@ -107,97 +101,102 @@ public class GameEngine : IGameEngine
             player.Hand.Remove(card);
         }
 
+        // Add cards to table pile
         match.TablePile.AddRange(request.Cards!);
         match.LastPlayCardCount = request.Cards!.Count;
 
+        // Set announced rank if this is the opening play
         if (match.AnnouncedRank == null)
         {
             match.AnnouncedRank = request.DeclaredRank;
         }
 
+        // Handle automatic disposal of four-of-a-kind
         var disposalEvents = AutoDisposeFourOfAKind(player);
+        
+        var cardPlayEvent = GameEventFactory.CreateCardPlayEvent(
+            player.Name, 
+            request.Cards!, 
+            match.AnnouncedRank!, 
+            player.Hand.Count
+        );
 
-        // Use structured message formatting
-        if (player.Hand.Count == 0)
-        {
-            result = MessageFormatter.CardPlay(player.Name, request.Cards!.Count, match.AnnouncedRank!) + 
-                    $" and has {MessageFormatter.FormatCount(0)} CARDS LEFT! Game continues.";
-        }
-        else
-        {
-            result = MessageFormatter.CardPlay(player.Name, request.Cards!.Count, match.AnnouncedRank!);
-        }
-
+        // Add disposal messages if any occurred
         if (disposalEvents.Any())
         {
-            result += " " + string.Join(" ", disposalEvents);
+            var disposalMessages = disposalEvents.Select(rank => 
+                GameEventFactory.CreateDisposalEvent(player.Name, rank).DisplayMessage);
+            cardPlayEvent.DisplayMessage += " " + string.Join(" ", disposalMessages);
         }
 
         AdvanceToNextActivePlayer(match);
+        return cardPlayEvent;
     }
 
-    private void HandleChallengeAction(Match match, Player challenger, SubmitMoveRequest request, out string result)
+    private GameEventDto HandleChallengeAction(Match match, Player challenger, SubmitMoveRequest request)
     {
         var cardIndex = match.TablePile.Count - match.LastPlayCardCount + request.ChallengePickIndex!.Value;
-        var flippedCard = match.TablePile[cardIndex];
+        var revealedCard = match.TablePile[cardIndex];
 
         var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
         var challengedPlayer = match.Players[prevPlayerIndex];
 
-        // Use structured message formatting
-        var challengeDetails = MessageFormatter.Challenge(challenger.Name, challengedPlayer.Name, request.ChallengePickIndex!.Value, match.LastPlayCardCount);
+        bool isMatch = revealedCard.Rank == match.AnnouncedRank || revealedCard.IsJoker;
+        bool challengerWasRight = !isMatch;
 
-        bool challengeHit = flippedCard.Rank == match.AnnouncedRank || flippedCard.IsJoker;
-
-        Player collector;
-        string challengeResult;
-
-        if (challengeHit)
-        {
-            collector = challenger;
-            challengeResult = MessageFormatter.ChallengeResult(flippedCard, match.AnnouncedRank!, challenger.Name, challengedPlayer.Name, true);
-        }
-        else
-        {
-            collector = challengedPlayer;
-            challengeResult = MessageFormatter.ChallengeResult(flippedCard, match.AnnouncedRank!, challenger.Name, challengedPlayer.Name, false);
-        }
-
+        // Determine who collects the cards
+        Player collector = challengerWasRight ? challengedPlayer : challenger;
+        
         var collectedCount = match.TablePile.Count;
         collector.Hand.AddRange(match.TablePile);
         match.TablePile.Clear();
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
 
+        // Handle automatic disposal
         var disposalEvents = AutoDisposeFourOfAKind(collector);
 
+        // Set current player to the collector
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = collectorIndex;
 
-        result = challengeDetails + " " + challengeResult;
+        var challengeEvent = GameEventFactory.CreateChallengeEvent(
+            challenger.Name,
+            challengedPlayer.Name,
+            request.ChallengePickIndex!.Value,
+            match.LastPlayCardCount,
+            revealedCard,
+            match.AnnouncedRank ?? "Unknown",
+            isMatch,
+            collector.Name,
+            collectedCount
+        );
+
+        // Add disposal messages if any occurred
         if (disposalEvents.Any())
         {
-            result += " " + string.Join(" ", disposalEvents);
+            var disposalMessages = disposalEvents.Select(rank => 
+                GameEventFactory.CreateDisposalEvent(collector.Name, rank).DisplayMessage);
+            challengeEvent.DisplayMessage += " " + string.Join(" ", disposalMessages);
         }
 
+        // Check if round should end
         var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
         if (playersWithNoCards.Any())
         {
             EndRound(match);
-            if (!string.IsNullOrEmpty(match.LastRoundEndMessage))
-            {
-                result += " " + match.LastRoundEndMessage;
-            }
         }
         else
         {
             AdvanceToNextActivePlayer(match);
         }
+
+        return challengeEvent;
     }
 
     private List<string> AutoDisposeFourOfAKind(Player player)
     {
-        var disposalEvents = new List<string>();
+        var disposedRanks = new List<string>();
         var groups = player.Hand.Where(c => !c.IsJoker)
             .GroupBy(c => c.Rank)
             .Where(g => g.Count() >= 4)
@@ -210,11 +209,10 @@ public class GameEngine : IGameEngine
             {
                 player.Hand.Remove(card);
             }
-            // Use structured message formatting
-            disposalEvents.Add(MessageFormatter.Disposal(player.Name, group.Key));
+            disposedRanks.Add(group.Key);
         }
 
-        return disposalEvents;
+        return disposedRanks;
     }
 
     private void AdvanceToNextActivePlayer(Match match)
@@ -229,7 +227,7 @@ public class GameEngine : IGameEngine
 
             if (attempts >= maxAttempts)
             {
-                Console.WriteLine("WARNING: All players have 0 cards but round hasn't ended - this shouldn't happen");
+                Console.WriteLine("WARNING: All players have 0 cards but round hasn't ended");
                 break;
             }
         } while (match.Players[match.CurrentPlayerIndex].Hand.Count == 0);
@@ -239,12 +237,12 @@ public class GameEngine : IGameEngine
     {
         if (match.Phase == GamePhase.RoundEnd)
         {
-            Console.WriteLine("WARNING: EndRound called but round already ended - skipping to prevent double scoring");
+            Console.WriteLine("WARNING: EndRound called but round already ended - skipping");
             return;
         }
 
         match.Phase = GamePhase.RoundEnd;
-        var roundResults = new List<string>();
+        var scoreResults = new List<PlayerScoreResult>();
         var winners = new List<Player>();
 
         foreach (var player in match.Players)
@@ -252,44 +250,39 @@ public class GameEngine : IGameEngine
             int regularCards = player.Hand.Count(c => !c.IsJoker);
             int jokerCards = player.Hand.Count(c => c.IsJoker);
 
-            var roundScore = 0;
             var regularCardPenalty = regularCards * match.Settings.ScorePerCard;
             var jokerCardPenalty = jokerCards * match.Settings.ScorePerJoker;
-
-            roundScore += regularCardPenalty;
-            roundScore += jokerCardPenalty;
+            var winnerBonus = 0;
 
             if (player.Hand.Count == 0)
             {
-                roundScore += match.Settings.WinnerBonus;
+                winnerBonus = match.Settings.WinnerBonus;
                 match.DealerIndex = match.Players.IndexOf(player);
                 winners.Add(player);
             }
 
+            var roundScore = regularCardPenalty + jokerCardPenalty + winnerBonus;
             player.Score += roundScore;
 
-            // Use structured message formatting
-            var scoreMessage = MessageFormatter.ScoreResult(
-                player.Name, 
-                roundScore, 
-                player.Hand.Count == 0, 
-                match.Settings.WinnerBonus, 
-                regularCards, 
-                jokerCards, 
-                regularCardPenalty, 
-                jokerCardPenalty);
-            
-            roundResults.Add(scoreMessage);
+            scoreResults.Add(new PlayerScoreResult
+            {
+                PlayerName = player.Name,
+                ScoreChange = roundScore,
+                TotalScore = player.Score,
+                IsWinner = player.Hand.Count == 0,
+                RegularCards = regularCards,
+                JokerCards = jokerCards,
+                WinnerBonus = winnerBonus
+            });
         }
 
-        // Use structured message formatting for round end
-        var winnerNames = winners.Select(w => w.Name).ToList();
-        var roundEndMessage = MessageFormatter.RoundEnd(match.RoundNumber, winnerNames);
-        roundEndMessage += " Scoring: " + string.Join(", ", roundResults);
+        var roundEndEvent = GameEventFactory.CreateRoundEndEvent(
+            match.RoundNumber, 
+            winners.Select(w => w.Name).ToList(), 
+            scoreResults
+        );
         
-        match.LastRoundEndMessage = roundEndMessage;
-
-        Console.WriteLine($"Round ended: {roundEndMessage}");
+        Console.WriteLine($"Round {match.RoundNumber} ended: {roundEndEvent.DisplayMessage}");
     }
 
     public bool IsValidMove(Match match, Guid playerId, SubmitMoveRequest request)
@@ -299,71 +292,75 @@ public class GameEngine : IGameEngine
         var player = match.Players.FirstOrDefault(p => p.Id == playerId);
         if (player == null) return false;
 
-        if (request.Action == ActionType.Play)
+        return request.Action switch
         {
-            if (player.Hand.Count == 0) return false;
+            ActionType.Play => IsValidPlayAction(match, player, request),
+            ActionType.Challenge => IsValidChallengeAction(match, player, request),
+            _ => false
+        };
+    }
 
-            var currentPlayer = match.Players[match.CurrentPlayerIndex];
-            if (currentPlayer.Id != playerId) return false;
+    private bool IsValidPlayAction(Match match, Player player, SubmitMoveRequest request)
+    {
+        if (player.Hand.Count == 0) return false;
 
-            // If only 1 active player remains (others have 0 cards), they cannot play more cards
-            var activePlayers = match.Players.Where(p => p.Hand.Count > 0).ToList();
-            var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
+        var currentPlayer = match.Players[match.CurrentPlayerIndex];
+        if (currentPlayer.Id != player.Id) return false;
 
-            if (activePlayers.Count == 1 && playersWithNoCards.Any())
-            {
-                Console.WriteLine($"VALIDATION: Only 1 active player remaining ({player.Name}) - blocking play action");
-                return false; // Cannot play cards when you're the last active player
-            }
+        // Check if only one active player remains
+        var activePlayers = match.Players.Where(p => p.Hand.Count > 0).ToList();
+        var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
 
-            if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)
-                return false;
-
-            var playerCardCounts = new Dictionary<(string rank, string suit), int>();
-            foreach (var card in player.Hand)
-            {
-                var key = (card.Rank, card.Suit);
-                playerCardCounts[key] = playerCardCounts.GetValueOrDefault(key, 0) + 1;
-            }
-
-            var requestedCardCounts = new Dictionary<(string rank, string suit), int>();
-            foreach (var card in request.Cards)
-            {
-                var key = (card.Rank, card.Suit);
-                requestedCardCounts[key] = requestedCardCounts.GetValueOrDefault(key, 0) + 1;
-            }
-
-            foreach (var kvp in requestedCardCounts)
-            {
-                if (!playerCardCounts.ContainsKey(kvp.Key) ||
-                    playerCardCounts[kvp.Key] < kvp.Value)
-                {
-                    return false;
-                }
-            }
-
-            if (match.AnnouncedRank == null)
-            {
-                return !string.IsNullOrEmpty(request.DeclaredRank);
-            }
-
-            return true;
-        }
-        else if (request.Action == ActionType.Challenge)
+        if (activePlayers.Count == 1 && playersWithNoCards.Any())
         {
-            if (player.Hand.Count == 0) return false;
-
-            if (match.TablePile.Count == 0 || match.AnnouncedRank == null)
-                return false;
-
-            if (!request.ChallengePickIndex.HasValue)
-                return false;
-
-            var pickIndex = request.ChallengePickIndex.Value;
-            return pickIndex >= 0 && pickIndex < match.LastPlayCardCount;
+            Console.WriteLine($"VALIDATION: Only 1 active player remaining ({player.Name}) - blocking play");
+            return false;
         }
 
-        return false;
+        if (request.Cards == null || request.Cards.Count < 1 || request.Cards.Count > 3)
+            return false;
+
+        // Verify player has the requested cards
+        var playerCardCounts = new Dictionary<(string rank, string suit), int>();
+        foreach (var card in player.Hand)
+        {
+            var key = (card.Rank, card.Suit);
+            playerCardCounts[key] = playerCardCounts.GetValueOrDefault(key, 0) + 1;
+        }
+
+        var requestedCardCounts = new Dictionary<(string rank, string suit), int>();
+        foreach (var card in request.Cards)
+        {
+            var key = (card.Rank, card.Suit);
+            requestedCardCounts[key] = requestedCardCounts.GetValueOrDefault(key, 0) + 1;
+        }
+
+        foreach (var kvp in requestedCardCounts)
+        {
+            if (!playerCardCounts.ContainsKey(kvp.Key) ||
+                playerCardCounts[kvp.Key] < kvp.Value)
+            {
+                return false;
+            }
+        }
+
+        // For opening turn, declared rank must be provided
+        if (match.AnnouncedRank == null)
+        {
+            return !string.IsNullOrEmpty(request.DeclaredRank);
+        }
+
+        return true;
+    }
+
+    private bool IsValidChallengeAction(Match match, Player player, SubmitMoveRequest request)
+    {
+        if (player.Hand.Count == 0) return false;
+        if (match.TablePile.Count == 0 || match.AnnouncedRank == null) return false;
+        if (!request.ChallengePickIndex.HasValue) return false;
+
+        var pickIndex = request.ChallengePickIndex.Value;
+        return pickIndex >= 0 && pickIndex < match.LastPlayCardCount;
     }
 
     private GameStateDto CreateGameStateDto(Match match, Guid requestingPlayerId)
@@ -387,6 +384,7 @@ public class GameEngine : IGameEngine
             }).ToList(),
             DeckSize = match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount,
+            CreatorPlayerId = match.Players[0].Id
         };
 
         var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == requestingPlayerId);

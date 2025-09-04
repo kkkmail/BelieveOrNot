@@ -29,12 +29,19 @@ export async function initializeConnection() {
         updateGameDisplay();
     });
 
+    // NEW: Handle structured game events
+    hub.on("GameEvent", (gameEvent) => {
+        console.log("=== GAME EVENT RECEIVED ===", gameEvent);
+        addToEventHistory(gameEvent);
+    });
+
+    // LEGACY: Handle old message broadcasts (for backward compatibility)
     hub.on("MessageBroadcast", (message, senderName) => {
-        console.log("=== MESSAGE BROADCAST RECEIVED ===", message, senderName);
+        console.log("=== LEGACY MESSAGE BROADCAST RECEIVED ===", message, senderName);
         addToEventHistory(message);
     });
 
-    // NEW: Handle game end results
+    // Handle game end results
     hub.on("GameEnded", (results) => {
         console.log("=== GAME ENDED ===", results);
         showFinalResults(results);

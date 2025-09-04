@@ -89,20 +89,40 @@ public static class MessageFormatter
         return $"{FormatPlayer(challenger)} challenges {FormatPlayer(challenged)} (card {FormatCount(cardIndex + 1)} of {FormatCount(totalCards)}).";
     }
 
-    public static string ChallengeResult(Card revealedCard, string announcedRank, string challenger, string challenged, bool challengerWon)
+    // public static string ChallengeResult(Card revealedCard, string announcedRank, string challenger, string challenged, bool challengerWon)
+    // {
+    //     var cardText = FormatCard(revealedCard);
+    //     var rankText = FormatRank(announcedRank);
+    //
+    //     if (challengerWon)
+    //     {
+    //         var matchText = revealedCard.IsJoker ?
+    //             $"(Joker matches {rankText})" :
+    //             $"(matches {rankText})";
+    //         return $"Challenged card was {cardText} {matchText}. {FormatPlayer(challenger)} was wrong and collects all cards.";
+    //     }
+    //     else
+    //     {
+    //         return $"Challenged card was {cardText} (does not match {rankText}). {FormatPlayer(challenger)} was right, {FormatPlayer(challenged)} collects all cards.";
+    //     }
+    // }
+
+    public static string ChallengeResult(Card revealedCard, string announcedRank, string challenger, string challenged, bool cardMatches)
     {
         var cardText = FormatCard(revealedCard);
         var rankText = FormatRank(announcedRank);
-        
-        if (challengerWon)
+
+        if (cardMatches)
         {
-            var matchText = revealedCard.IsJoker ? 
-                $"(Joker matches {rankText})" : 
+            // Card matches the announced rank - challenger was WRONG
+            var matchText = revealedCard.IsJoker ?
+                $"(Joker matches {rankText})" :
                 $"(matches {rankText})";
             return $"Challenged card was {cardText} {matchText}. {FormatPlayer(challenger)} was wrong and collects all cards.";
         }
         else
         {
+            // Card does NOT match - challenger was RIGHT
             return $"Challenged card was {cardText} (does not match {rankText}). {FormatPlayer(challenger)} was right, {FormatPlayer(challenged)} collects all cards.";
         }
     }
@@ -176,7 +196,7 @@ public static class MessageFormatter
             var formattedWinners = string.Join(", ", winnerNames.Select(FormatPlayer));
             winnerText = $"🏆 Tie game! Winners: {formattedWinners} with {FormatPoints(winnerScore)} points each!";
         }
-        
+
         return $"🎯 {FormatPlayer(playerName)} ended the game. {winnerText}";
     }
 }

@@ -4,7 +4,7 @@
 export const CONFIG = {
     // Challenge card animation timings
     CHALLENGE_CARD_FLIP_DURATION: 600, // milliseconds for flip animation
-    CHALLENGE_CARD_DISPLAY_DURATION: 3000, // 3 seconds to show result
+    CHALLENGE_CARD_DISPLAY_DURATION: 5000, // 5 seconds to show result
     CHALLENGE_RESULT_FADE_DURATION: 300, // milliseconds for fade out
     
     // Challenge result symbols
