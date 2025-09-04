@@ -28,6 +28,7 @@ public class GameEngine : IGameEngine
         match.TablePile.Clear();
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
+        match.DisposedRanks.Clear(); // Reset disposed ranks for new round
 
         int playerCount = match.Players.Count;
         for (int cardIndex = 0; cardIndex < deck.Count; cardIndex++)
@@ -39,7 +40,7 @@ public class GameEngine : IGameEngine
         var disposalMessages = new List<string>();
         foreach (var player in match.Players)
         {
-            var disposedRanks = AutoDisposeFourOfAKind(player);
+            var disposedRanks = AutoDisposeFourOfAKind(player, match);
             foreach (var rank in disposedRanks)
             {
                 var disposalEvent = GameEventFactory.CreateDisposalEvent(player.Name, rank);
@@ -112,7 +113,7 @@ public class GameEngine : IGameEngine
         }
 
         // Handle automatic disposal of four-of-a-kind
-        var disposalEvents = AutoDisposeFourOfAKind(player);
+        var disposalEvents = AutoDisposeFourOfAKind(player, match);
         
         var cardPlayEvent = GameEventFactory.CreateCardPlayEvent(
             player.Name, 
@@ -159,7 +160,7 @@ public class GameEngine : IGameEngine
         match.LastPlayCardCount = 0;
 
         // Handle automatic disposal
-        var disposalEvents = AutoDisposeFourOfAKind(collector);
+        var disposalEvents = AutoDisposeFourOfAKind(collector, match);
 
         // Set current player to the collector
         var collectorIndex = match.Players.IndexOf(collector);
@@ -200,7 +201,7 @@ public class GameEngine : IGameEngine
         return challengeEvent;
     }
 
-    private List<string> AutoDisposeFourOfAKind(Player player)
+    private List<string> AutoDisposeFourOfAKind(Player player, Match match)
     {
         var disposedRanks = new List<string>();
         var groups = player.Hand.Where(c => !c.IsJoker)
@@ -216,6 +217,7 @@ public class GameEngine : IGameEngine
                 player.Hand.Remove(card);
             }
             disposedRanks.Add(group.Key);
+            match.DisposedRanks.Add(group.Key); // Track disposed rank
         }
 
         return disposedRanks;
@@ -390,6 +392,7 @@ public class GameEngine : IGameEngine
             }).ToList(),
             DeckSize = match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount,
+            DisposedRanks = match.DisposedRanks.ToList(), // Include disposed ranks
             CreatorPlayerId = match.Players[0].Id
         };
 

@@ -27,14 +27,26 @@ export function updateRankDropdown() {
         availableRanks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     }
 
-    // Add rank options
-    availableRanks.forEach(rank => {
+    // Filter out disposed ranks
+    const disposedRanks = gameState?.disposedRanks || gameState?.DisposedRanks || [];
+    const selectableRanks = availableRanks.filter(rank => !disposedRanks.includes(rank));
+
+    console.log("Rank dropdown update:", {
+        availableRanks,
+        disposedRanks,
+        selectableRanks
+    });
+
+    // Add rank options (excluding disposed ones)
+    selectableRanks.forEach(rank => {
         const option = document.createElement('option');
         option.value = rank;
         option.textContent = rank;
         declaredRankSelect.appendChild(option);
     });
 
-    // REMOVED: No longer adding Joker as a selectable rank
-    // Players cannot declare "Joker" as the announced rank
+    // Show info if some ranks were filtered out
+    if (disposedRanks.length > 0) {
+        console.log(`Filtered out ${disposedRanks.length} disposed ranks: ${disposedRanks.join(', ')}`);
+    }
 }

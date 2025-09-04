@@ -15,6 +15,9 @@ public class GameStateDto
     public int DeckSize { get; set; }
     public int JokerCount { get; set; }
     
+    // NEW: Track disposed ranks for dropdown filtering
+    public List<string> DisposedRanks { get; set; } = new();
+    
     // NEW: Structured event data instead of LastAction string
     public GameEventDto? Event { get; set; }
 }
