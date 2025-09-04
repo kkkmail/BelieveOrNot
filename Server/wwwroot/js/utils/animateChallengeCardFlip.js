@@ -3,12 +3,15 @@ import { CONFIG } from "./config.js";
 import { getSuitSymbol } from "../cards/getSuitSymbol.js";
 import { getSuitClass } from "../cards/getSuitClass.js";
 
-export function animateChallengeCardFlip(cardElement, revealedCard, announcedRank, isMatch) {
+export function animateChallengeCardFlip(cardElement, revealedCard, announcedRank, isMatch, isChallenger = false, remainingCards = null, challengeCardIndex = 0) {
     return new Promise((resolve) => {
         console.log("Starting challenge card flip animation", {
             revealedCard,
             announcedRank,
             isMatch,
+            isChallenger,
+            remainingCards,
+            challengeCardIndex,
             cardElement: cardElement
         });
 
@@ -85,6 +88,76 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                 resultOverlay.style.opacity = '1';
                 console.log("Showing result symbol:", isMatch ? 'SUCCESS' : 'FAIL');
             }, 100);
+            
+            // If card matches (✓ shown) and this is the challenger with remaining cards, show them IMMEDIATELY
+            if (isMatch && isChallenger && remainingCards && remainingCards.length > 0) {
+                console.log("🎯 CHALLENGER CONDITION MET - STARTING REMAINING CARDS ANIMATION");
+                console.log("isMatch:", isMatch);
+                console.log("isChallenger:", isChallenger); 
+                console.log("remainingCards:", remainingCards);
+                console.log("remainingCards.length:", remainingCards.length);
+                console.log("challengeCardIndex:", challengeCardIndex);
+                
+                // Find the challenge area and animate remaining cards directly
+                const challengeCards = document.getElementById('challengeCards');
+                console.log("challengeCards element:", challengeCards);
+                
+                if (challengeCards) {
+                    const allCards = challengeCards.children;
+                    console.log("Total cards in challenge area:", allCards.length);
+                    console.log("All card elements:", Array.from(allCards));
+                    
+                    let remainingIndex = 0;
+                    
+                    for (let pos = 0; pos < allCards.length; pos++) {
+                        console.log(`Checking position ${pos}:`);
+                        console.log("  - challengeCardIndex:", challengeCardIndex);
+                        console.log("  - Is this the challenged card?", pos === challengeCardIndex);
+                        
+                        if (pos === challengeCardIndex) {
+                            console.log(`  - SKIPPING position ${pos} - this is the challenged card`);
+                            continue; // Skip challenged card
+                        }
+                        
+                        if (remainingIndex < remainingCards.length) {
+                            const cardElement = allCards[pos];
+                            const serverCard = remainingCards[remainingIndex];
+                            
+                            console.log(`  - ANIMATING position ${pos} with remaining card ${remainingIndex}:`, serverCard);
+                            console.log("  - Card element:", cardElement);
+                            console.log("  - Card element current content:", cardElement.innerHTML);
+                            console.log("  - Card element current classes:", cardElement.className);
+                            console.log("  - Card element position info:", {
+                                offsetTop: cardElement.offsetTop,
+                                offsetLeft: cardElement.offsetLeft,
+                                style: cardElement.style.cssText
+                            });
+                            
+                            const delay = remainingIndex * 400;
+                            console.log(`  - Will animate after ${delay}ms delay`);
+                            
+                            setTimeout(() => {
+                                console.log(`🎬 Starting animation for position ${pos} with card:`, serverCard);
+                                animateChallengeCardFlip(cardElement, serverCard, "", false, false, null, -1);
+                            }, delay);
+                            
+                            remainingIndex++;
+                        } else {
+                            console.log(`  - No more remaining cards to animate (remainingIndex: ${remainingIndex})`);
+                        }
+                    }
+                    
+                    console.log(`Scheduled ${remainingIndex} remaining card animations`);
+                } else {
+                    console.error("❌ Challenge cards container not found!");
+                }
+            } else {
+                console.log("❌ CHALLENGER CONDITION NOT MET");
+                console.log("isMatch:", isMatch);
+                console.log("isChallenger:", isChallenger); 
+                console.log("remainingCards:", remainingCards);
+                console.log("remainingCards?.length:", remainingCards?.length);
+            }
             
         }, CONFIG.CHALLENGE_CARD_FLIP_DURATION + CONFIG.CHALLENGE_CARD_REVEAL_DELAY);
         

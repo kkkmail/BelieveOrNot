@@ -114,18 +114,18 @@ public class GameEngine : IGameEngine
 
         // Handle automatic disposal of four-of-a-kind
         var disposalEvents = AutoDisposeFourOfAKind(player, match);
-        
+
         var cardPlayEvent = GameEventFactory.CreateCardPlayEvent(
-            player.Name, 
-            request.Cards!, 
-            match.AnnouncedRank!, 
+            player.Name,
+            request.Cards!,
+            match.AnnouncedRank!,
             player.Hand.Count
         );
 
         // Add disposal messages if any occurred
         if (disposalEvents.Any())
         {
-            var disposalMessages = disposalEvents.Select(rank => 
+            var disposalMessages = disposalEvents.Select(rank =>
                 GameEventFactory.CreateDisposalEvent(player.Name, rank).DisplayMessage);
             cardPlayEvent.DisplayMessage += " " + string.Join(" ", disposalMessages);
         }
@@ -147,13 +147,14 @@ public class GameEngine : IGameEngine
 
         // Determine who collects the cards
         Player collector = challengerWasRight ? challengedPlayer : challenger;
-        
+
         var collectedCount = match.TablePile.Count;
-        
-        // FIXED: Store the announced rank and last play count BEFORE clearing them
+
+        // FIXED: Store the announced rank, last play count, AND table cards BEFORE clearing them
         var currentAnnouncedRank = match.AnnouncedRank ?? "Unknown";
         var currentLastPlayCount = match.LastPlayCardCount;
-        
+        var allTableCards = new List<Card>(match.TablePile); // Copy before clearing
+
         collector.Hand.AddRange(match.TablePile);
         match.TablePile.Clear();
         match.AnnouncedRank = null;
@@ -166,23 +167,24 @@ public class GameEngine : IGameEngine
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = collectorIndex;
 
-        // FIXED: Use the stored values instead of the cleared ones
+        // FIXED: Pass all table cards to include remaining cards data
         var challengeEvent = GameEventFactory.CreateChallengeEvent(
             challenger.Name,
             challengedPlayer.Name,
             request.ChallengePickIndex!.Value,
-            currentLastPlayCount, // Use stored value instead of match.LastPlayCardCount (which is now 0)
+            currentLastPlayCount,
             revealedCard,
-            currentAnnouncedRank, // Use stored value instead of match.AnnouncedRank (which is now null)
+            currentAnnouncedRank,
             isMatch,
             collector.Name,
-            collectedCount
+            collectedCount,
+            allTableCards // NEW: Pass all table cards for remaining cards extraction
         );
 
         // Add disposal messages if any occurred
         if (disposalEvents.Any())
         {
-            var disposalMessages = disposalEvents.Select(rank => 
+            var disposalMessages = disposalEvents.Select(rank =>
                 GameEventFactory.CreateDisposalEvent(collector.Name, rank).DisplayMessage);
             challengeEvent.DisplayMessage += " " + string.Join(" ", disposalMessages);
         }
@@ -285,11 +287,11 @@ public class GameEngine : IGameEngine
         }
 
         var roundEndEvent = GameEventFactory.CreateRoundEndEvent(
-            match.RoundNumber, 
-            winners.Select(w => w.Name).ToList(), 
+            match.RoundNumber,
+            winners.Select(w => w.Name).ToList(),
             scoreResults
         );
-        
+
         Console.WriteLine($"Round {match.RoundNumber} ended: {roundEndEvent.DisplayMessage}");
     }
 

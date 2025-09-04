@@ -1,4 +1,4 @@
-﻿public class ChallengeEventData
+public class ChallengeEventData
 {
     public string ChallengerName { get; set; } = string.Empty;
     public string ChallengedPlayerName { get; set; } = string.Empty;
@@ -9,4 +9,5 @@
     public bool IsMatch { get; set; }
     public string CollectorName { get; set; } = string.Empty;
     public int CardsCollected { get; set; }
+    public List<Card>? RemainingCards { get; set; } // NEW: For challenger animation
 }

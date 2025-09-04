@@ -1,8 +1,18 @@
 // Server/GameEventFactory.cs
 public static class GameEventFactory
 {
-    public static GameEventDto CreateChallengeEvent(string challenger, string challenged, int cardIndex, int totalCards, Card revealedCard, string announcedRank, bool cardMatches, string collector, int cardsCollected)
+    public static GameEventDto CreateChallengeEvent(string challenger, string challenged, int cardIndex, int totalCards, Card revealedCard, string announcedRank, bool cardMatches, string collector, int cardsCollected, List<Card> allTableCards)
     {
+        // Get remaining cards (excluding the revealed one) for challenger animation
+        List<Card>? remainingCards = null;
+        if (cardMatches && collector == challenger) // Challenger collects when card matches
+        {
+            remainingCards = allTableCards
+                .Skip(allTableCards.Count - totalCards) // Get last play cards
+                .Where((card, index) => index != cardIndex) // Exclude revealed card
+                .ToList();
+        }
+
         var data = new ChallengeEventData
         {
             ChallengerName = challenger,
@@ -13,7 +23,8 @@ public static class GameEventFactory
             AnnouncedRank = announcedRank,
             IsMatch = cardMatches,
             CollectorName = collector,
-            CardsCollected = cardsCollected
+            CardsCollected = cardsCollected,
+            RemainingCards = remainingCards
         };
 
         // Create the display message with correct logic

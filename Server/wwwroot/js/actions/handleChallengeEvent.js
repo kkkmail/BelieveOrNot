@@ -2,6 +2,7 @@
 import {animateChallengeCardFlip} from "../utils/animateChallengeCardFlip.js";
 import {hideChallenge} from "./hideChallenge.js";
 import {setSelectedChallengeIndex} from "../core/variables.js";
+import {gameState, playerId} from "../core/variables.js";
 
 let pendingChallengeAnimation = null;
 
@@ -45,8 +46,10 @@ export async function handleChallengeEvent(challengeEventData) {
     // Handle both camelCase and PascalCase property names
     const revealedCard = challengeEventData.revealedCard || challengeEventData.RevealedCard;
     const isMatch = challengeEventData.isMatch !== undefined ? challengeEventData.isMatch : challengeEventData.IsMatch;
+    const challengerName = challengeEventData.challengerName || challengeEventData.ChallengerName;
+    const remainingCards = challengeEventData.remainingCards || challengeEventData.RemainingCards;
 
-    console.log("Extracted challenge data:", { revealedCard, isMatch, announcedRank });
+    console.log("Extracted challenge data:", { revealedCard, isMatch, challengerName, remainingCards, announcedRank });
 
     if (!revealedCard) {
         console.error("❌ No revealed card in challenge event data");
@@ -56,20 +59,26 @@ export async function handleChallengeEvent(challengeEventData) {
         return;
     }
 
+    // Check if current player is the challenger
+    const currentPlayer = gameState?.players?.find(p => p.id === playerId);
+    const isChallenger = currentPlayer?.name === challengerName;
+
+    console.log("Challenger check:", { currentPlayerName: currentPlayer?.name, challengerName, isChallenger });
+
     // Animate both elements if they exist (challenge area and table area)
     const animationPromises = [];
 
     if (challengeCardElement) {
         console.log("🎬 Animating challenge card element");
         animationPromises.push(
-            animateChallengeCardFlip(challengeCardElement, revealedCard, announcedRank, isMatch)
+            animateChallengeCardFlip(challengeCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, cardIndex)
         );
     }
 
     if (tableCardElement) {
         console.log("🎬 Animating table card element");
         animationPromises.push(
-            animateChallengeCardFlip(tableCardElement, revealedCard, announcedRank, isMatch)
+            animateChallengeCardFlip(tableCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, cardIndex)
         );
     }
 
