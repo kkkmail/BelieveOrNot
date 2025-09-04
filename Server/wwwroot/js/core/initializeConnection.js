@@ -8,8 +8,6 @@ import { attemptReconnection, handleDisconnection, handleReconnection } from "..
 import { showFinalResults } from "../utils/showFinalResults.js";
 
 export async function initializeConnection() {
-    const serverUrl = "http://localhost:5000/game";
-
     // Get or create persistent client ID
     const persistentClientId = getOrCreateClientId();
     setClientId(persistentClientId);
@@ -19,7 +17,7 @@ export async function initializeConnection() {
     if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }
 
     const hub = new s.HubConnectionBuilder()
-        .withUrl(serverUrl)
+        .withUrl("/game")
         .withAutomaticReconnect()
         .build();
 
