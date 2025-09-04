@@ -1,4 +1,6 @@
-﻿public class PlayerScoreResult
+﻿namespace BelieveOrNot.Server;
+
+public class PlayerScoreResult
 {
     public string PlayerName { get; set; } = string.Empty;
     public int ScoreChange { get; set; }

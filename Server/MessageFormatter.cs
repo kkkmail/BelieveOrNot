@@ -1,6 +1,8 @@
 // Server/MessageFormatter.cs
 // Server-side message formatting that generates HTML directly
 
+namespace BelieveOrNot.Server;
+
 public static class MessageFormatter
 {
     public static string FormatPlayer(string playerName)

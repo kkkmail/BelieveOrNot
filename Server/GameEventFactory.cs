@@ -1,4 +1,6 @@
 // Server/GameEventFactory.cs
+namespace BelieveOrNot.Server;
+
 public static class GameEventFactory
 {
     public static GameEventDto CreateChallengeEvent(string challenger, string challenged, int cardIndex, int totalCards, Card revealedCard, string announcedRank, bool cardMatches, string collector, int cardsCollected, List<Card> allTableCards)

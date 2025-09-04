@@ -1,4 +1,6 @@
-﻿public class RoundEndEventData
+﻿namespace BelieveOrNot.Server;
+
+public class RoundEndEventData
 {
     public int RoundNumber { get; set; }
     public List<string> WinnerNames { get; set; } = new();

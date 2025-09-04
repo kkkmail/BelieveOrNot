@@ -1,3 +1,5 @@
+namespace BelieveOrNot.Server;
+
 public class Match
 {
     public Guid Id { get; set; } = Guid.NewGuid();

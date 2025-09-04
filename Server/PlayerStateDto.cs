@@ -1,4 +1,6 @@
-﻿public class PlayerStateDto
+﻿namespace BelieveOrNot.Server;
+
+public class PlayerStateDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

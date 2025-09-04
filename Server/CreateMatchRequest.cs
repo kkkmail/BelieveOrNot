@@ -1,4 +1,6 @@
-// Server/CreateMatchRequest.cs
+﻿// Server/CreateMatchRequest.cs
+namespace BelieveOrNot.Server;
+
 public class CreateMatchRequest
 {
     public string PlayerName { get; set; } = string.Empty;

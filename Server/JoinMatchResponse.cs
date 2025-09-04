@@ -1,4 +1,6 @@
-﻿public class JoinMatchResponse
+﻿namespace BelieveOrNot.Server;
+
+public class JoinMatchResponse
 {
     public bool Success { get; set; }
     public Match? Match { get; set; }

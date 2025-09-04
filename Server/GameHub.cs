@@ -1,6 +1,9 @@
 // Server/GameHub.cs
+
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
+
+namespace BelieveOrNot.Server;
 
 public class GameHub : Hub
 {

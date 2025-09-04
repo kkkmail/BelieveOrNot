@@ -1,3 +1,5 @@
+﻿namespace BelieveOrNot.Server;
+
 public class ChallengeEventData
 {
     public string ChallengerName { get; set; } = string.Empty;

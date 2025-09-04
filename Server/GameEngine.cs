@@ -1,4 +1,6 @@
 // Server/GameEngine.cs
+namespace BelieveOrNot.Server;
+
 public class GameEngine : IGameEngine
 {
     private readonly Random _random = new();

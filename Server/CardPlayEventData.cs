@@ -1,4 +1,6 @@
-﻿public class CardPlayEventData
+﻿namespace BelieveOrNot.Server;
+
+public class CardPlayEventData
 {
     public string PlayerName { get; set; } = string.Empty;
     public List<Card> CardsPlayed { get; set; } = new();

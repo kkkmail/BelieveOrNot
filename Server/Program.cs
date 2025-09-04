@@ -1,3 +1,5 @@
+using BelieveOrNot.Server;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add configuration

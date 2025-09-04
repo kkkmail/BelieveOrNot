@@ -1,4 +1,6 @@
 // Server/GameEventDto.cs
+namespace BelieveOrNot.Server;
+
 public class GameEventDto
 {
     public string Type { get; set; } = string.Empty;
