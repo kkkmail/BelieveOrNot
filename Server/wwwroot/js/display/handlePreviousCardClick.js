@@ -52,10 +52,16 @@ export function handlePreviousCardClick(cardIndex) {
     // Clear any selected cards since we're switching to challenge mode
     setSelectedCards([]);
 
+    // Set interaction state and clear stored message when starting challenge
+    window.playerInteractionState = true;
+    window.lastPlayedMessage = null;
+
     // Toggle selection
     if (selectedChallengeIndex === cardIndex) {
         // Deselect
         setSelectedChallengeIndex(-1);
+        // Clear interaction state when deselecting
+        window.playerInteractionState = false;
         console.log('Challenge card deselected');
     } else {
         // Select this card

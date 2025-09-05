@@ -1,6 +1,7 @@
 // js/display/updateActionsDisplay.js
 import {gameState, playerId, selectedCards, selectedChallengeIndex, setSelectedCards} from "../core/variables.js";
 import {getSuitSymbol} from "../cards/getSuitSymbol.js";
+import {CONFIG} from "../utils/config.js";
 
 export function updateActionsDisplay() {
     const playBtn = document.getElementById('playBtn');
@@ -32,16 +33,16 @@ export function updateActionsDisplay() {
     }
 
     const isCreator = playerId && gameState.creatorPlayerId === playerId;
-    
+
     // Handle different game phases
     if (gameState.phase === 0) { // WaitingForPlayers
         if (tableMessage) tableMessage.textContent = 'Waiting for players to join...';
-        
+
         if (isCreator && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
             startRoundBtn.textContent = 'Start Round';
         }
-        
+
         if (isCreator && endGameBtn && gameState.players && gameState.players.length > 0) {
             endGameBtn.classList.remove('hidden');
         }
@@ -52,7 +53,7 @@ export function updateActionsDisplay() {
         if (isCreator && endRoundBtn) {
             endRoundBtn.classList.remove('hidden');
         }
-        
+
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         const isMyTurn = currentPlayer && currentPlayer.id === playerId;
 
@@ -81,11 +82,11 @@ export function updateActionsDisplay() {
             if (selectedCards.length > 0) {
                 setSelectedCards([]);
             }
-            
+
             if (gameState.tablePileCount > 0) {
                 const lastPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
                 const lastPlayer = gameState.players[lastPlayerIndex];
-                
+
                 if (selectedChallengeIndex !== -1) {
                     if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${lastPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
                     if (tableControls) tableControls.classList.add('challenge-mode');
@@ -128,14 +129,14 @@ export function updateActionsDisplay() {
                 // In challenge mode
                 const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
                 const previousPlayer = gameState.players[previousPlayerIndex];
-                
+
                 if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${previousPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
             } else if (cardPlayPreview || window.lastPlayedMessage) {
                 // Show card play preview or stored message with instructions
                 const message = cardPlayPreview || window.lastPlayedMessage;
-                if (tableMessage) tableMessage.innerHTML = `🎯 ${message} - Play as ${boldRank} or challenge`;
+                if (tableMessage) tableMessage.innerHTML = `🎯 ${message}${CONFIG.MESSAGE_SEPARATOR}Play as ${boldRank} or challenge`;
                 if (selectedCards.length > 0) {
                     if (playBtn) {
                         playBtn.classList.remove('hidden');
@@ -155,12 +156,12 @@ export function updateActionsDisplay() {
         // Clear stored message and interaction state when round ends
         window.lastPlayedMessage = null;
         window.playerInteractionState = false;
-        
+
         if (isCreator && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
             startRoundBtn.textContent = 'Start New Round';
         }
-        
+
         if (isCreator && endGameBtn) {
             endGameBtn.classList.remove('hidden');
         }
@@ -168,9 +169,11 @@ export function updateActionsDisplay() {
     }
 
     if (gameState.phase === 3) { // GameEnd
-        if (tableMessage) tableMessage.textContent = 'Game ended';
+        // Clear stored message and interaction state when game ends
         window.lastPlayedMessage = null;
         window.playerInteractionState = false;
+
+        if (tableMessage) tableMessage.textContent = 'Game ended';
         return;
     }
 }

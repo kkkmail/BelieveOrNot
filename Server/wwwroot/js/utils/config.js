@@ -21,4 +21,7 @@ export const CONFIG = {
     // Cleanup delays after animation
     CHALLENGE_CLEANUP_DELAY_CHALLENGER: 200, // ms to wait before clearing selection for challenger
     CHALLENGE_CLEANUP_DELAY_NON_CHALLENGER: 200, // ms to wait before clearing selection for non-challenger
+
+    // UI message formatting
+    MESSAGE_SEPARATOR: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', // 6 non-breaking spaces for message part separation
 };
