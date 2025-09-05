@@ -12,8 +12,6 @@ export function updateActionsDisplay() {
     const tableMessage = document.getElementById('tableMessage');
     const tableControls = document.getElementById('tableControls');
 
-    console.log("=== updateActionsDisplay DEBUG ===");
-
     // Hide all by default
     if (playBtn) playBtn.classList.add('hidden');
     if (confirmChallengeBtn) confirmChallengeBtn.classList.add('hidden');
@@ -30,7 +28,6 @@ export function updateActionsDisplay() {
 
     if (!gameState || !playerId) {
         if (tableMessage) tableMessage.textContent = 'Waiting for game...';
-        console.log("Missing gameState or playerId");
         return;
     }
 
@@ -38,7 +35,6 @@ export function updateActionsDisplay() {
     
     // Handle different game phases
     if (gameState.phase === 0) { // WaitingForPlayers
-        console.log("Phase 0 - Waiting for players");
         if (tableMessage) tableMessage.textContent = 'Waiting for players to join...';
         
         if (isCreator && startRoundBtn) {
@@ -53,8 +49,6 @@ export function updateActionsDisplay() {
     }
 
     if (gameState.phase === 1) { // InProgress
-        console.log("Phase 1 - Game in progress");
-        
         if (isCreator && endRoundBtn) {
             endRoundBtn.classList.remove('hidden');
         }
@@ -63,13 +57,17 @@ export function updateActionsDisplay() {
         const isMyTurn = currentPlayer && currentPlayer.id === playerId;
 
         if (!isMyTurn) {
-            if (tableMessage) tableMessage.textContent = `${currentPlayer?.name || 'Someone'}'s turn`;
-            console.log("Not my turn, exiting");
+            // Show whose turn it is, and show stored played message if we have one
+            let message = `${currentPlayer?.name || 'Someone'}'s turn`;
+            if (window.lastPlayedMessage) {
+                message += ` - ${window.lastPlayedMessage}`;
+            }
+            if (tableMessage) tableMessage.innerHTML = message;
             return;
         }
 
         // Determine if should blink (only if no interaction)
-        const hasInteraction = selectedCards.length > 0 || selectedChallengeIndex !== -1;
+        const hasInteraction = selectedCards.length > 0 || selectedChallengeIndex !== -1 || window.lastPlayedMessage;
         if (tableControls && !hasInteraction) {
             tableControls.classList.add('active-turn');
         }
@@ -80,8 +78,6 @@ export function updateActionsDisplay() {
 
         // If only 1 active player remains and there are finished players, only challenges allowed
         if (activePlayers.length === 1 && playersWithNoCards.length > 0) {
-            console.log("Only 1 active player remains - only challenge allowed");
-            
             if (selectedCards.length > 0) {
                 setSelectedCards([]);
             }
@@ -101,32 +97,31 @@ export function updateActionsDisplay() {
             return;
         }
 
-        // Get card play preview - this is the key part that was missing
+        // Get card play preview
         const cardPlayPreview = getCardPlayPreview();
 
         // Normal game logic (not end-game situation)
         if (!gameState.announcedRank) {
-            console.log("Opening turn - no announced rank");
-            
             if (selectedChallengeIndex !== -1) {
                 // In challenge mode
                 if (tableMessage) tableMessage.innerHTML = `🎯 Challenge previous player - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
-            } else if (cardPlayPreview) {
-                // Show card play preview with instructions
-                const message = `🎯 ${cardPlayPreview} - Choose a rank to declare`;
-                if (tableMessage) tableMessage.innerHTML = message;
-                if (rankSelector) rankSelector.classList.remove('hidden');
-                if (playBtn) {
-                    playBtn.classList.remove('hidden');
-                    playBtn.textContent = `Play ${selectedCards.length} Card(s)`;
+            } else if (cardPlayPreview || window.lastPlayedMessage) {
+                // Show card play preview or stored message with instructions
+                const message = cardPlayPreview || window.lastPlayedMessage;
+                if (tableMessage) tableMessage.innerHTML = `🎯 ${message} - Choose a rank to declare`;
+                if (selectedCards.length > 0) {
+                    if (rankSelector) rankSelector.classList.remove('hidden');
+                    if (playBtn) {
+                        playBtn.classList.remove('hidden');
+                        playBtn.textContent = `Play ${selectedCards.length} Card(s)`;
+                    }
                 }
             } else {
                 if (tableMessage) tableMessage.innerHTML = '🎯 Select cards from your hand to play';
             }
         } else {
-            console.log("Normal turn - announced rank exists:", gameState.announcedRank);
             const boldRank = `<strong>${gameState.announcedRank}</strong>`;
 
             if (selectedChallengeIndex !== -1) {
@@ -137,13 +132,15 @@ export function updateActionsDisplay() {
                 if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${previousPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
-            } else if (cardPlayPreview) {
-                // Show card play preview with instructions
-                const message = `🎯 ${cardPlayPreview} - Play as ${boldRank} or challenge`;
-                if (tableMessage) tableMessage.innerHTML = message;
-                if (playBtn) {
-                    playBtn.classList.remove('hidden');
-                    playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
+            } else if (cardPlayPreview || window.lastPlayedMessage) {
+                // Show card play preview or stored message with instructions
+                const message = cardPlayPreview || window.lastPlayedMessage;
+                if (tableMessage) tableMessage.innerHTML = `🎯 ${message} - Play as ${boldRank} or challenge`;
+                if (selectedCards.length > 0) {
+                    if (playBtn) {
+                        playBtn.classList.remove('hidden');
+                        playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
+                    }
                 }
             } else {
                 if (tableMessage) tableMessage.innerHTML = `🎯 Select cards to play as ${boldRank} or click a previous card to challenge`;
@@ -153,9 +150,10 @@ export function updateActionsDisplay() {
     }
 
     if (gameState.phase === 2) { // RoundEnd
-        console.log("Phase 2 - Round ended");
         if (tableMessage) tableMessage.textContent = 'Round ended - waiting for next round';
         setSelectedCards([]);
+        // Clear stored message when round ends
+        window.lastPlayedMessage = null;
         
         if (isCreator && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
@@ -169,25 +167,17 @@ export function updateActionsDisplay() {
     }
 
     if (gameState.phase === 3) { // GameEnd
-        console.log("Phase 3 - Game ended");
         if (tableMessage) tableMessage.textContent = 'Game ended';
+        window.lastPlayedMessage = null;
         return;
     }
-
-    console.log("=== END DEBUG ===");
 }
 
 function getCardPlayPreview() {
-    // Hide when round ends
-    if (gameState && gameState.phase === 2) { // RoundEnd
-        return null;
-    }
-
     if (selectedCards.length === 0) {
         return null;
     }
 
-    // Get the actual cards that will be played
     if (!gameState || !gameState.yourHand) {
         return null;
     }
@@ -225,8 +215,5 @@ function getCardPlayPreview() {
         }
     });
 
-    // Check if cards were just played (use global flag)
-    const actionText = window.cardsJustPlayed ? 'Played in order' : 'Will play in order';
-
-    return `<span style="color: #007bff; font-weight: bold;">${actionText}: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
+    return `<span style="color: #007bff; font-weight: bold;">Will play in order: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
 }

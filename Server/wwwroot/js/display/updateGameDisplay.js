@@ -66,5 +66,7 @@ export function updateGameDisplay() {
     // Only clear if game phase changed to non-active
     if (gameState.phase !== 1) {
         setSelectedCards([]);
+        // Clear preview when round/game ends
+        window.cardsJustPlayed = false;
     }
 }

@@ -7,10 +7,8 @@ export async function startRound() {
         return;
     }
 
-    // Clear any persistent card play message when starting a new round
-    if (window.setCardPlayMessage) {
-        window.setCardPlayMessage(null);
-    }
+    // Clear stored message when starting a new round
+    window.lastPlayedMessage = null;
 
     try {
         await connection.invoke("StartRound", currentMatch.matchId, playerId);

@@ -4,6 +4,7 @@ import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {updateHandDisplay} from "../display/updateHandDisplay.js";
 import {generateGuid} from "../utils/generateGuid.js";
 import {customAlert} from "../utils/customAlert.js";
+import {getSuitSymbol} from "../cards/getSuitSymbol.js";
 
 export async function playCards() {
     if (selectedCards.length === 0) {
@@ -66,13 +67,21 @@ export async function playCards() {
         }
     }
 
+    // Create and store the "Played in order" message
+    const cardNames = cardsToPlay.map(card => {
+        if (card.rank === 'Joker') {
+            return 'Joker';
+        } else {
+            const suitSymbol = getSuitSymbol(card.suit);
+            return `${card.rank}${suitSymbol}`;
+        }
+    });
+
+    window.lastPlayedMessage = `<span style="color: #007bff; font-weight: bold;">Played in order: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
+
     console.log("Playing cards:", cardsToPlay.map(c => `${c.rank} of ${c.suit}`));
 
     try {
-        // Set flag to show "Played" instead of "Will play"
-        window.cardsJustPlayed = true;
-        updateActionsDisplay();
-
         await connection.invoke("SubmitMove", {
             matchId: gameState.matchId,
             clientCmdId: generateGuid(),
@@ -82,20 +91,20 @@ export async function playCards() {
             declaredRank: declaredRank
         });
 
-        // Clear selected cards immediately after successful play
+        // Clear selected cards after successful play
         setSelectedCards([]);
 
         console.log("Selected cards cleared after play");
 
-        // Update displays to reflect cleared selection
+        // Update displays
         updateHandDisplay();
         updateActionsDisplay();
     } catch (err) {
         console.error("Failed to play cards:", err);
         await customAlert("Failed to play cards: " + err, 'Play Failed');
 
-        // Clear flag if play failed
-        window.cardsJustPlayed = false;
+        // Clear stored message if play failed
+        window.lastPlayedMessage = null;
         updateActionsDisplay();
     }
 }

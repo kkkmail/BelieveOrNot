@@ -40,6 +40,9 @@ export function toggleCardSelection(cardIndex) {
     // Clear any challenge selection when selecting cards to play
     setSelectedChallengeIndex(-1);
 
+    // Clear stored "played" message when starting new selection
+    window.lastPlayedMessage = null;
+
     const index = selectedCards.indexOf(cardIndex);
     if (index > -1) {
         selectedCards.splice(index, 1);
@@ -53,9 +56,6 @@ export function toggleCardSelection(cardIndex) {
             return;
         }
     }
-
-    // Clear "played" flag when selection changes
-    window.cardsJustPlayed = false;
 
     // Update display immediately
     updateHandDisplay();
