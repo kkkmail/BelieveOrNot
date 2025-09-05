@@ -2,7 +2,8 @@
 import {showChallenge} from "../actions/showChallenge.js";
 import {playCards} from "../actions/playCards.js";
 import {startRound} from "../game/startRound.js";
-import {endRound, endGame} from "../actions/gameManagement.js";
+import {endRound} from "../actions/endRound.js";
+import {endGame} from "../actions/endGame.js";
 
 export function setupGameButtons() {
     const startRoundBtn = document.getElementById('startRoundBtn');

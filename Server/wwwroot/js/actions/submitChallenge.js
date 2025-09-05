@@ -2,7 +2,9 @@
 import {connection, gameState, playerId, selectedChallengeIndex, setSelectedChallengeIndex} from "../core/variables.js";
 import {generateGuid} from "../utils/generateGuid.js";
 import {customConfirm} from "../utils/customConfirm.js";
-import {setPendingChallengeAnimation, clearPendingChallengeAnimation} from "./handleChallengeEvent.js";
+import {setPendingChallengeAnimation} from "./setPendingChallengeAnimation.js";
+import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.js";
+import {hideChallenge} from "./hideChallenge.js";
 
 export async function submitChallenge() {
     console.log("submitChallenge called, selectedChallengeIndex:", selectedChallengeIndex);

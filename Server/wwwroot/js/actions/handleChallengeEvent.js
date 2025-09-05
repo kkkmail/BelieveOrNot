@@ -3,30 +3,17 @@ import {animateChallengeCardFlip} from "../utils/animateChallengeCardFlip.js";
 import {hideChallenge} from "./hideChallenge.js";
 import {setSelectedChallengeIndex} from "../core/variables.js";
 import {gameState, playerId} from "../core/variables.js";
-
-let pendingChallengeAnimation = null;
-
-export function setPendingChallengeAnimation(animationInfo) {
-    pendingChallengeAnimation = animationInfo;
-    console.log("✅ Pending challenge animation set up:", pendingChallengeAnimation);
-}
-
-export function clearPendingChallengeAnimation() {
-    pendingChallengeAnimation = null;
-    console.log("🧹 Cleared pending challenge animation");
-}
-
-export function hasPendingChallengeAnimation() {
-    return pendingChallengeAnimation !== null;
-}
+import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.js";
 
 // Function to be called when challenge event is received from server
 export async function handleChallengeEvent(challengeEventData) {
     console.log("=== HANDLE CHALLENGE EVENT ===");
-    console.log("pendingChallengeAnimation:", pendingChallengeAnimation);
+    
+    const pendingAnimation = window.pendingChallengeAnimation;
+    console.log("pendingChallengeAnimation:", pendingAnimation);
     console.log("challengeEventData:", challengeEventData);
 
-    if (!pendingChallengeAnimation) {
+    if (!pendingAnimation) {
         console.log("❌ No pending challenge animation");
         return;
     }
@@ -41,7 +28,7 @@ export async function handleChallengeEvent(challengeEventData) {
 
     console.log("✅ Processing challenge event with structured data");
 
-    const { challengeCardElement, tableCardElement, cardIndex, announcedRank } = pendingChallengeAnimation;
+    const { challengeCardElement, tableCardElement, cardIndex, announcedRank } = pendingAnimation;
     
     // Handle both camelCase and PascalCase property names
     const revealedCard = challengeEventData.revealedCard || challengeEventData.RevealedCard;
