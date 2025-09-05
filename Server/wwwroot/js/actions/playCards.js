@@ -67,7 +67,7 @@ export async function playCards() {
         }
     }
 
-    // Create and store the "Played in order" message
+    // Create and store the "You played in order" message
     const cardNames = cardsToPlay.map(card => {
         if (card.rank === 'Joker') {
             return 'Joker';
@@ -77,7 +77,7 @@ export async function playCards() {
         }
     });
 
-    window.lastPlayedMessage = `<span style="color: #007bff; font-weight: bold;">Played in order: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
+    window.lastPlayedMessage = `<span style="color: #007bff; font-weight: bold;">You played in order: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
 
     console.log("Playing cards:", cardsToPlay.map(c => `${c.rank} of ${c.suit}`));
 
@@ -91,10 +91,11 @@ export async function playCards() {
             declaredRank: declaredRank
         });
 
-        // Clear selected cards after successful play
+        // Clear selected cards and interaction state after successful play
         setSelectedCards([]);
+        window.playerInteractionState = false;
 
-        console.log("Selected cards cleared after play");
+        console.log("Selected cards cleared after play, interaction state cleared");
 
         // Update displays
         updateHandDisplay();

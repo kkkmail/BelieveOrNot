@@ -7,8 +7,9 @@ export async function startRound() {
         return;
     }
 
-    // Clear stored message when starting a new round
+    // Clear stored message and interaction state when starting a new round
     window.lastPlayedMessage = null;
+    window.playerInteractionState = false;
 
     try {
         await connection.invoke("StartRound", currentMatch.matchId, playerId);

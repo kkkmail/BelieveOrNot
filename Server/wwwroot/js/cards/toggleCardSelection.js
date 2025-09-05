@@ -40,8 +40,9 @@ export function toggleCardSelection(cardIndex) {
     // Clear any challenge selection when selecting cards to play
     setSelectedChallengeIndex(-1);
 
-    // Clear stored "played" message when starting new selection
+    // Clear stored "played" message and set interaction state when starting new selection
     window.lastPlayedMessage = null;
+    window.playerInteractionState = true;
 
     const index = selectedCards.indexOf(cardIndex);
     if (index > -1) {

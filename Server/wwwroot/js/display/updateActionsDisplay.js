@@ -59,17 +59,16 @@ export function updateActionsDisplay() {
         if (!isMyTurn) {
             // Show whose turn it is, and show stored played message if we have one
             const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${currentPlayer?.name || 'Someone'}</span>`;
-            let message = `${formattedPlayerName}'s turn`;
+            let message = `Turn: ${formattedPlayerName}`;
             if (window.lastPlayedMessage) {
-                message += ` - ${window.lastPlayedMessage}`;
+                message += `      ${window.lastPlayedMessage}`;
             }
             if (tableMessage) tableMessage.innerHTML = message;
             return;
         }
 
-        // Determine if should blink (only if no interaction)
-        const hasInteraction = selectedCards.length > 0 || selectedChallengeIndex !== -1 || window.lastPlayedMessage;
-        if (tableControls && !hasInteraction) {
+        // Determine if should blink - ALWAYS blink when it's our turn unless we're in interaction state
+        if (tableControls && !window.playerInteractionState) {
             tableControls.classList.add('active-turn');
         }
 
@@ -153,8 +152,9 @@ export function updateActionsDisplay() {
     if (gameState.phase === 2) { // RoundEnd
         if (tableMessage) tableMessage.textContent = 'Round ended - waiting for next round';
         setSelectedCards([]);
-        // Clear stored message when round ends
+        // Clear stored message and interaction state when round ends
         window.lastPlayedMessage = null;
+        window.playerInteractionState = false;
         
         if (isCreator && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
@@ -170,6 +170,7 @@ export function updateActionsDisplay() {
     if (gameState.phase === 3) { // GameEnd
         if (tableMessage) tableMessage.textContent = 'Game ended';
         window.lastPlayedMessage = null;
+        window.playerInteractionState = false;
         return;
     }
 }
