@@ -58,7 +58,8 @@ export function updateActionsDisplay() {
 
         if (!isMyTurn) {
             // Show whose turn it is, and show stored played message if we have one
-            let message = `${currentPlayer?.name || 'Someone'}'s turn`;
+            const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${currentPlayer?.name || 'Someone'}</span>`;
+            let message = `${formattedPlayerName}'s turn`;
             if (window.lastPlayedMessage) {
                 message += ` - ${window.lastPlayedMessage}`;
             }
