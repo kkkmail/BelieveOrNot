@@ -1,3 +1,5 @@
+﻿namespace BelieveOrNot.Server;
+
 public static class DeckBuilder
 {
     private static readonly string[] Suits = { "Hearts", "Diamonds", "Clubs", "Spades" };

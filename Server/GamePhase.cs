@@ -1,4 +1,6 @@
-﻿public enum GamePhase
+﻿namespace BelieveOrNot.Server;
+
+public enum GamePhase
 {
     WaitingForPlayers,
     InProgress,

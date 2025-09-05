@@ -1,4 +1,6 @@
-﻿public interface IGameEngine
+﻿namespace BelieveOrNot.Server;
+
+public interface IGameEngine
 {
     GameStateDto StartNewRound(Match match);
     GameStateDto SubmitMove(Match match, Guid playerId, SubmitMoveRequest request);

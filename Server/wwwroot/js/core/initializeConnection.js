@@ -8,8 +8,6 @@ import { attemptReconnection, handleDisconnection, handleReconnection } from "..
 import { showFinalResults } from "../utils/showFinalResults.js";
 
 export async function initializeConnection() {
-    const serverUrl = "http://localhost:5000/game";
-
     // Get or create persistent client ID
     const persistentClientId = getOrCreateClientId();
     setClientId(persistentClientId);
@@ -19,7 +17,7 @@ export async function initializeConnection() {
     if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }
 
     const hub = new s.HubConnectionBuilder()
-        .withUrl(serverUrl)
+        .withUrl("/game")
         .withAutomaticReconnect()
         .build();
 
@@ -31,12 +29,19 @@ export async function initializeConnection() {
         updateGameDisplay();
     });
 
+    // NEW: Handle structured game events
+    hub.on("GameEvent", (gameEvent) => {
+        console.log("=== GAME EVENT RECEIVED ===", gameEvent);
+        addToEventHistory(gameEvent);
+    });
+
+    // LEGACY: Handle old message broadcasts (for backward compatibility)
     hub.on("MessageBroadcast", (message, senderName) => {
-        console.log("=== MESSAGE BROADCAST RECEIVED ===", message, senderName);
+        console.log("=== LEGACY MESSAGE BROADCAST RECEIVED ===", message, senderName);
         addToEventHistory(message);
     });
 
-    // NEW: Handle game end results
+    // Handle game end results
     hub.on("GameEnded", (results) => {
         console.log("=== GAME ENDED ===", results);
         showFinalResults(results);

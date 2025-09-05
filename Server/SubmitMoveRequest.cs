@@ -1,3 +1,5 @@
+﻿namespace BelieveOrNot.Server;
+
 public class SubmitMoveRequest
 {
     public Guid MatchId { get; set; }

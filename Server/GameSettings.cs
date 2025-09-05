@@ -1,3 +1,5 @@
+﻿namespace BelieveOrNot.Server;
+
 public class GameSettings
 {
     // These are default values - will be overridden by appsettings.json if present

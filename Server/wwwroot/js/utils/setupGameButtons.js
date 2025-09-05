@@ -1,13 +1,14 @@
 // js/utils/setupGameButtons.js
-import {showChallenge} from "../actions/showChallenge.js";
 import {playCards} from "../actions/playCards.js";
 import {startRound} from "../game/startRound.js";
-import {endRound, endGame} from "../actions/gameManagement.js";
+import {endRound} from "../actions/endRound.js";
+import {endGame} from "../actions/endGame.js";
+import {submitChallenge} from "../actions/submitChallenge.js";
 
 export function setupGameButtons() {
     const startRoundBtn = document.getElementById('startRoundBtn');
     const playBtn = document.getElementById('playBtn');
-    const challengeBtn = document.getElementById('challengeBtn');
+    const confirmChallengeBtn = document.getElementById('confirmChallengeBtn');
     const endRoundBtn = document.getElementById('endRoundBtn');
     const endGameBtn = document.getElementById('endGameBtn');
 
@@ -33,18 +34,17 @@ export function setupGameButtons() {
         console.log("Play button listener added");
     }
 
-    if (challengeBtn && !challengeBtn.hasAttribute('data-listener')) {
-        challengeBtn.setAttribute('data-listener', 'true');
-        challengeBtn.addEventListener('click', function (event) {
+    if (confirmChallengeBtn && !confirmChallengeBtn.hasAttribute('data-listener')) {
+        confirmChallengeBtn.setAttribute('data-listener', 'true');
+        confirmChallengeBtn.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            console.log("Challenge button clicked");
-            showChallenge();
+            console.log("Confirm challenge button clicked");
+            submitChallenge();
         });
-        console.log("Challenge button listener added");
+        console.log("Confirm challenge button listener added");
     }
 
-    // NEW: End round button
     if (endRoundBtn && !endRoundBtn.hasAttribute('data-listener')) {
         endRoundBtn.setAttribute('data-listener', 'true');
         endRoundBtn.addEventListener('click', function (event) {
@@ -56,7 +56,6 @@ export function setupGameButtons() {
         console.log("End round button listener added");
     }
 
-    // NEW: End game button
     if (endGameBtn && !endGameBtn.hasAttribute('data-listener')) {
         endGameBtn.setAttribute('data-listener', 'true');
         endGameBtn.addEventListener('click', function (event) {

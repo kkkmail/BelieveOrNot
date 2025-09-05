@@ -1,6 +1,5 @@
 // js/cards/toggleCardSelection.js
-import {gameState, selectedCards, playerId} from "../core/variables.js";
-import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
+import {gameState, selectedCards, playerId, setSelectedChallengeIndex} from "../core/variables.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {updateHandDisplay} from "../display/updateHandDisplay.js";
 import {showMessage} from "../utils/showMessage.js";
@@ -38,6 +37,13 @@ export function toggleCardSelection(cardIndex) {
         }
     }
 
+    // Clear any challenge selection when selecting cards to play
+    setSelectedChallengeIndex(-1);
+
+    // Clear stored "played" message and set interaction state when starting new selection
+    window.lastPlayedMessage = null;
+    window.playerInteractionState = true;
+
     const index = selectedCards.indexOf(cardIndex);
     if (index > -1) {
         selectedCards.splice(index, 1);
@@ -52,13 +58,9 @@ export function toggleCardSelection(cardIndex) {
         }
     }
 
-    // Clear "played" flag when selection changes
-    window.cardsJustPlayed = false;
-
     // Update display immediately
     updateHandDisplay();
     updateActionsDisplay();
-    updateCardPlayPreview(); // This will now show "Will play" again
 
     console.log('Selected cards:', selectedCards);
 }

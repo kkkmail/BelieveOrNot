@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" href="styles/game-board/actions.css">
     <link rel="stylesheet" href="styles/game-board/animations.css">
-    <link rel="stylesheet" href="styles/game-board/challenge.css">
     <link rel="stylesheet" href="styles/game-board/core.css">
     <link rel="stylesheet" href="styles/game-board/hand.css">
     <link rel="stylesheet" href="styles/game-board/management.css">
@@ -34,6 +33,7 @@
     <link rel="stylesheet" href="styles/game-board/scoring.css">
     <link rel="stylesheet" href="styles/game-board/status.css">
     <link rel="stylesheet" href="styles/game-board/table.css">
+    <link rel="stylesheet" href="styles/game-board/table-controls.css">
 
 </head>
 <body>
@@ -62,10 +62,15 @@
 
     <script type="module" src="js/initialization.js"></script>
 
-    <script type="module" src="js/actions/gameManagement.js"></script>
+    <script type="module" src="js/actions/clearPendingChallengeAnimation.js"></script>
+    <script type="module" src="js/actions/endGame.js"></script>
+    <script type="module" src="js/actions/endRound.js"></script>
+    <script type="module" src="js/actions/handleChallengeEvent.js"></script>
+    <script type="module" src="js/actions/hasPendingChallengeAnimation.js"></script>
     <script type="module" src="js/actions/hideChallenge.js"></script>
     <script type="module" src="js/actions/playCards.js"></script>
     <script type="module" src="js/actions/selectChallengeCard.js"></script>
+    <script type="module" src="js/actions/setPendingChallengeAnimation.js"></script>
     <script type="module" src="js/actions/showChallenge.js"></script>
     <script type="module" src="js/actions/submitChallenge.js"></script>
 
@@ -93,8 +98,10 @@
     <script type="module" src="js/game/startRound.js"></script>
 
     <script type="module" src="js/utils/addToEventHistory.js"></script>
+    <script type="module" src="js/utils/animateChallengeCardFlip.js"></script>
     <script type="module" src="js/utils/broadcastMessage.js"></script>
     <script type="module" src="js/utils/clientIdUtils.js"></script>
+    <script type="module" src="js/utils/config.js"></script>
     <script type="module" src="js/utils/copyMatchId.js"></script>
     <script type="module" src="js/utils/customAlert.js"></script>
     <script type="module" src="js/utils/customConfirm.js"></script>

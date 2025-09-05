@@ -1,3 +1,5 @@
+namespace BelieveOrNot.Server;
+
 public class GameStateDto
 {
     public Guid MatchId { get; set; }
@@ -8,11 +10,16 @@ public class GameStateDto
     public string? AnnouncedRank { get; set; }
     public int CurrentPlayerIndex { get; set; }
     public int RoundNumber { get; set; }
-    public string? LastAction { get; set; }
     public List<Card>? YourHand { get; set; }
     public Guid? CreatorPlayerId { get; set; }
-    
+
     // Added for dynamic rank dropdown
     public int DeckSize { get; set; }
     public int JokerCount { get; set; }
+
+    // NEW: Track disposed ranks for dropdown filtering
+    public List<string> DisposedRanks { get; set; } = new();
+
+    // NEW: Structured event data instead of LastAction string
+    public GameEventDto? Event { get; set; }
 }

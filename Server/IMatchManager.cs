@@ -1,4 +1,6 @@
 // Server/IMatchManager.cs
+namespace BelieveOrNot.Server;
+
 public interface IMatchManager
 {
     Match? GetMatch(Guid matchId);

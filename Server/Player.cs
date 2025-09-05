@@ -1,4 +1,6 @@
-// Server/Player.cs
+﻿// Server/Player.cs
+namespace BelieveOrNot.Server;
+
 public class Player
 {
     public Guid Id { get; set; } = Guid.NewGuid();

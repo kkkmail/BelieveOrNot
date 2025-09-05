@@ -9,6 +9,18 @@ import {updateTablePileDisplay} from "./updateTablePileDisplay.js";
 export function updateGameDisplay() {
     if (!gameState) return;
 
+    // Store previous play info BEFORE updating display (for challenge animation)
+    const previousPlayCards = document.getElementById('previousPlayCards');
+    if (previousPlayCards && previousPlayCards.children.length > 0 && gameState.lastPlayCardCount === 0) {
+        // Game state shows no last play but we have cards displayed - store them for potential animation
+        console.log("🎯 Storing previous play cards for potential challenge animation");
+        window.storedPreviousPlayCards = Array.from(previousPlayCards.children).map(card => ({
+            element: card.cloneNode(true),
+            index: Array.from(previousPlayCards.children).indexOf(card)
+        }));
+        window.storedPreviousPlayInfo = document.getElementById('playInfoDisplay')?.innerHTML || '';
+    }
+
     // Update basic game info
     document.getElementById('roundNumber').textContent = gameState.roundNumber;
     document.getElementById('announcedRank').textContent = gameState.announcedRank || '-';
@@ -50,11 +62,11 @@ export function updateGameDisplay() {
     // Update scores
     updateScoresDisplay();
 
-    // REMOVED the old start button logic from here since it's now handled in updateActionsDisplay
-
     // Clear any lingering card selections after state update (but preserve valid selections)
     // Only clear if game phase changed to non-active
     if (gameState.phase !== 1) {
         setSelectedCards([]);
+        // Clear preview when round/game ends
+        window.cardsJustPlayed = false;
     }
 }
