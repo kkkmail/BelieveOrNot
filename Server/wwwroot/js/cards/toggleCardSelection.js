@@ -1,5 +1,5 @@
 // js/cards/toggleCardSelection.js
-import {gameState, selectedCards, playerId} from "../core/variables.js";
+import {gameState, selectedCards, playerId, setSelectedChallengeIndex} from "../core/variables.js";
 import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {updateHandDisplay} from "../display/updateHandDisplay.js";
@@ -37,6 +37,9 @@ export function toggleCardSelection(cardIndex) {
             return;
         }
     }
+
+    // Clear any challenge selection when selecting cards to play
+    setSelectedChallengeIndex(-1);
 
     const index = selectedCards.indexOf(cardIndex);
     if (index > -1) {

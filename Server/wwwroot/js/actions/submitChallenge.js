@@ -4,7 +4,8 @@ import {generateGuid} from "../utils/generateGuid.js";
 import {customConfirm} from "../utils/customConfirm.js";
 import {setPendingChallengeAnimation} from "./setPendingChallengeAnimation.js";
 import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.js";
-import {hideChallenge} from "./hideChallenge.js";
+import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
+import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 
 export async function submitChallenge() {
     console.log("submitChallenge called, selectedChallengeIndex:", selectedChallengeIndex);
@@ -59,19 +60,15 @@ export async function submitChallenge() {
         console.log("Challenge request:", challengeRequest);
 
         // Store pending animation info to trigger when we get the result
-        const challengeCardElement = document.querySelector(`.challenge-card-display:nth-child(${selectedChallengeIndex + 1})`);
         const tableCardElement = document.querySelector(`#previousPlayCards .card:nth-child(${selectedChallengeIndex + 1})`);
         
-        console.log("Looking for animation elements:", {
-            challengeSelector: `.challenge-card-display:nth-child(${selectedChallengeIndex + 1})`,
+        console.log("Looking for animation element:", {
             tableSelector: `#previousPlayCards .card:nth-child(${selectedChallengeIndex + 1})`,
-            challengeCardElement: !!challengeCardElement,
             tableCardElement: !!tableCardElement
         });
         
-        if (challengeCardElement || tableCardElement) {
+        if (tableCardElement) {
             setPendingChallengeAnimation({
-                challengeCardElement,
                 tableCardElement,
                 cardIndex: selectedChallengeIndex,
                 announcedRank: gameState.announcedRank
@@ -82,14 +79,15 @@ export async function submitChallenge() {
 
         await connection.invoke("SubmitMove", challengeRequest);
 
-        console.log("Challenge submitted successfully - keeping challenge UI visible until animation completes");
-        // DON'T hide challenge area yet - wait for animation to complete
+        console.log("Challenge submitted successfully - keeping selection until animation completes");
+        // DON'T clear selection yet - wait for animation to complete
     } catch (err) {
         console.error("Failed to challenge:", err);
         alert("Failed to challenge: " + err.message || err);
         clearPendingChallengeAnimation();
-        // Hide challenge area on error
-        hideChallenge();
+        // Clear selection on error
         setSelectedChallengeIndex(-1);
+        updatePreviousPlayDisplay();
+        updateActionsDisplay();
     }
 }

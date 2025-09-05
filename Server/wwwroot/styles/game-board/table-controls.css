@@ -1,0 +1,47 @@
+/* Table Controls - Replace challenge area */
+.table-controls {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 10px;
+    border: 2px solid #007bff;
+    text-align: center;
+}
+
+.table-message {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    min-height: 20px;
+}
+
+.table-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 40px;
+}
+
+/* Challenge mode styling */
+.table-controls.challenge-mode {
+    background: rgba(255, 193, 7, 0.2);
+    border-color: #ffc107;
+}
+
+.table-controls.challenge-mode .table-message {
+    color: #856404;
+}
+
+@media (max-width: 768px) {
+    .table-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .table-actions .btn {
+        min-width: 200px;
+    }
+}

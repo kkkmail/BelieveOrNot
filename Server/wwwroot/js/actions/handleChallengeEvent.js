@@ -1,9 +1,10 @@
 // js/actions/handleChallengeEvent.js
 import {animateChallengeCardFlip} from "../utils/animateChallengeCardFlip.js";
-import {hideChallenge} from "./hideChallenge.js";
 import {setSelectedChallengeIndex} from "../core/variables.js";
 import {gameState, playerId} from "../core/variables.js";
 import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.js";
+import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
+import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 
 // Function to be called when challenge event is received from server
 export async function handleChallengeEvent(challengeEventData) {
@@ -21,14 +22,15 @@ export async function handleChallengeEvent(challengeEventData) {
     if (!challengeEventData) {
         console.error("❌ No challenge event data provided");
         clearPendingChallengeAnimation();
-        hideChallenge();
         setSelectedChallengeIndex(-1);
+        updatePreviousPlayDisplay();
+        updateActionsDisplay();
         return;
     }
 
     console.log("✅ Processing challenge event with structured data");
 
-    const { challengeCardElement, tableCardElement, cardIndex, announcedRank } = pendingAnimation;
+    const { tableCardElement, cardIndex, announcedRank } = pendingAnimation;
     
     // Handle both camelCase and PascalCase property names
     const revealedCard = challengeEventData.revealedCard || challengeEventData.RevealedCard;
@@ -42,8 +44,9 @@ export async function handleChallengeEvent(challengeEventData) {
     if (!revealedCard) {
         console.error("❌ No revealed card in challenge event data");
         clearPendingChallengeAnimation();
-        hideChallenge();
         setSelectedChallengeIndex(-1);
+        updatePreviousPlayDisplay();
+        updateActionsDisplay();
         return;
     }
 
@@ -53,15 +56,8 @@ export async function handleChallengeEvent(challengeEventData) {
 
     console.log("Challenger check:", { currentPlayerName: currentPlayer?.name, challengerName, isChallenger });
 
-    // Animate both elements if they exist (challenge area and table area)
+    // Animate both elements if they exist (same as original logic)
     const animationPromises = [];
-
-    if (challengeCardElement) {
-        console.log("🎬 Animating challenge card element");
-        animationPromises.push(
-            animateChallengeCardFlip(challengeCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, remainingCardsMatch, cardIndex)
-        );
-    }
 
     if (tableCardElement) {
         console.log("🎬 Animating table card element");
@@ -79,11 +75,12 @@ export async function handleChallengeEvent(challengeEventData) {
         console.warn("⚠️ No animations to run");
     }
 
-    // NOW hide challenge area after animation completes
-    console.log("🧹 Hiding challenge area after animation completed");
-    hideChallenge();
-    setSelectedChallengeIndex(-1);
-
-    // Clear pending animation
-    clearPendingChallengeAnimation();
+    // DELAY clearing selection and updating display (like original challenge area)
+    setTimeout(() => {
+        console.log("🧹 Clearing selection after animation completed + wait time");
+        setSelectedChallengeIndex(-1);
+        clearPendingChallengeAnimation();
+        updatePreviousPlayDisplay();
+        updateActionsDisplay();
+    }, 200); // Small delay like original to ensure animation cleanup is complete
 }

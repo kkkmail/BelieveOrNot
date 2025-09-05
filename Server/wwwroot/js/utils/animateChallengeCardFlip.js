@@ -90,7 +90,7 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                 console.log("Showing result symbol:", isMatch ? 'SUCCESS' : 'FAIL');
             }, 100);
             
-            // If card matches (✓ shown) and this is the challenger with remaining cards, show them with correct match status
+            // RESTORED: If card matches (✓ shown) and this is the challenger with remaining cards, show them with correct match status
             if (isMatch && isChallenger && remainingCards && remainingCards.length > 0) {
                 console.log("🎯 CHALLENGER CONDITION MET - STARTING REMAINING CARDS ANIMATION");
                 console.log("isMatch:", isMatch);
@@ -100,13 +100,13 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                 console.log("remainingCards.length:", remainingCards.length);
                 console.log("challengeCardIndex:", challengeCardIndex);
                 
-                // Find the challenge area and animate remaining cards directly
-                const challengeCards = document.getElementById('challengeCards');
-                console.log("challengeCards element:", challengeCards);
+                // Find the last play area and animate remaining cards directly
+                const previousPlayCards = document.getElementById('previousPlayCards');
+                console.log("previousPlayCards element:", previousPlayCards);
                 
-                if (challengeCards) {
-                    const allCards = challengeCards.children;
-                    console.log("Total cards in challenge area:", allCards.length);
+                if (previousPlayCards) {
+                    const allCards = previousPlayCards.children;
+                    console.log("Total cards in previous play area:", allCards.length);
                     console.log("All card elements:", Array.from(allCards));
                     
                     let remainingIndex = 0;
@@ -146,7 +146,7 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                     
                     console.log(`Scheduled ${remainingIndex} remaining card animations`);
                 } else {
-                    console.error("❌ Challenge cards container not found!");
+                    console.error("❌ Previous play cards container not found!");
                 }
             } else {
                 console.log("❌ CHALLENGER CONDITION NOT MET");

@@ -6,6 +6,12 @@ export function updatePreviousPlayDisplay() {
     const playInfoDisplay = document.getElementById('playInfoDisplay');
     const previousPlaySection = document.getElementById('previousPlaySection');
 
+    // CRITICAL: Don't clear cards if challenge animation is pending/running
+    if (window.pendingChallengeAnimation && selectedChallengeIndex !== -1) {
+        console.log("🚫 Preserving previous play cards during challenge animation");
+        return;
+    }
+
     const lastPlayCount = gameState.lastPlayCardCount || gameState.LastPlayCardCount || 0;
 
     if (!lastPlayCount || lastPlayCount === 0) {
@@ -45,11 +51,7 @@ export function updatePreviousPlayDisplay() {
             handlePreviousCardClick(i);
         });
 
-        // FIXED: Show selection if this card is currently selected for challenge
-        // Check both direct table selection AND challenge area selection
-        const challengeArea = document.getElementById('challengeArea');
-        const isChallengeAreaVisible = challengeArea && !challengeArea.classList.contains('hidden');
-
+        // Show selection if this card is currently selected for challenge
         if (selectedChallengeIndex === i) {
             cardElement.classList.add('challenge-selected');
         }

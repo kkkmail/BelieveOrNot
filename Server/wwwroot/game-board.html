@@ -43,6 +43,22 @@
         </div>
     </div>
     
+    <!-- Table Controls - NEW: Replace challenge area with table controls -->
+    <div class="table-controls" id="tableControls">
+        <div class="table-message" id="tableMessage">Wait your turn</div>
+        <div class="table-actions" id="tableActions">
+            <!-- Opening turn rank selection -->
+            <div class="rank-selector hidden" id="rankSelector">
+                <label for="declaredRank">Declare Rank:</label>
+                <select id="declaredRank">
+                    <!-- Options will be populated dynamically by updateRankDropdown() -->
+                </select>
+            </div>
+            <button class="btn btn-primary hidden" id="playBtn">Play Selected Cards</button>
+            <button class="btn btn-warning hidden" id="confirmChallengeBtn">Flip Selected Card</button>
+        </div>
+    </div>
+    
     <!-- Game Management Buttons -->
     <div class="game-management">
         <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
@@ -56,32 +72,6 @@
     <h3>Your Hand (<span id="handCount">0</span> cards)</h3>
     <div class="hand-cards" id="handCards">
         <!-- Player's cards will be populated here -->
-    </div>
-
-    <!-- Actions Area -->
-    <div class="actions-area" id="actionsArea">
-        <!-- Opening turn rank selection -->
-        <div class="rank-selector hidden" id="rankSelector">
-            <label for="declaredRank">Declare Rank:</label>
-            <select id="declaredRank">
-                <!-- Options will be populated dynamically by updateRankDropdown() -->
-            </select>
-        </div>
-
-        <button class="btn btn-primary hidden" id="playBtn">Play Selected Cards</button>
-        <button class="btn btn-warning hidden" id="challengeBtn">Challenge!</button>
-    </div>
-
-    <!-- Challenge Area -->
-    <div class="challenge-area hidden" id="challengeArea">
-        <h3>Choose a card to flip from the last play:</h3>
-        <div class="challenge-cards" id="challengeCards">
-            <!-- Challenge cards will be populated here -->
-        </div>
-        <div>
-            <button class="btn btn-warning" id="submitChallengeBtn">Flip Selected Card</button>
-            <button class="btn btn-secondary" id="hideChallengeBtn">Cancel</button>
-        </div>
     </div>
 </div>
 

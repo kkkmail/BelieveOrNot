@@ -1,9 +1,10 @@
-import {showChallenge} from "../actions/showChallenge.js";
 import {showMessage} from "../utils/showMessage.js";
-import {gameState, playerId, setSelectedChallengeIndex} from "../core/variables.js";
+import {gameState, playerId, setSelectedChallengeIndex, selectedChallengeIndex, setSelectedCards} from "../core/variables.js";
+import {updatePreviousPlayDisplay} from "./updatePreviousPlayDisplay.js";
+import {updateActionsDisplay} from "./updateActionsDisplay.js";
 
 export function handlePreviousCardClick(cardIndex) {
-    console.log('Previous play card ' + (cardIndex + 1) + ' clicked - showing challenge interface');
+    console.log('Previous play card ' + (cardIndex + 1) + ' clicked');
 
     // Check if we can challenge
     if (!gameState || gameState.phase !== 1) {
@@ -48,12 +49,21 @@ export function handlePreviousCardClick(cardIndex) {
         return;
     }
 
-    // FIXED: This is equivalent to clicking Challenge button + selecting this card
-    // 1. Set the selected challenge index
-    setSelectedChallengeIndex(cardIndex);
+    // Clear any selected cards since we're switching to challenge mode
+    setSelectedCards([]);
 
-    // 2. Show the challenge area (same as clicking Challenge button)
-    showChallenge(); // This will create identical cards and show the selected one
+    // Toggle selection
+    if (selectedChallengeIndex === cardIndex) {
+        // Deselect
+        setSelectedChallengeIndex(-1);
+        console.log('Challenge card deselected');
+    } else {
+        // Select this card
+        setSelectedChallengeIndex(cardIndex);
+        console.log('Challenge card selected:', cardIndex + 1);
+    }
 
-    console.log('Challenge interface shown with card ' + (cardIndex + 1) + ' pre-selected');
+    // Update displays
+    updatePreviousPlayDisplay();
+    updateActionsDisplay();
 }

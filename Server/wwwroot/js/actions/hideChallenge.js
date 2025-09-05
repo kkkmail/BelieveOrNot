@@ -1,10 +1,12 @@
 import {setSelectedChallengeIndex} from "../core/variables.js";
 import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
+import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 
 export function hideChallenge() {
-    document.getElementById('challengeArea').classList.add('hidden');
+    // Clear challenge selection
     setSelectedChallengeIndex(-1);
 
-    // FIXED: Also clear table selection when challenge is cancelled
+    // Update displays
     updatePreviousPlayDisplay();
+    updateActionsDisplay();
 }
