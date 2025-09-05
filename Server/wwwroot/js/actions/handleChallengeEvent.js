@@ -14,39 +14,36 @@ export async function handleChallengeEvent(challengeEventData) {
     console.log("pendingChallengeAnimation:", pendingAnimation);
     console.log("challengeEventData:", challengeEventData);
 
-    if (!pendingAnimation) {
-        console.log("❌ No pending challenge animation");
-        return;
-    }
-
     if (!challengeEventData) {
         console.error("❌ No challenge event data provided");
-        clearPendingChallengeAnimation();
-        setSelectedChallengeIndex(-1);
-        updatePreviousPlayDisplay();
-        updateActionsDisplay();
+        if (pendingAnimation) {
+            clearPendingChallengeAnimation();
+            setSelectedChallengeIndex(-1);
+            updatePreviousPlayDisplay();
+            updateActionsDisplay();
+        }
         return;
     }
 
-    console.log("✅ Processing challenge event with structured data");
-
-    const { tableCardElement, cardIndex, announcedRank } = pendingAnimation;
-    
     // Handle both camelCase and PascalCase property names
     const revealedCard = challengeEventData.revealedCard || challengeEventData.RevealedCard;
     const isMatch = challengeEventData.isMatch !== undefined ? challengeEventData.isMatch : challengeEventData.IsMatch;
     const challengerName = challengeEventData.challengerName || challengeEventData.ChallengerName;
     const remainingCards = challengeEventData.remainingCards || challengeEventData.RemainingCards;
     const remainingCardsMatch = challengeEventData.remainingCardsMatch || challengeEventData.RemainingCardsMatch;
+    const cardIndex = challengeEventData.cardIndex !== undefined ? challengeEventData.cardIndex : challengeEventData.CardIndex;
+    const announcedRank = challengeEventData.announcedRank || challengeEventData.AnnouncedRank;
 
-    console.log("Extracted challenge data:", { revealedCard, isMatch, challengerName, remainingCards, remainingCardsMatch, announcedRank });
+    console.log("Extracted challenge data:", { revealedCard, isMatch, challengerName, remainingCards, remainingCardsMatch, cardIndex, announcedRank });
 
     if (!revealedCard) {
         console.error("❌ No revealed card in challenge event data");
-        clearPendingChallengeAnimation();
-        setSelectedChallengeIndex(-1);
-        updatePreviousPlayDisplay();
-        updateActionsDisplay();
+        if (pendingAnimation) {
+            clearPendingChallengeAnimation();
+            setSelectedChallengeIndex(-1);
+            updatePreviousPlayDisplay();
+            updateActionsDisplay();
+        }
         return;
     }
 
@@ -56,14 +53,38 @@ export async function handleChallengeEvent(challengeEventData) {
 
     console.log("Challenger check:", { currentPlayerName: currentPlayer?.name, challengerName, isChallenger });
 
-    // Animate both elements if they exist (same as original logic)
     const animationPromises = [];
 
-    if (tableCardElement) {
-        console.log("🎬 Animating table card element");
-        animationPromises.push(
-            animateChallengeCardFlip(tableCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, remainingCardsMatch, cardIndex)
-        );
+    if (pendingAnimation) {
+        // Challenger case - use pending animation info
+        console.log("✅ Processing challenger animation");
+        const { tableCardElement } = pendingAnimation;
+        
+        if (tableCardElement) {
+            console.log("🎬 Animating table card element for challenger");
+            animationPromises.push(
+                animateChallengeCardFlip(tableCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, remainingCardsMatch, cardIndex)
+            );
+        }
+    } else {
+        // Non-challenger case - animate the challenged card
+        console.log("✅ Processing non-challenger animation");
+        const previousPlayCards = document.getElementById('previousPlayCards');
+        
+        if (previousPlayCards && cardIndex !== undefined) {
+            const challengedCardElement = previousPlayCards.children[cardIndex];
+            
+            if (challengedCardElement) {
+                console.log("🎬 Animating challenged card for non-challenger at index:", cardIndex);
+                animationPromises.push(
+                    animateChallengeCardFlip(challengedCardElement, revealedCard, announcedRank, isMatch, false, null, null, cardIndex)
+                );
+            } else {
+                console.warn("⚠️ Challenged card element not found at index:", cardIndex);
+            }
+        } else {
+            console.warn("⚠️ Previous play cards container not found or card index missing");
+        }
     }
 
     // Wait for all animations to complete
@@ -75,12 +96,16 @@ export async function handleChallengeEvent(challengeEventData) {
         console.warn("⚠️ No animations to run");
     }
 
-    // DELAY clearing selection and updating display (like original challenge area)
+    // Clear selection and update display after animation
     setTimeout(() => {
         console.log("🧹 Clearing selection after animation completed + wait time");
+        
+        if (pendingAnimation) {
+            clearPendingChallengeAnimation();
+        }
+        
         setSelectedChallengeIndex(-1);
-        clearPendingChallengeAnimation();
         updatePreviousPlayDisplay();
         updateActionsDisplay();
-    }, 200); // Small delay like original to ensure animation cleanup is complete
+    }, 200);
 }
