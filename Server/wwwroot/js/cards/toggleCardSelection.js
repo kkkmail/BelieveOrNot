@@ -1,6 +1,5 @@
 // js/cards/toggleCardSelection.js
 import {gameState, selectedCards, playerId, setSelectedChallengeIndex} from "../core/variables.js";
-import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {updateHandDisplay} from "../display/updateHandDisplay.js";
 import {showMessage} from "../utils/showMessage.js";
@@ -60,8 +59,7 @@ export function toggleCardSelection(cardIndex) {
 
     // Update display immediately
     updateHandDisplay();
-    updateActionsDisplay();
-    updateCardPlayPreview(); // This will now show "Will play" again
+    updateActionsDisplay(); // This now handles the card play preview message
 
     console.log('Selected cards:', selectedCards);
 }

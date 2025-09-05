@@ -35,6 +35,15 @@
     color: #856404;
 }
 
+/* Active turn styling with blinking effect */
+.table-controls.active-turn {
+    animation: pulse-glow 2s infinite;
+}
+
+.table-controls.active-turn .table-message {
+    animation: blink 1.5s infinite;
+}
+
 @media (max-width: 768px) {
     .table-actions {
         flex-direction: column;

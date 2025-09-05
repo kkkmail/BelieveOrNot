@@ -1,5 +1,6 @@
 // js/display/updateActionsDisplay.js
 import {gameState, playerId, selectedCards, selectedChallengeIndex, setSelectedCards} from "../core/variables.js";
+import {getSuitSymbol} from "../cards/getSuitSymbol.js";
 
 export function updateActionsDisplay() {
     const playBtn = document.getElementById('playBtn');
@@ -24,6 +25,7 @@ export function updateActionsDisplay() {
     // Reset table controls styling
     if (tableControls) {
         tableControls.classList.remove('challenge-mode');
+        tableControls.classList.remove('active-turn');
     }
 
     if (!gameState || !playerId) {
@@ -66,6 +68,11 @@ export function updateActionsDisplay() {
             return;
         }
 
+        // Add active turn styling for blinking effect
+        if (tableControls) {
+            tableControls.classList.add('active-turn');
+        }
+
         // Check if there are players with cards remaining (active players)
         const activePlayers = gameState.players.filter(p => p.handCount > 0);
         const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
@@ -83,15 +90,18 @@ export function updateActionsDisplay() {
                 const lastPlayer = gameState.players[lastPlayerIndex];
                 
                 if (selectedChallengeIndex !== -1) {
-                    if (tableMessage) tableMessage.textContent = `Challenge ${lastPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
+                    if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${lastPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
                     if (tableControls) tableControls.classList.add('challenge-mode');
                     if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
                 } else {
-                    if (tableMessage) tableMessage.textContent = `Click a card from ${lastPlayer.name}'s last play to challenge it`;
+                    if (tableMessage) tableMessage.innerHTML = `🎯 Click a card from ${lastPlayer.name}'s last play to challenge it`;
                 }
             }
             return;
         }
+
+        // Check if we have a persistent "played" message to show
+        const cardPlayMessage = getCardPlayMessage();
 
         // Normal game logic (not end-game situation)
         if (!gameState.announcedRank) {
@@ -99,40 +109,55 @@ export function updateActionsDisplay() {
             
             if (selectedChallengeIndex !== -1) {
                 // In challenge mode
-                if (tableMessage) tableMessage.textContent = `Challenge previous player - card ${selectedChallengeIndex + 1} selected`;
+                if (tableMessage) tableMessage.innerHTML = `🎯 Challenge previous player - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
+            } else if (cardPlayMessage) {
+                // Show persistent card play message
+                if (tableMessage) tableMessage.innerHTML = `🎯 ${cardPlayMessage}`;
             } else if (selectedCards.length > 0) {
-                // In play mode
-                if (tableMessage) tableMessage.textContent = 'Choose a rank to declare for your cards';
+                // In play mode - show card preview and instructions
+                const previewMessage = generateCardPlayPreview();
+                const message = previewMessage ? 
+                    `🎯 ${previewMessage} - Choose a rank to declare` : 
+                    '🎯 Choose a rank to declare for your cards';
+                if (tableMessage) tableMessage.innerHTML = message;
                 if (rankSelector) rankSelector.classList.remove('hidden');
                 if (playBtn) {
                     playBtn.classList.remove('hidden');
                     playBtn.textContent = `Play ${selectedCards.length} Card(s)`;
                 }
             } else {
-                if (tableMessage) tableMessage.textContent = 'Select cards from your hand to play';
+                if (tableMessage) tableMessage.innerHTML = '🎯 Select cards from your hand to play';
             }
         } else {
             console.log("Normal turn - announced rank exists:", gameState.announcedRank);
+            const boldRank = `<strong>${gameState.announcedRank}</strong>`;
 
             if (selectedChallengeIndex !== -1) {
                 // In challenge mode
                 const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
                 const previousPlayer = gameState.players[previousPlayerIndex];
                 
-                if (tableMessage) tableMessage.textContent = `Challenge ${previousPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
+                if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${previousPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
+            } else if (cardPlayMessage) {
+                // Show persistent card play message
+                if (tableMessage) tableMessage.innerHTML = `🎯 ${cardPlayMessage}`;
             } else if (selectedCards.length > 0) {
-                // In play mode
-                if (tableMessage) tableMessage.textContent = `Play cards as ${gameState.announcedRank} or click a previous card to challenge`;
+                // In play mode - show card preview and instructions
+                const previewMessage = generateCardPlayPreview();
+                const message = previewMessage ? 
+                    `🎯 ${previewMessage} - Play as ${boldRank} or challenge` : 
+                    `🎯 Play cards as ${boldRank} or click a previous card to challenge`;
+                if (tableMessage) tableMessage.innerHTML = message;
                 if (playBtn) {
                     playBtn.classList.remove('hidden');
                     playBtn.textContent = `Play ${selectedCards.length} Card(s) as ${gameState.announcedRank}`;
                 }
             } else {
-                if (tableMessage) tableMessage.textContent = `Select cards to play as ${gameState.announcedRank} or click a previous card to challenge`;
+                if (tableMessage) tableMessage.innerHTML = `🎯 Select cards to play as ${boldRank} or click a previous card to challenge`;
             }
         }
         return;
@@ -142,6 +167,9 @@ export function updateActionsDisplay() {
         console.log("Phase 2 - Round ended");
         if (tableMessage) tableMessage.textContent = 'Round ended - waiting for next round';
         setSelectedCards([]);
+        
+        // Clear any persistent card play message
+        clearCardPlayMessage();
         
         if (isCreator && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
@@ -157,8 +185,66 @@ export function updateActionsDisplay() {
     if (gameState.phase === 3) { // GameEnd
         console.log("Phase 3 - Game ended");
         if (tableMessage) tableMessage.textContent = 'Game ended';
+        clearCardPlayMessage();
         return;
     }
 
     console.log("=== END DEBUG ===");
 }
+
+function generateCardPlayPreview() {
+    if (!gameState || !gameState.yourHand || selectedCards.length === 0) {
+        return null;
+    }
+
+    // Get the actual cards that will be played (same logic as original updateCardPlayPreview)
+    const sortedHand = [...gameState.yourHand].sort((a, b) => {
+        if (a.rank === 'Joker' && b.rank !== 'Joker') return -1;
+        if (a.rank !== 'Joker' && b.rank === 'Joker') return 1;
+        if (a.rank === 'Joker' && b.rank === 'Joker') return 0;
+
+        const rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const aRankIndex = rankOrder.indexOf(a.rank);
+        const bRankIndex = rankOrder.indexOf(b.rank);
+
+        if (aRankIndex !== bRankIndex) {
+            return aRankIndex - bRankIndex;
+        }
+
+        const suitOrder = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+        return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+    });
+
+    const cardsToPlay = selectedCards.map(index => sortedHand[index]).filter(card => card);
+
+    if (cardsToPlay.length === 0) {
+        return null;
+    }
+
+    const cardNames = cardsToPlay.map(card => {
+        if (card.rank === 'Joker') {
+            return 'Joker';
+        } else {
+            const suitSymbol = getSuitSymbol(card.suit);
+            return `${card.rank}${suitSymbol}`;
+        }
+    });
+
+    const actionText = 'Will play in order';
+    return `<span style="color: #007bff; font-weight: bold;">${actionText}: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
+}
+
+function setCardPlayMessage(message) {
+    window.persistentCardPlayMessage = message;
+}
+
+function getCardPlayMessage() {
+    return window.persistentCardPlayMessage || null;
+}
+
+function clearCardPlayMessage() {
+    window.persistentCardPlayMessage = null;
+}
+
+// Export the setter function for use in playCards.js
+window.setCardPlayMessage = setCardPlayMessage;

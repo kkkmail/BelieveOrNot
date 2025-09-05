@@ -1,10 +1,10 @@
 // js/actions/playCards.js
 import {connection, gameState, playerId, selectedCards, setSelectedCards} from "../core/variables.js";
-import {updateCardPlayPreview} from "../utils/updateCardPlayPreview.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {updateHandDisplay} from "../display/updateHandDisplay.js";
 import {generateGuid} from "../utils/generateGuid.js";
 import {customAlert} from "../utils/customAlert.js";
+import {getSuitSymbol} from "../cards/getSuitSymbol.js";
 
 export async function playCards() {
     if (selectedCards.length === 0) {
@@ -32,7 +32,6 @@ export async function playCards() {
             setSelectedCards([]);
             updateHandDisplay();
             updateActionsDisplay();
-            updateCardPlayPreview();
             return;
         }
     }
@@ -70,10 +69,26 @@ export async function playCards() {
 
     console.log("Playing cards:", cardsToPlay.map(c => `${c.rank} of ${c.suit}`));
 
+    // Create the "Played in order" message before sending to server
+    const cardNames = cardsToPlay.map(card => {
+        if (card.rank === 'Joker') {
+            return 'Joker';
+        } else {
+            const suitSymbol = getSuitSymbol(card.suit);
+            return `${card.rank}${suitSymbol}`;
+        }
+    });
+
+    const playedMessage = `<span style="color: #007bff; font-weight: bold;">Played in order: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
+
     try {
-        // Set flag to show "Played" instead of "Will play"
-        window.cardsJustPlayed = true;
-        updateCardPlayPreview();
+        // Set the persistent message to show "Played in order"
+        if (window.setCardPlayMessage) {
+            window.setCardPlayMessage(playedMessage);
+        }
+
+        // Update display to show the "Played" message immediately
+        updateActionsDisplay();
 
         await connection.invoke("SubmitMove", {
             matchId: gameState.matchId,
@@ -96,8 +111,10 @@ export async function playCards() {
         console.error("Failed to play cards:", err);
         await customAlert("Failed to play cards: " + err, 'Play Failed');
 
-        // Clear flag if play failed
-        window.cardsJustPlayed = false;
-        updateCardPlayPreview();
+        // Clear the persistent message if play failed
+        if (window.setCardPlayMessage) {
+            window.setCardPlayMessage(null);
+        }
+        updateActionsDisplay();
     }
 }
