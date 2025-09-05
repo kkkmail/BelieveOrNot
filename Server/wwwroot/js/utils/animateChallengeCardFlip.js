@@ -135,7 +135,7 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                             
                             setTimeout(() => {
                                 console.log(`🎬 Starting animation for position ${pos} with card:`, serverCard, "matches:", cardMatches);
-                                animateChallengeCardFlip(cardElement, serverCard, "", cardMatches, false, null, null, -1);
+                                animateChallengeCardFlip(cardElement, serverCard, announcedRank, cardMatches, false, null, null, -1);
                             }, delay);
                             
                             remainingIndex++;

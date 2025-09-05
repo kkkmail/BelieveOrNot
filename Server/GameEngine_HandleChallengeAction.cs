@@ -36,7 +36,33 @@ public partial class GameEngine
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = collectorIndex;
 
-        // FIXED: Pass all table cards to include remaining cards data
+        // FIXED: Calculate remaining cards and their match status for animation
+        List<Card>? remainingCards = null;
+        List<bool>? remainingCardsMatch = null;
+
+        if (isMatch && collector == challenger) // Challenger collects when challenged card matches
+        {
+            var lastPlayCards = allTableCards
+                .Skip(allTableCards.Count - currentLastPlayCount)
+                .ToList();
+
+            remainingCards = new List<Card>();
+            remainingCardsMatch = new List<bool>();
+
+            for (int i = 0; i < lastPlayCards.Count; i++)
+            {
+                if (i != request.ChallengePickIndex!.Value) // Exclude the challenged card
+                {
+                    var card = lastPlayCards[i];
+                    remainingCards.Add(card);
+                    // Check if this remaining card matches the announced rank
+                    bool cardMatches = card.Rank == currentAnnouncedRank || card.IsJoker;
+                    remainingCardsMatch.Add(cardMatches);
+                }
+            }
+        }
+
+        // FIXED: Pass remaining cards with their match status
         var challengeEvent = GameEventFactory.CreateChallengeEvent(
             challenger.Name,
             challengedPlayer.Name,
@@ -47,7 +73,9 @@ public partial class GameEngine
             isMatch,
             collector.Name,
             collectedCount,
-            allTableCards // NEW: Pass all table cards for remaining cards extraction
+            allTableCards,
+            remainingCards,
+            remainingCardsMatch
         );
 
         // Add disposal messages if any occurred

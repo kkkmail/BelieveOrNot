@@ -3,18 +3,8 @@ namespace BelieveOrNot.Server;
 
 public static partial class GameEventFactory
 {
-    public static GameEventDto CreateChallengeEvent(string challenger, string challenged, int cardIndex, int totalCards, Card revealedCard, string announcedRank, bool cardMatches, string collector, int cardsCollected, List<Card> allTableCards)
+    public static GameEventDto CreateChallengeEvent(string challenger, string challenged, int cardIndex, int totalCards, Card revealedCard, string announcedRank, bool cardMatches, string collector, int cardsCollected, List<Card> allTableCards, List<Card>? remainingCards = null, List<bool>? remainingCardsMatch = null)
     {
-        // Get remaining cards (excluding the revealed one) for challenger animation
-        List<Card>? remainingCards = null;
-        if (cardMatches && collector == challenger) // Challenger collects when card matches
-        {
-            remainingCards = allTableCards
-                .Skip(allTableCards.Count - totalCards) // Get last play cards
-                .Where((card, index) => index != cardIndex) // Exclude revealed card
-                .ToList();
-        }
-
         var data = new ChallengeEventData
         {
             ChallengerName = challenger,
@@ -26,7 +16,8 @@ public static partial class GameEventFactory
             IsMatch = cardMatches,
             CollectorName = collector,
             CardsCollected = cardsCollected,
-            RemainingCards = remainingCards
+            RemainingCards = remainingCards,
+            RemainingCardsMatch = remainingCardsMatch
         };
 
         // Create the display message with correct logic
@@ -35,6 +26,10 @@ public static partial class GameEventFactory
         var displayMessage = challengeDetails + " " + challengeResult;
 
         Console.WriteLine($"DEBUG Challenge Event - CardIndex: {cardIndex}, TotalCards: {totalCards}, AnnouncedRank: '{announcedRank}', CardMatches: {cardMatches}, Collector: {collector}");
+        if (remainingCards != null && remainingCardsMatch != null)
+        {
+            Console.WriteLine($"DEBUG Remaining Cards: {remainingCards.Count}, Match Status: [{string.Join(", ", remainingCardsMatch)}]");
+        }
 
         return new GameEventDto
         {
