@@ -35,8 +35,11 @@ export async function addToEventHistory(event) {
         
         // Check if this is a challenge event that needs animation
         if (eventType === 'Challenge' && eventData) {
-            console.log("🎯 DETECTED CHALLENGE EVENT - triggering animation");
+            console.log("🎯 DETECTED CHALLENGE EVENT - setting flag and triggering animation");
             shouldTriggerAnimation = true;
+            
+            // Set flag to prevent card clearing during animation
+            window.challengeEventPending = true;
         }
     } else if (typeof event === 'string') {
         // OLD: Legacy string message (for backward compatibility)
@@ -57,26 +60,25 @@ export async function addToEventHistory(event) {
     }
 
     if (shouldTriggerAnimation) {
-        // Trigger animation before adding to history
-        setTimeout(async () => {
-            console.log("Calling handleChallengeEvent...");
-            const eventData = event.data || event.Data;
-            await handleChallengeEvent(eventData);
-            console.log("handleChallengeEvent completed");
-        }, 100);
+        // Trigger animation immediately
+        console.log("Calling handleChallengeEvent...");
+        const eventData = event.data || event.Data;
+        await handleChallengeEvent(eventData);
+        console.log("handleChallengeEvent completed");
         
-        // Add a small delay before showing the message to let animation start
-        setTimeout(() => {
-            window.gameEventHistory.push(timestampedEvent);
+        // Clear the flag after animation
+        window.challengeEventPending = false;
+        
+        // Add to history after animation
+        window.gameEventHistory.push(timestampedEvent);
 
-            // Keep last 8 messages
-            if (window.gameEventHistory.length > 8) {
-                window.gameEventHistory.shift();
-            }
+        // Keep last 8 messages
+        if (window.gameEventHistory.length > 8) {
+            window.gameEventHistory.shift();
+        }
 
-            console.log("Event history updated (after animation):", window.gameEventHistory.length, "messages");
-            showEventHistory();
-        }, 200);
+        console.log("Event history updated (after animation):", window.gameEventHistory.length, "messages");
+        showEventHistory();
     } else {
         // Regular message processing
         console.log("Regular message processing");

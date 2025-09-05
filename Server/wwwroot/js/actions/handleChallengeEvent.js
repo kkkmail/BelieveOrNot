@@ -67,7 +67,7 @@ export async function handleChallengeEvent(challengeEventData) {
             );
         }
     } else {
-        // Non-challenger case - animate the challenged card
+        // Non-challenger case - animate the challenged card in the existing display
         console.log("✅ Processing non-challenger animation");
         const previousPlayCards = document.getElementById('previousPlayCards');
         

@@ -6,9 +6,15 @@ export function updatePreviousPlayDisplay() {
     const playInfoDisplay = document.getElementById('playInfoDisplay');
     const previousPlaySection = document.getElementById('previousPlaySection');
 
-    // CRITICAL: Don't clear cards if challenge animation is pending/running
+    // CRITICAL: Don't clear cards if challenge animation is pending/running for challenger
     if (window.pendingChallengeAnimation && selectedChallengeIndex !== -1) {
-        console.log("🚫 Preserving previous play cards during challenge animation");
+        console.log("🚫 Preserving previous play cards during challenger animation");
+        return;
+    }
+
+    // CRITICAL: Don't clear cards if challenge animation is about to happen for non-challenger
+    if (window.challengeEventPending) {
+        console.log("🚫 Preserving previous play cards - challenge event pending");
         return;
     }
 
