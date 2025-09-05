@@ -68,8 +68,9 @@ export function updateActionsDisplay() {
             return;
         }
 
-        // Add active turn styling for blinking effect
-        if (tableControls) {
+        // Determine if should blink (only if no interaction)
+        const hasInteraction = selectedCards.length > 0 || selectedChallengeIndex !== -1;
+        if (tableControls && !hasInteraction) {
             tableControls.classList.add('active-turn');
         }
 
@@ -100,8 +101,8 @@ export function updateActionsDisplay() {
             return;
         }
 
-        // Check if we have a persistent "played" message to show
-        const cardPlayMessage = getCardPlayMessage();
+        // Get card play preview - this is the key part that was missing
+        const cardPlayPreview = getCardPlayPreview();
 
         // Normal game logic (not end-game situation)
         if (!gameState.announcedRank) {
@@ -112,15 +113,9 @@ export function updateActionsDisplay() {
                 if (tableMessage) tableMessage.innerHTML = `🎯 Challenge previous player - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
-            } else if (cardPlayMessage) {
-                // Show persistent card play message
-                if (tableMessage) tableMessage.innerHTML = `🎯 ${cardPlayMessage}`;
-            } else if (selectedCards.length > 0) {
-                // In play mode - show card preview and instructions
-                const previewMessage = generateCardPlayPreview();
-                const message = previewMessage ? 
-                    `🎯 ${previewMessage} - Choose a rank to declare` : 
-                    '🎯 Choose a rank to declare for your cards';
+            } else if (cardPlayPreview) {
+                // Show card play preview with instructions
+                const message = `🎯 ${cardPlayPreview} - Choose a rank to declare`;
                 if (tableMessage) tableMessage.innerHTML = message;
                 if (rankSelector) rankSelector.classList.remove('hidden');
                 if (playBtn) {
@@ -142,15 +137,9 @@ export function updateActionsDisplay() {
                 if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${previousPlayer.name} - card ${selectedChallengeIndex + 1} selected`;
                 if (tableControls) tableControls.classList.add('challenge-mode');
                 if (confirmChallengeBtn) confirmChallengeBtn.classList.remove('hidden');
-            } else if (cardPlayMessage) {
-                // Show persistent card play message
-                if (tableMessage) tableMessage.innerHTML = `🎯 ${cardPlayMessage}`;
-            } else if (selectedCards.length > 0) {
-                // In play mode - show card preview and instructions
-                const previewMessage = generateCardPlayPreview();
-                const message = previewMessage ? 
-                    `🎯 ${previewMessage} - Play as ${boldRank} or challenge` : 
-                    `🎯 Play cards as ${boldRank} or click a previous card to challenge`;
+            } else if (cardPlayPreview) {
+                // Show card play preview with instructions
+                const message = `🎯 ${cardPlayPreview} - Play as ${boldRank} or challenge`;
                 if (tableMessage) tableMessage.innerHTML = message;
                 if (playBtn) {
                     playBtn.classList.remove('hidden');
@@ -168,9 +157,6 @@ export function updateActionsDisplay() {
         if (tableMessage) tableMessage.textContent = 'Round ended - waiting for next round';
         setSelectedCards([]);
         
-        // Clear any persistent card play message
-        clearCardPlayMessage();
-        
         if (isCreator && startRoundBtn) {
             startRoundBtn.classList.remove('hidden');
             startRoundBtn.textContent = 'Start New Round';
@@ -185,19 +171,28 @@ export function updateActionsDisplay() {
     if (gameState.phase === 3) { // GameEnd
         console.log("Phase 3 - Game ended");
         if (tableMessage) tableMessage.textContent = 'Game ended';
-        clearCardPlayMessage();
         return;
     }
 
     console.log("=== END DEBUG ===");
 }
 
-function generateCardPlayPreview() {
-    if (!gameState || !gameState.yourHand || selectedCards.length === 0) {
+function getCardPlayPreview() {
+    // Hide when round ends
+    if (gameState && gameState.phase === 2) { // RoundEnd
         return null;
     }
 
-    // Get the actual cards that will be played (same logic as original updateCardPlayPreview)
+    if (selectedCards.length === 0) {
+        return null;
+    }
+
+    // Get the actual cards that will be played
+    if (!gameState || !gameState.yourHand) {
+        return null;
+    }
+
+    // Sort hand the same way as in updateHandDisplay
     const sortedHand = [...gameState.yourHand].sort((a, b) => {
         if (a.rank === 'Joker' && b.rank !== 'Joker') return -1;
         if (a.rank !== 'Joker' && b.rank === 'Joker') return 1;
@@ -230,21 +225,8 @@ function generateCardPlayPreview() {
         }
     });
 
-    const actionText = 'Will play in order';
+    // Check if cards were just played (use global flag)
+    const actionText = window.cardsJustPlayed ? 'Played in order' : 'Will play in order';
+
     return `<span style="color: #007bff; font-weight: bold;">${actionText}: ${cardNames.join(' → ')} (${cardsToPlay.length} card${cardsToPlay.length === 1 ? '' : 's'})</span>`;
 }
-
-function setCardPlayMessage(message) {
-    window.persistentCardPlayMessage = message;
-}
-
-function getCardPlayMessage() {
-    return window.persistentCardPlayMessage || null;
-}
-
-function clearCardPlayMessage() {
-    window.persistentCardPlayMessage = null;
-}
-
-// Export the setter function for use in playCards.js
-window.setCardPlayMessage = setCardPlayMessage;

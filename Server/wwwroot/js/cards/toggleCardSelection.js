@@ -59,7 +59,7 @@ export function toggleCardSelection(cardIndex) {
 
     // Update display immediately
     updateHandDisplay();
-    updateActionsDisplay(); // This now handles the card play preview message
+    updateActionsDisplay();
 
     console.log('Selected cards:', selectedCards);
 }
