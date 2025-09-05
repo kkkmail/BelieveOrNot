@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="styles/game-board/core.css">
     <link rel="stylesheet" href="styles/game-board/hand.css">
     <link rel="stylesheet" href="styles/game-board/management.css">
+    <link rel="stylesheet" href="styles/game-board/management-controls.css">
     <link rel="stylesheet" href="styles/game-board/players.css">
     <link rel="stylesheet" href="styles/game-board/responsive.css">
     <link rel="stylesheet" href="styles/game-board/scoring.css">
@@ -39,6 +40,13 @@
 <body>
     <!-- Connection Status -->
     <div class="connection-status" id="connectionStatus">Connecting...</div>
+    
+    <!-- Game Management Controls -->
+    <div class="game-management-controls" id="gameManagementControls">
+        <button class="btn btn-warning hidden" id="endRoundBtn">End Round</button>
+        <button class="btn btn-danger hidden" id="endGameBtn">End Game</button>
+        <button class="btn btn-success hidden" id="newGameBtn">Start New Game</button>
+    </div>
 
     <div class="container">
         <!-- Game Header -->
@@ -65,6 +73,7 @@
     <script type="module" src="js/actions/clearPendingChallengeAnimation.js"></script>
     <script type="module" src="js/actions/endGame.js"></script>
     <script type="module" src="js/actions/endRound.js"></script>
+    <script type="module" src="js/actions/newGame.js"></script>
     <script type="module" src="js/actions/handleChallengeEvent.js"></script>
     <script type="module" src="js/actions/hasPendingChallengeAnimation.js"></script>
     <script type="module" src="js/actions/hideChallenge.js"></script>

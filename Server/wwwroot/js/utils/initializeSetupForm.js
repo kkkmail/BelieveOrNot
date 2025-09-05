@@ -5,7 +5,15 @@ export function initializeSetupForm() {
     // Check if there's a match ID in the URL and pre-fill it
     const matchIdFromUrl = getMatchIdFromUrl();
     const matchIdInput = document.getElementById('matchId');
+    const playerNameInput = document.getElementById('playerName');
     const urlInfo = document.getElementById('urlInfo');
+    
+    // Prefill player name from previous session
+    const lastPlayerName = localStorage.getItem('lastPlayerName');
+    if (lastPlayerName && playerNameInput && !playerNameInput.value) {
+        playerNameInput.value = lastPlayerName;
+        console.log('Pre-filled player name from previous session:', lastPlayerName);
+    }
     
     if (matchIdFromUrl && matchIdInput) {
         matchIdInput.value = matchIdFromUrl;
@@ -17,8 +25,14 @@ export function initializeSetupForm() {
         }
         
         // Focus on the player name field since match ID is already filled
-        const playerNameInput = document.getElementById('playerName');
         if (playerNameInput) {
+            setTimeout(() => {
+                playerNameInput.focus();
+            }, 100);
+        }
+    } else {
+        // No match ID in URL, focus on player name if it's empty
+        if (playerNameInput && !playerNameInput.value) {
             setTimeout(() => {
                 playerNameInput.focus();
             }, 100);

@@ -1,5 +1,6 @@
 // js/utils/showFinalResults.js
 import {clearMatchIdFromUrl} from "./urlManager.js";
+import {newGame} from "../actions/newGame.js";
 
 export function showFinalResults(results) {
     console.log("Showing final results:", results);
@@ -140,7 +141,10 @@ export function showFinalResults(results) {
         max-width: 180px;
     `;
     newGameButton.textContent = '🎮 Start New Game';
-    newGameButton.addEventListener('click', () => startNewGame());
+    newGameButton.addEventListener('click', () => {
+        closeResults();
+        newGame(); // Use the newGame function which handles name prefilling
+    });
     
     // Copy Results button
     const copyButton = document.createElement('button');
@@ -216,16 +220,6 @@ export function showFinalResults(results) {
                 document.body.removeChild(overlay);
             }
         }, 300);
-    }
-    
-    function startNewGame() {
-        console.log("Starting new game - returning to main page");
-        
-        // Clear match ID from URL
-        clearMatchIdFromUrl();
-        
-        // Reload the page to start fresh
-        window.location.reload();
     }
 }
 

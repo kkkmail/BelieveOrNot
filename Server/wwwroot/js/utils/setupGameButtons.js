@@ -3,6 +3,7 @@ import {playCards} from "../actions/playCards.js";
 import {startRound} from "../game/startRound.js";
 import {endRound} from "../actions/endRound.js";
 import {endGame} from "../actions/endGame.js";
+import {newGame} from "../actions/newGame.js";
 import {submitChallenge} from "../actions/submitChallenge.js";
 
 export function setupGameButtons() {
@@ -11,6 +12,7 @@ export function setupGameButtons() {
     const confirmChallengeBtn = document.getElementById('confirmChallengeBtn');
     const endRoundBtn = document.getElementById('endRoundBtn');
     const endGameBtn = document.getElementById('endGameBtn');
+    const newGameBtn = document.getElementById('newGameBtn');
 
     if (startRoundBtn && !startRoundBtn.hasAttribute('data-listener')) {
         startRoundBtn.setAttribute('data-listener', 'true');
@@ -65,5 +67,16 @@ export function setupGameButtons() {
             endGame();
         });
         console.log("End game button listener added");
+    }
+
+    if (newGameBtn && !newGameBtn.hasAttribute('data-listener')) {
+        newGameBtn.setAttribute('data-listener', 'true');
+        newGameBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("New game button clicked");
+            newGame();
+        });
+        console.log("New game button listener added");
     }
 }
