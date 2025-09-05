@@ -3,7 +3,7 @@ import { CONFIG } from "./config.js";
 import { getSuitSymbol } from "../cards/getSuitSymbol.js";
 import { getSuitClass } from "../cards/getSuitClass.js";
 
-export function animateChallengeCardFlip(cardElement, revealedCard, announcedRank, isMatch, isChallenger = false, remainingCards = null, challengeCardIndex = 0) {
+export function animateChallengeCardFlip(cardElement, revealedCard, announcedRank, isMatch, isChallenger = false, remainingCards = null, remainingCardsMatch = null, challengeCardIndex = 0) {
     return new Promise((resolve) => {
         console.log("Starting challenge card flip animation", {
             revealedCard,
@@ -11,6 +11,7 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
             isMatch,
             isChallenger,
             remainingCards,
+            remainingCardsMatch,
             challengeCardIndex,
             cardElement: cardElement
         });
@@ -89,12 +90,13 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                 console.log("Showing result symbol:", isMatch ? 'SUCCESS' : 'FAIL');
             }, 100);
             
-            // If card matches (✓ shown) and this is the challenger with remaining cards, show them IMMEDIATELY
+            // If card matches (✓ shown) and this is the challenger with remaining cards, show them with correct match status
             if (isMatch && isChallenger && remainingCards && remainingCards.length > 0) {
                 console.log("🎯 CHALLENGER CONDITION MET - STARTING REMAINING CARDS ANIMATION");
                 console.log("isMatch:", isMatch);
                 console.log("isChallenger:", isChallenger); 
                 console.log("remainingCards:", remainingCards);
+                console.log("remainingCardsMatch:", remainingCardsMatch);
                 console.log("remainingCards.length:", remainingCards.length);
                 console.log("challengeCardIndex:", challengeCardIndex);
                 
@@ -122,23 +124,18 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                         if (remainingIndex < remainingCards.length) {
                             const cardElement = allCards[pos];
                             const serverCard = remainingCards[remainingIndex];
+                            const cardMatches = remainingCardsMatch ? remainingCardsMatch[remainingIndex] : false;
                             
                             console.log(`  - ANIMATING position ${pos} with remaining card ${remainingIndex}:`, serverCard);
+                            console.log(`  - Card matches announced rank:`, cardMatches);
                             console.log("  - Card element:", cardElement);
-                            console.log("  - Card element current content:", cardElement.innerHTML);
-                            console.log("  - Card element current classes:", cardElement.className);
-                            console.log("  - Card element position info:", {
-                                offsetTop: cardElement.offsetTop,
-                                offsetLeft: cardElement.offsetLeft,
-                                style: cardElement.style.cssText
-                            });
                             
                             const delay = remainingIndex * 400;
                             console.log(`  - Will animate after ${delay}ms delay`);
                             
                             setTimeout(() => {
-                                console.log(`🎬 Starting animation for position ${pos} with card:`, serverCard);
-                                animateChallengeCardFlip(cardElement, serverCard, "", false, false, null, -1);
+                                console.log(`🎬 Starting animation for position ${pos} with card:`, serverCard, "matches:", cardMatches);
+                                animateChallengeCardFlip(cardElement, serverCard, "", cardMatches, false, null, null, -1);
                             }, delay);
                             
                             remainingIndex++;

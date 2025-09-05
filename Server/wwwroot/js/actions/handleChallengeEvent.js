@@ -35,8 +35,9 @@ export async function handleChallengeEvent(challengeEventData) {
     const isMatch = challengeEventData.isMatch !== undefined ? challengeEventData.isMatch : challengeEventData.IsMatch;
     const challengerName = challengeEventData.challengerName || challengeEventData.ChallengerName;
     const remainingCards = challengeEventData.remainingCards || challengeEventData.RemainingCards;
+    const remainingCardsMatch = challengeEventData.remainingCardsMatch || challengeEventData.RemainingCardsMatch;
 
-    console.log("Extracted challenge data:", { revealedCard, isMatch, challengerName, remainingCards, announcedRank });
+    console.log("Extracted challenge data:", { revealedCard, isMatch, challengerName, remainingCards, remainingCardsMatch, announcedRank });
 
     if (!revealedCard) {
         console.error("❌ No revealed card in challenge event data");
@@ -58,14 +59,14 @@ export async function handleChallengeEvent(challengeEventData) {
     if (challengeCardElement) {
         console.log("🎬 Animating challenge card element");
         animationPromises.push(
-            animateChallengeCardFlip(challengeCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, cardIndex)
+            animateChallengeCardFlip(challengeCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, remainingCardsMatch, cardIndex)
         );
     }
 
     if (tableCardElement) {
         console.log("🎬 Animating table card element");
         animationPromises.push(
-            animateChallengeCardFlip(tableCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, cardIndex)
+            animateChallengeCardFlip(tableCardElement, revealedCard, announcedRank, isMatch, isChallenger, remainingCards, remainingCardsMatch, cardIndex)
         );
     }
 

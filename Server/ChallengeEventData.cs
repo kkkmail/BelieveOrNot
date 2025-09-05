@@ -1,4 +1,4 @@
-﻿namespace BelieveOrNot.Server;
+namespace BelieveOrNot.Server;
 
 public class ChallengeEventData
 {
@@ -11,5 +11,6 @@ public class ChallengeEventData
     public bool IsMatch { get; set; }
     public string CollectorName { get; set; } = string.Empty;
     public int CardsCollected { get; set; }
-    public List<Card>? RemainingCards { get; set; } // NEW: For challenger animation
+    public List<Card>? RemainingCards { get; set; } // For challenger animation
+    public List<bool>? RemainingCardsMatch { get; set; } // NEW: Match status for each remaining card
 }
