@@ -124,7 +124,10 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
             
         }, CONFIG.CHALLENGE_CARD_FLIP_DURATION + CONFIG.CHALLENGE_CARD_REVEAL_DELAY);
         
-        // Step 4: Clean up and restore original state
+        // Step 4: Clean up and restore original state - use different timing for challenger vs non-challenger
+        const displayDuration = isChallenger ? CONFIG.CHALLENGE_CARD_DISPLAY_DURATION : CONFIG.CHALLENGE_CARD_DISPLAY_DURATION_NON_CHALLENGER;
+        const extraTime = isChallenger ? CONFIG.CHALLENGE_CARD_EXTRA_TIME : CONFIG.CHALLENGE_CARD_EXTRA_TIME_NON_CHALLENGER;
+        
         setTimeout(() => {
             console.log("Starting cleanup and restore");
             
@@ -137,6 +140,6 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
             console.log("Challenge card animation completed");
             resolve();
             
-        }, CONFIG.CHALLENGE_CARD_DISPLAY_DURATION + CONFIG.CHALLENGE_CARD_EXTRA_TIME);
+        }, displayDuration + extraTime);
     });
 }

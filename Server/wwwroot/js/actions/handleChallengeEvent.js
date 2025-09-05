@@ -5,6 +5,7 @@ import {gameState, playerId} from "../core/variables.js";
 import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.js";
 import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
+import {CONFIG} from "../utils/config.js";
 
 // Function to be called when challenge event is received from server
 export async function handleChallengeEvent(challengeEventData) {
@@ -96,7 +97,9 @@ export async function handleChallengeEvent(challengeEventData) {
         console.warn("⚠️ No animations to run");
     }
 
-    // Clear selection and update display after animation
+    // Use config constants for cleanup delay
+    const cleanupDelay = isChallenger ? CONFIG.CHALLENGE_CLEANUP_DELAY_CHALLENGER : CONFIG.CHALLENGE_CLEANUP_DELAY_NON_CHALLENGER;
+    
     setTimeout(() => {
         console.log("🧹 Clearing selection after animation completed + wait time");
         
@@ -107,5 +110,5 @@ export async function handleChallengeEvent(challengeEventData) {
         setSelectedChallengeIndex(-1);
         updatePreviousPlayDisplay();
         updateActionsDisplay();
-    }, 200);
+    }, cleanupDelay);
 }
