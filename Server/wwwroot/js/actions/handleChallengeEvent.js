@@ -10,7 +10,11 @@ import {CONFIG} from "../utils/config.js";
 // Function to be called when challenge event is received from server
 export async function handleChallengeEvent(challengeEventData) {
     console.log("=== HANDLE CHALLENGE EVENT ===");
-    
+
+    // Clear "You played in order..." message when challenge ends
+    window.lastPlayedMessage = null;
+    console.log("Cleared lastPlayedMessage due to challenge end");
+
     const pendingAnimation = window.pendingChallengeAnimation;
     console.log("pendingChallengeAnimation:", pendingAnimation);
     console.log("challengeEventData:", challengeEventData);
@@ -60,7 +64,7 @@ export async function handleChallengeEvent(challengeEventData) {
         // Challenger case - use pending animation info
         console.log("✅ Processing challenger animation");
         const { tableCardElement } = pendingAnimation;
-        
+
         if (tableCardElement) {
             console.log("🎬 Animating table card element for challenger");
             animationPromises.push(
@@ -71,10 +75,10 @@ export async function handleChallengeEvent(challengeEventData) {
         // Non-challenger case - animate the challenged card in the existing display
         console.log("✅ Processing non-challenger animation");
         const previousPlayCards = document.getElementById('previousPlayCards');
-        
+
         if (previousPlayCards && cardIndex !== undefined) {
             const challengedCardElement = previousPlayCards.children[cardIndex];
-            
+
             if (challengedCardElement) {
                 console.log("🎬 Animating challenged card for non-challenger at index:", cardIndex);
                 animationPromises.push(
@@ -99,15 +103,16 @@ export async function handleChallengeEvent(challengeEventData) {
 
     // Use config constants for cleanup delay
     const cleanupDelay = isChallenger ? CONFIG.CHALLENGE_CLEANUP_DELAY_CHALLENGER : CONFIG.CHALLENGE_CLEANUP_DELAY_NON_CHALLENGER;
-    
+
     setTimeout(() => {
         console.log("🧹 Clearing selection after animation completed + wait time");
-        
+
         if (pendingAnimation) {
             clearPendingChallengeAnimation();
         }
-        
+
         setSelectedChallengeIndex(-1);
+        window.playerInteractionState = false; // Reset interaction state to allow blinking
         updatePreviousPlayDisplay();
         updateActionsDisplay();
     }, cleanupDelay);

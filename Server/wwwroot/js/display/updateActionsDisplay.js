@@ -34,7 +34,7 @@ export function updateActionsDisplay() {
     // HOME PAGE: Show only "Other Games" button when not in any game
     if (!gameState || !playerId) {
         if (tableMessage) tableMessage.textContent = 'Waiting for game...';
-        
+
         console.log("HOME PAGE: Showing only Other Games button");
         if (otherGamesBtn) {
             otherGamesBtn.classList.remove('hidden');
@@ -84,7 +84,7 @@ export function updateActionsDisplay() {
             const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${currentPlayer?.name || 'Someone'}</span>`;
             let message = `Turn: ${formattedPlayerName}`;
             if (window.lastPlayedMessage) {
-                message += `      ${window.lastPlayedMessage}`;
+                message += `${CONFIG.MESSAGE_SEPARATOR}${window.lastPlayedMessage}`;
             }
             if (tableMessage) tableMessage.innerHTML = message;
             return;
@@ -201,9 +201,9 @@ export function updateActionsDisplay() {
         window.playerInteractionState = false;
 
         if (tableMessage) tableMessage.textContent = 'Game ended';
-        
+
         console.log("GAME ENDED: Showing New Game and Other Games buttons for everyone");
-        
+
         // GAME ENDED: Show both buttons for ALL players
         if (newGameBtn) {
             newGameBtn.classList.remove('hidden');
@@ -211,7 +211,7 @@ export function updateActionsDisplay() {
         if (otherGamesBtn) {
             otherGamesBtn.classList.remove('hidden');
         }
-        
+
         return;
     }
 }

@@ -19,7 +19,7 @@ body {
     position: relative;
 }
 
-/* Integrated top controls - positioned within the container */
+/* Top controls - positioned within the container */
 .top-controls {
     position: absolute;
     top: 20px;
@@ -37,7 +37,7 @@ body {
     font-size: 14px;
     font-weight: 600;
     text-align: center;
-    min-width: 100px;
+    width: 125px;
 }
 
 .connection-status.connected {
@@ -76,7 +76,7 @@ body {
     text-align: center;
     margin-bottom: 30px;
     color: white;
-    padding-top: 20px; /* Add space for top controls */
+    padding-top: 20px;
 }
 
 .game-header h1 {
@@ -104,7 +104,7 @@ body {
     .connection-status {
         font-size: 12px;
         padding: 8px 12px;
-        min-width: 80px;
+        width: 112px;
     }
     
     .help-button {
@@ -114,6 +114,6 @@ body {
     }
     
     .game-header {
-        padding-top: 60px; /* More space on mobile for controls */
+        padding-top: 60px;
     }
 }
