@@ -16,12 +16,67 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    position: relative;
+}
+
+/* Integrated top controls - positioned within the container */
+.top-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1000;
+}
+
+.connection-status {
+    padding: 10px 15px;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.connection-status.connected {
+    background: #28a745;
+}
+
+.connection-status.disconnected {
+    background: #dc3545;
+}
+
+/* Help button styles */
+.help-button {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.help-button:hover {
+    background: #138496;
+    transform: scale(1.1);
 }
 
 .game-header {
     text-align: center;
     margin-bottom: 30px;
     color: white;
+    padding-top: 20px; /* Add space for top controls */
 }
 
 .game-header h1 {
@@ -39,62 +94,26 @@ body {
     display: none !important;
 }
 
-.connection-status {
-    position: fixed;
-    top: 20px;
-    right: 50px; /* Move connection status away from edge to make room for help button */
-    padding: 10px 15px;
-    border-radius: 20px;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 1001;
-}
-
-.connection-status.connected {
-    background: #28a745;
-}
-
-.connection-status.disconnected {
-    background: #dc3545;
-}
-
-/* Help button styles - positioned to the right of connection status */
-.help-button {
-    position: fixed;
-    top: 22px; /* Align with connection status */
-    right: 20px; /* Position to the right of connection status (closer to edge) */
-    background: #17a2b8;
-    color: white;
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-    z-index: 1000;
-}
-
-.help-button:hover {
-    background: #138496;
-    transform: scale(1.1);
-}
-
 @media (max-width: 768px) {
+    .top-controls {
+        top: 10px;
+        right: 10px;
+        gap: 10px;
+    }
+    
     .connection-status {
-        right: 70px; /* Maintain gap on mobile */
+        font-size: 12px;
+        padding: 8px 12px;
+        min-width: 80px;
     }
     
     .help-button {
-        right: 10px;
         width: 28px;
         height: 28px;
         font-size: 14px;
+    }
+    
+    .game-header {
+        padding-top: 60px; /* More space on mobile for controls */
     }
 }

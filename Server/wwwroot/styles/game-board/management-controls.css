@@ -1,8 +1,8 @@
-/* Game Management Controls - positioned under connection status */
+/* Game Management Controls - positioned below top controls */
 .game-management-controls {
-    position: fixed;
-    top: 65px; /* Below connection status with some gap */
-    right: 20px; /* Align with help button */
+    position: absolute;
+    top: 70px; /* Below the top controls */
+    right: 20px;
     display: flex;
     flex-direction: column;
     gap: 8px;

@@ -38,21 +38,21 @@
 
 </head>
 <body>
-    <!-- Connection Status -->
-    <div class="connection-status" id="connectionStatus">Connecting...</div>
-    
-    <!-- Help Button -->
-    <button class="help-button" id="helpBtn" title="Game Rules & Help">?</button>
-    
-    <!-- Game Management Controls -->
-    <div class="game-management-controls" id="gameManagementControls">
-        <button class="btn btn-warning hidden" id="endRoundBtn">End Round</button>
-        <button class="btn btn-danger hidden" id="endGameBtn">End Game</button>
-        <button class="btn btn-success hidden" id="newGameBtn">Start New Game</button>
-        <button class="btn btn-info hidden" id="otherGamesBtn">Other Games</button>
-    </div>
-
     <div class="container">
+        <!-- Top Controls - positioned absolutely within container -->
+        <div class="top-controls">
+            <div class="connection-status" id="connectionStatus">Connecting...</div>
+            <button class="help-button" id="helpBtn" title="Game Rules & Help">?</button>
+        </div>
+        
+        <!-- Game Management Controls - positioned absolutely within container -->
+        <div class="game-management-controls" id="gameManagementControls">
+            <button class="btn btn-warning hidden" id="endRoundBtn">End Round</button>
+            <button class="btn btn-danger hidden" id="endGameBtn">End Game</button>
+            <button class="btn btn-success hidden" id="newGameBtn">Start New Game</button>
+            <button class="btn btn-info hidden" id="otherGamesBtn">Other Games</button>
+        </div>
+
         <!-- Game Header -->
         <header class="game-header">
             <h1>🎴 Believe Or Not</h1>
