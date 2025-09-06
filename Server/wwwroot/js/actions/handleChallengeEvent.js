@@ -11,6 +11,10 @@ import {CONFIG} from "../utils/config.js";
 export async function handleChallengeEvent(challengeEventData) {
     console.log("=== HANDLE CHALLENGE EVENT ===");
 
+    // Clear "You played in order..." message when challenge ends
+    window.lastPlayedMessage = null;
+    console.log("Cleared lastPlayedMessage due to challenge end");
+
     const pendingAnimation = window.pendingChallengeAnimation;
     console.log("pendingChallengeAnimation:", pendingAnimation);
     console.log("challengeEventData:", challengeEventData);
