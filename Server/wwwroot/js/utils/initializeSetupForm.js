@@ -1,5 +1,6 @@
 // js/utils/initializeSetupForm.js
 import { getMatchIdFromUrl } from "./urlManager.js";
+import { getStoredPlayerName } from "./clientIdUtils.js";
 
 export function initializeSetupForm() {
     // Check if there's a match ID in the URL and pre-fill it
@@ -8,11 +9,11 @@ export function initializeSetupForm() {
     const playerNameInput = document.getElementById('playerName');
     const urlInfo = document.getElementById('urlInfo');
     
-    // Prefill player name from previous session
-    const lastPlayerName = localStorage.getItem('lastPlayerName');
-    if (lastPlayerName && playerNameInput && !playerNameInput.value) {
-        playerNameInput.value = lastPlayerName;
-        console.log('Pre-filled player name from previous session:', lastPlayerName);
+    // Prefill player name from cookie (much more reliable than localStorage)
+    const storedPlayerName = getStoredPlayerName();
+    if (storedPlayerName && playerNameInput && !playerNameInput.value) {
+        playerNameInput.value = storedPlayerName;
+        console.log('Pre-filled player name from cookie:', storedPlayerName);
     }
     
     if (matchIdFromUrl && matchIdInput) {
