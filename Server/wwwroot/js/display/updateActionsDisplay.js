@@ -15,7 +15,7 @@ export function updateActionsDisplay() {
     const tableMessage = document.getElementById('tableMessage');
     const tableControls = document.getElementById('tableControls');
 
-    // Hide all by default
+    // Hide ALL buttons by default
     if (playBtn) playBtn.classList.add('hidden');
     if (confirmChallengeBtn) confirmChallengeBtn.classList.add('hidden');
     if (rankSelector) rankSelector.classList.add('hidden');
@@ -31,10 +31,11 @@ export function updateActionsDisplay() {
         tableControls.classList.remove('active-turn');
     }
 
-    // HOME PAGE: Show other games button when not in any game
+    // HOME PAGE: Show only "Other Games" button when not in any game
     if (!gameState || !playerId) {
         if (tableMessage) tableMessage.textContent = 'Waiting for game...';
         
+        console.log("HOME PAGE: Showing only Other Games button");
         if (otherGamesBtn) {
             otherGamesBtn.classList.remove('hidden');
         }
@@ -42,34 +43,37 @@ export function updateActionsDisplay() {
     }
 
     const isCreator = playerId && gameState.creatorPlayerId === playerId;
+    console.log("Button visibility check:", {phase: gameState.phase, isCreator});
 
     // Handle different game phases
-    if (gameState.phase === 0) { // WaitingForPlayers
+    if (gameState.phase === 0) { // WaitingForPlayers - Game started but round has not started
         if (tableMessage) tableMessage.textContent = 'Waiting for players to join...';
 
-        if (isCreator && startRoundBtn) {
-            startRoundBtn.classList.remove('hidden');
-            startRoundBtn.textContent = 'Start Round';
-        }
-
-        if (isCreator && endGameBtn && gameState.players && gameState.players.length > 0) {
-            endGameBtn.classList.remove('hidden');
-        }
-
-        // Show new game button ONLY if creator is alone (no other players have joined)
-        if (isCreator && gameState.players && gameState.players.length === 1) {
-            if (newGameBtn) {
-                newGameBtn.classList.remove('hidden');
+        if (isCreator) {
+            console.log("CREATOR - Game started: Showing Start Round and End Game buttons");
+            if (startRoundBtn) {
+                startRoundBtn.classList.remove('hidden');
+                startRoundBtn.textContent = 'Start Round';
             }
+            if (endGameBtn) {
+                endGameBtn.classList.remove('hidden');
+            }
+        } else {
+            console.log("OTHER PLAYER - Game started: No buttons");
+            // Other players see no buttons when game started but round not started
         }
-        
-        // NO other games button once a game has been created (even while waiting)
         return;
     }
 
-    if (gameState.phase === 1) { // InProgress - NO escape buttons during active play
-        if (isCreator && endRoundBtn) {
-            endRoundBtn.classList.remove('hidden');
+    if (gameState.phase === 1) { // InProgress - Round started
+        if (isCreator) {
+            console.log("CREATOR - Round started: Showing only End Round button");
+            if (endRoundBtn) {
+                endRoundBtn.classList.remove('hidden');
+            }
+        } else {
+            console.log("OTHER PLAYER - Round started: No buttons");
+            // Other players see no buttons during round
         }
 
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
@@ -168,36 +172,39 @@ export function updateActionsDisplay() {
         return;
     }
 
-    if (gameState.phase === 2) { // RoundEnd
+    if (gameState.phase === 2) { // RoundEnd - Round ended
         if (tableMessage) tableMessage.textContent = 'Round ended - waiting for next round';
         setSelectedCards([]);
         // Clear stored message and interaction state when round ends
         window.lastPlayedMessage = null;
         window.playerInteractionState = false;
 
-        if (isCreator && startRoundBtn) {
-            startRoundBtn.classList.remove('hidden');
-            startRoundBtn.textContent = 'Start New Round';
+        if (isCreator) {
+            console.log("CREATOR - Round ended: Showing Start New Round and End Game buttons");
+            if (startRoundBtn) {
+                startRoundBtn.classList.remove('hidden');
+                startRoundBtn.textContent = 'Start New Round';
+            }
+            if (endGameBtn) {
+                endGameBtn.classList.remove('hidden');
+            }
+        } else {
+            console.log("OTHER PLAYER - Round ended: No buttons");
+            // Other players see no buttons when round ends
         }
-
-        if (isCreator && endGameBtn) {
-            endGameBtn.classList.remove('hidden');
-        }
-        
-        // NO other games button during round end - must continue or end game properly
         return;
     }
 
-    if (gameState.phase === 3) { // GameEnd
+    if (gameState.phase === 3) { // GameEnd - Game ended
         // Clear stored message and interaction state when game ends
         window.lastPlayedMessage = null;
         window.playerInteractionState = false;
 
         if (tableMessage) tableMessage.textContent = 'Game ended';
         
-        console.log("GAME ENDED: Showing both New Game and Other Games buttons");
+        console.log("GAME ENDED: Showing New Game and Other Games buttons for everyone");
         
-        // GAME ENDED: Show both new game and other games buttons
+        // GAME ENDED: Show both buttons for ALL players
         if (newGameBtn) {
             newGameBtn.classList.remove('hidden');
         }
