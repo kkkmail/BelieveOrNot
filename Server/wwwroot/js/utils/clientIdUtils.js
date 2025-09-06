@@ -1,5 +1,5 @@
 // js/utils/clientIdUtils.js
-// Persistent client ID management using cookies
+// Persistent client ID and player name management using cookies
 
 export function generateClientId() {
     return 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -17,6 +17,22 @@ export function getOrCreateClientId() {
     }
     
     return clientId;
+}
+
+export function getStoredPlayerName() {
+    return getCookie('believeOrNotPlayerName');
+}
+
+export function storePlayerName(playerName) {
+    if (playerName && playerName.trim()) {
+        setCookie('believeOrNotPlayerName', playerName.trim(), 365); // 1 year expiry
+        console.log('Stored player name in cookie:', playerName.trim());
+    }
+}
+
+export function clearStoredPlayerName() {
+    document.cookie = 'believeOrNotPlayerName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    console.log('Player name cleared from cookie');
 }
 
 export function getCookie(name) {

@@ -3,6 +3,7 @@ import {showMessage} from "../utils/showMessage.js";
 import {showGameBoard} from "./showGameBoard.js";
 import {connection, playerId, currentMatch, setCurrentMatch, setPlayerId, clientId} from "../core/variables.js";
 import {setMatchIdInUrl} from "../utils/urlManager.js";
+import {storePlayerName} from "../utils/clientIdUtils.js";
 
 export async function createMatch() {
     const playerName = document.getElementById('playerName').value.trim();
@@ -10,6 +11,9 @@ export async function createMatch() {
         alert('Please enter your name');
         return;
     }
+
+    // Store the player name in cookie for future sessions
+    storePlayerName(playerName);
 
     const settings = {
         deckSize: parseInt(document.getElementById('deckSize').value),

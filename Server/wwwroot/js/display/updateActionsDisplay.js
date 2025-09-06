@@ -10,6 +10,7 @@ export function updateActionsDisplay() {
     const startRoundBtn = document.getElementById('startRoundBtn');
     const endRoundBtn = document.getElementById('endRoundBtn');
     const endGameBtn = document.getElementById('endGameBtn');
+    const newGameBtn = document.getElementById('newGameBtn');
     const tableMessage = document.getElementById('tableMessage');
     const tableControls = document.getElementById('tableControls');
 
@@ -20,6 +21,7 @@ export function updateActionsDisplay() {
     if (startRoundBtn) startRoundBtn.classList.add('hidden');
     if (endRoundBtn) endRoundBtn.classList.add('hidden');
     if (endGameBtn) endGameBtn.classList.add('hidden');
+    if (newGameBtn) newGameBtn.classList.add('hidden');
 
     // Reset table controls styling
     if (tableControls) {
@@ -174,6 +176,11 @@ export function updateActionsDisplay() {
         window.playerInteractionState = false;
 
         if (tableMessage) tableMessage.textContent = 'Game ended';
+        
+        // Show new game button for finished game
+        if (newGameBtn) {
+            newGameBtn.classList.remove('hidden');
+        }
         return;
     }
 }

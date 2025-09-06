@@ -4,6 +4,7 @@ import {showMessage} from "../utils/showMessage.js";
 import {showGameBoard} from "./showGameBoard.js";
 import {setMatchIdInUrl} from "../utils/urlManager.js";
 import {customAlert} from "../utils/customAlert.js";
+import {storePlayerName} from "../utils/clientIdUtils.js";
 
 export async function joinMatch() {
     const playerName = document.getElementById('playerName').value.trim();
@@ -13,6 +14,9 @@ export async function joinMatch() {
         await customAlert('Please enter your name and match ID');
         return;
     }
+
+    // Store the player name in cookie for future sessions
+    storePlayerName(playerName);
 
     try {
         const result = await connection.invoke("JoinExistingMatch", matchId, playerName, clientId);
@@ -25,6 +29,9 @@ export async function joinMatch() {
 
             if (result.assignedName !== playerName) {
                 console.log(`Name changed from "${playerName}" to "${result.assignedName}" due to duplicate`);
+                
+                // Store the assigned name instead of the original name
+                storePlayerName(result.assignedName);
                 
                 // Format the message with HTML styling
                 const originalName = `<span style="font-weight: bold; font-style: italic;">${playerName}</span>`;
