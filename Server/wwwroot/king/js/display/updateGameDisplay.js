@@ -1,103 +1,55 @@
 // js/display/updateGameDisplay.js
 import { gameState, playerId } from "../core/variables.js";
+import { selectTrump } from "../actions/selectTrump.js";
+import { playCard } from "../actions/playCard.js";
 
 export function updateGameDisplay() {
-    if (!gameState) {
-        console.log('No game state to display');
-        return;
-    }
+    if (!gameState) return;
 
-    console.log('Updating game display with state:', gameState);
+    console.log("Updating King game display...", gameState);
 
-    // Update basic game info
-    const currentRoundElem = document.getElementById('currentRound');
-    if (currentRoundElem) {
-        currentRoundElem.textContent = `${gameState.currentRoundIndex + 1}/${gameState.totalRounds}`;
-    }
-
-    const currentPhaseElem = document.getElementById('currentPhase');
-    if (currentPhaseElem) {
-        currentPhaseElem.textContent = gameState.isCollectingPhase ? 'Collecting' : 'Avoiding';
-    }
-
-    const currentPlayerElem = document.getElementById('currentPlayerName');
-    if (currentPlayerElem && gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
-        currentPlayerElem.textContent = gameState.players[gameState.currentPlayerIndex].name;
-    }
-
-    const currentTrumpElem = document.getElementById('currentTrump');
-    if (currentTrumpElem) {
-        currentTrumpElem.textContent = gameState.currentTrump ? `${getTrumpSymbol(gameState.currentTrump)} ${gameState.currentTrump}` : '-';
-    }
-
-    // Update match ID display
-    const displayMatchId = document.getElementById('displayMatchId');
-    if (displayMatchId) {
-        displayMatchId.value = gameState.matchId.replace(/-/g, '');
-    }
-
-    // Update phase text
-    const phaseText = {
-        0: 'Waiting for Players',
-        1: 'Game In Progress',
-        2: 'Round Ended',
-        3: 'Game Ended'
-    };
-    const gamePhaseElem = document.getElementById('gamePhase');
-    if (gamePhaseElem) {
-        gamePhaseElem.textContent = phaseText[gameState.phase] || 'Unknown';
-    }
-
-    // Update players around the table
     updatePlayersDisplay();
-
-    // Update hand
     updateHandDisplay();
-
-    // Update current trick
     updateCurrentTrick();
-
-    // Update trump selection
     updateTrumpSelection();
-
-    // Update action buttons
     updateActionButtons();
+    updateRoundInfo();
+    updateScoresDisplay();
+    updateMatchIdDisplay();
+
+    console.log("King game display updated");
 }
 
 function updatePlayersDisplay() {
     if (!gameState.players) return;
 
     gameState.players.forEach((player, index) => {
-        const playerElem = document.getElementById(`playerPosition${player.position}`);
-        if (playerElem) {
-            const nameElem = playerElem.querySelector('.player-name');
-            const cardCountElem = playerElem.querySelector('.card-count');
-            const scoreElem = playerElem.querySelector('.score');
+        const playerElem = document.getElementById(`playerPosition${index}`);
+        if (!playerElem) return;
 
-            if (nameElem) {
-                let displayName = player.name;
-                if (player.id === playerId) {
-                    displayName += ' (You)';
-                }
-                if (!player.isConnected) {
-                    displayName += ' (Disconnected)';
-                }
-                nameElem.textContent = displayName;
-            }
+        const playerInfo = playerElem.querySelector('.player-info');
+        if (!playerInfo) return;
 
-            if (cardCountElem) {
-                cardCountElem.textContent = player.handCount;
-            }
+        const nameElem = playerInfo.querySelector('.player-name');
+        const cardCountElem = playerInfo.querySelector('.card-count');
+        const scoreElem = playerInfo.querySelector('.score');
 
-            if (scoreElem) {
-                scoreElem.textContent = player.score;
-            }
-
-            // Update visual indicators
-            playerElem.classList.toggle('current-turn', index === gameState.currentPlayerIndex);
-            playerElem.classList.toggle('trump-setter', index === gameState.trumpSetterIndex && gameState.isCollectingPhase);
-            playerElem.classList.remove('empty');
+        if (nameElem) {
+            nameElem.textContent = player.name;
         }
+
+        if (cardCountElem) {
+            cardCountElem.textContent = player.handCount || 0;
+        }
+
+        if (scoreElem) {
+            scoreElem.textContent = player.score || 0;
+        }
+
+        // Update visual indicators
+        playerElem.classList.toggle('current-turn', index === gameState.currentPlayerIndex);
+        playerElem.classList.toggle('trump-setter', index === gameState.trumpSetterIndex && gameState.isCollectingPhase);
+        playerElem.classList.remove('empty');
     });
 }
 
@@ -224,6 +176,62 @@ function updateActionButtons() {
     }
 }
 
+function updateRoundInfo() {
+    const currentRound = document.getElementById('currentRound');
+    const currentPhase = document.getElementById('currentPhase');
+    const currentPlayerName = document.getElementById('currentPlayerName');
+    const currentTrump = document.getElementById('currentTrump');
+
+    if (currentRound && gameState.currentRoundIndex !== undefined && gameState.totalRounds) {
+        currentRound.textContent = `${gameState.currentRoundIndex + 1}/${gameState.totalRounds}`;
+    }
+
+    if (currentPhase) {
+        if (gameState.phase === 0) {
+            currentPhase.textContent = 'Setup';
+        } else if (gameState.phase === 1) {
+            currentPhase.textContent = gameState.isCollectingPhase ? 'Collecting' : 'Avoiding';
+        } else if (gameState.phase === 2) {
+            currentPhase.textContent = 'Round End';
+        } else if (gameState.phase === 3) {
+            currentPhase.textContent = 'Game End';
+        }
+    }
+
+    if (currentPlayerName && gameState.players && gameState.currentPlayerIndex >= 0) {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        currentPlayerName.textContent = currentPlayer ? currentPlayer.name : '-';
+    }
+
+    if (currentTrump) {
+        currentTrump.textContent = gameState.currentTrump ? getTrumpSymbol(gameState.currentTrump) : '-';
+    }
+}
+
+function updateScoresDisplay() {
+    const scoreTable = document.getElementById('scoreTable');
+    if (!scoreTable || !gameState.players) return;
+
+    scoreTable.innerHTML = '';
+
+    gameState.players.forEach(player => {
+        const scoreRow = document.createElement('div');
+        scoreRow.className = 'score-row';
+        scoreRow.innerHTML = `
+            <span class="player-name">${player.name}</span>
+            <span class="player-score">${player.score || 0}</span>
+        `;
+        scoreTable.appendChild(scoreRow);
+    });
+}
+
+function updateMatchIdDisplay() {
+    const displayMatchId = document.getElementById('displayMatchId');
+    if (displayMatchId && gameState.matchId) {
+        displayMatchId.value = gameState.matchId;
+    }
+}
+
 function getMyPlayerIndex() {
     if (!gameState.players || !playerId) return -1;
     return gameState.players.findIndex(p => p.id === playerId);
@@ -241,15 +249,4 @@ function getSuitSymbol(suit) {
 
 function getTrumpSymbol(suit) {
     return getSuitSymbol(suit);
-}
-
-// Placeholder functions - these would be implemented in separate files
-function playCard(card) {
-    console.log('Play card:', card);
-    // TODO: Implement card playing
-}
-
-function selectTrump(suit) {
-    console.log('Select trump:', suit);
-    // TODO: Implement trump selection
 }
