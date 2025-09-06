@@ -5,6 +5,7 @@ import {showGameBoard} from "./showGameBoard.js";
 import {setMatchIdInUrl} from "../utils/urlManager.js";
 import {customAlert} from "../utils/customAlert.js";
 import {storePlayerName} from "../utils/clientIdUtils.js";
+import {routeToCorrectGame} from "../utils/gameRouter.js";
 
 export async function joinMatch() {
     const playerName = document.getElementById('playerName').value.trim();
@@ -13,6 +14,12 @@ export async function joinMatch() {
     if (!playerName || !matchId) {
         await customAlert('Please enter your name and match ID');
         return;
+    }
+
+    // Check if this match belongs to a different game
+    const shouldRedirect = await routeToCorrectGame(matchId);
+    if (shouldRedirect) {
+        return; // Redirecting to different game
     }
 
     // Hide Other Games button immediately when joining

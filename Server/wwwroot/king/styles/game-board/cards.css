@@ -1,0 +1,134 @@
+/* Card Styles */
+.hand-area {
+    margin: 30px 0;
+}
+
+.hand-area h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.hand-cards {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.card {
+    width: 70px;
+    height: 100px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+    user-select: none;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.card.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+    transform: translateY(-15px);
+}
+
+.card.playable {
+    border-color: #28a745;
+    background: #d4edda;
+}
+
+.card.not-playable {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.card.king-of-hearts {
+    border-color: #dc3545;
+    background: linear-gradient(45deg, #fff 0%, #ffe6e6 100%);
+}
+
+.card .rank {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    line-height: 1;
+    text-align: center;
+}
+
+.card .suit {
+    font-size: 18px;
+    line-height: 1;
+    text-align: center;
+}
+
+/* Suit colors */
+.card.hearts { color: #dc3545; }
+.card.diamonds { color: #dc3545; }
+.card.clubs { color: #333; }
+.card.spades { color: #333; }
+
+/* Card back (for other players) */
+.card-back {
+    width: 50px;
+    height: 70px;
+    border: 2px solid #5a6c7d;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #8fa4b3 0%, #7189a3 50%, #8fa4b3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 2px;
+    cursor: default;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.card-back::before {
+    content: "♠♥♦♣";
+    font-size: 12px;
+    color: #ecf0f1;
+    opacity: 0.6;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: 60px;
+        height: 85px;
+        gap: 5px;
+    }
+    
+    .card .rank {
+        font-size: 14px;
+    }
+    
+    .card .suit {
+        font-size: 16px;
+    }
+    
+    .card-back {
+        width: 40px;
+        height: 55px;
+    }
+    
+    .card-back::before {
+        font-size: 10px;
+    }
+}
