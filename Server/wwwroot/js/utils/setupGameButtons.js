@@ -5,6 +5,8 @@ import {endRound} from "../actions/endRound.js";
 import {endGame} from "../actions/endGame.js";
 import {newGame} from "../actions/newGame.js";
 import {submitChallenge} from "../actions/submitChallenge.js";
+import {showOtherGamesModal} from "./showOtherGamesModal.js";
+import {showHelpModal} from "./showHelpModal.js";
 
 export function setupGameButtons() {
     const startRoundBtn = document.getElementById('startRoundBtn');
@@ -88,7 +90,7 @@ export function setupGameButtons() {
             event.preventDefault();
             event.stopPropagation();
             console.log("Other games button clicked");
-            window.open('other-games.html', '_blank');
+            showOtherGamesModal();
         });
         console.log("Other games button listener added");
     }
@@ -99,8 +101,7 @@ export function setupGameButtons() {
             event.preventDefault();
             event.stopPropagation();
             console.log("Help button clicked");
-            window.open('help.html', '_blank');
+            showHelpModal();
         });
         console.log("Help button listener added");
-    }
-}
+    }}
