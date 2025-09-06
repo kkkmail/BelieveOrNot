@@ -4,6 +4,9 @@ import {getSuitSymbol} from "../cards/getSuitSymbol.js";
 import {CONFIG} from "../utils/config.js";
 
 export function updateActionsDisplay() {
+    console.log("=== updateActionsDisplay called ===");
+    console.log("gameState, playerId:", {gameState, playerId});
+
     const playBtn = document.getElementById('playBtn');
     const confirmChallengeBtn = document.getElementById('confirmChallengeBtn');
     const rankSelector = document.getElementById('rankSelector');
@@ -32,7 +35,7 @@ export function updateActionsDisplay() {
     }
 
     // HOME PAGE: Show only "Other Games" button when not in any game
-    if (!gameState || !playerId) {
+    if (!gameState) {
         if (tableMessage) tableMessage.textContent = 'Waiting for game...';
 
         console.log("HOME PAGE: Showing only Other Games button");
@@ -49,13 +52,19 @@ export function updateActionsDisplay() {
     if (gameState.phase === 0) { // WaitingForPlayers - Game started but round has not started
         if (tableMessage) tableMessage.textContent = 'Waiting for players to join...';
 
+        // Explicitly hide Other Games button for all players in waiting phase
+        if (otherGamesBtn) otherGamesBtn.classList.add('hidden');
+
         if (isCreator) {
-            console.log("CREATOR - Game started: Showing Start Round and End Game buttons");
-            if (startRoundBtn) {
-                startRoundBtn.classList.remove('hidden');
-                startRoundBtn.textContent = 'Start Round';
+            if (gameState.players && gameState.players.length >= 2) {
+                console.log("CREATOR - Game started: Showing Start Round button");
+                if (startRoundBtn) {
+                    startRoundBtn.classList.remove('hidden');
+                    startRoundBtn.textContent = 'Start Round';
+                }
             }
             if (endGameBtn) {
+                console.log("CREATOR - Game started: Showing End Game button");
                 endGameBtn.classList.remove('hidden');
             }
         } else {

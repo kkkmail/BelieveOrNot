@@ -37,7 +37,7 @@ body {
     font-size: 14px;
     font-weight: 600;
     text-align: center;
-    width: 125px;
+    width: 135px;
 }
 
 .connection-status.connected {
@@ -100,19 +100,19 @@ body {
         right: 10px;
         gap: 10px;
     }
-    
+
     .connection-status {
         font-size: 12px;
         padding: 8px 12px;
         width: 112px;
     }
-    
+
     .help-button {
         width: 28px;
         height: 28px;
         font-size: 14px;
     }
-    
+
     .game-header {
         padding-top: 60px;
     }

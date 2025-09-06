@@ -25,17 +25,17 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
         // Store original content and classes
         const originalContent = cardElement.innerHTML;
         const originalClasses = cardElement.className;
-        
+
         // Step 1: Show a flipping animation by temporarily hiding the card
         cardElement.style.transform = 'rotateY(90deg)';
         cardElement.style.transition = `transform ${CONFIG.CHALLENGE_CARD_FLIP_DURATION / 2}ms ease`;
-        
+
         // Step 2: After half the flip duration, change content to revealed card
         setTimeout(() => {
             // Clear current content and rebuild as revealed card
             cardElement.innerHTML = '';
             cardElement.className = `card ${getSuitClass(revealedCard.suit)}`;
-            
+
             if (revealedCard.rank === 'Joker') {
                 cardElement.classList.add('joker');
                 cardElement.innerHTML = `
@@ -48,14 +48,14 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                     <div class="suit">${getSuitSymbol(revealedCard.suit)}</div>
                 `;
             }
-            
+
             // Complete the flip to show the revealed card
             cardElement.style.transform = 'rotateY(0deg)';
-            
+
             console.log("Card flipped to show:", revealedCard);
-            
+
         }, CONFIG.CHALLENGE_CARD_FLIP_DURATION / 2);
-        
+
         // Step 3: Show result overlay after card is visible
         setTimeout(() => {
             const resultOverlay = document.createElement('div');
@@ -79,67 +79,71 @@ export function animateChallengeCardFlip(cardElement, revealedCard, announcedRan
                 transition: opacity ${CONFIG.CHALLENGE_RESULT_FADE_DURATION}ms ease;
                 z-index: 10;
             `;
-            
+
             resultOverlay.textContent = isMatch ? CONFIG.CHALLENGE_SUCCESS_SYMBOL : CONFIG.CHALLENGE_FAIL_SYMBOL;
             cardElement.style.position = 'relative';
             cardElement.appendChild(resultOverlay);
-            
+
             // Fade in the result symbol
             setTimeout(() => {
                 resultOverlay.style.opacity = '1';
                 console.log("Showing result symbol:", isMatch ? 'SUCCESS' : 'FAIL');
             }, 100);
-            
+
             // Only animate remaining cards for challenger when card matches
             if (isMatch && isChallenger && remainingCards && remainingCards.length > 0) {
                 console.log("🎯 CHALLENGER - animating remaining cards");
-                
+
                 const previousPlayCards = document.getElementById('previousPlayCards');
-                
+
                 if (previousPlayCards) {
                     const allCards = previousPlayCards.children;
                     let remainingIndex = 0;
-                    
+
                     for (let pos = 0; pos < allCards.length; pos++) {
                         if (pos === challengeCardIndex) {
                             continue; // Skip challenged card
                         }
-                        
+
                         if (remainingIndex < remainingCards.length) {
                             const cardElement = allCards[pos];
                             const serverCard = remainingCards[remainingIndex];
                             const cardMatches = remainingCardsMatch ? remainingCardsMatch[remainingIndex] : false;
-                            
+
                             const delay = remainingIndex * 400;
-                            
+
                             setTimeout(() => {
-                                animateChallengeCardFlip(cardElement, serverCard, announcedRank, cardMatches, false, null, null, -1);
+                                animateChallengeCardFlip(cardElement, serverCard, announcedRank, cardMatches, true, null, null, -1);
                             }, delay);
-                            
+
                             remainingIndex++;
                         }
                     }
                 }
             }
-            
+
         }, CONFIG.CHALLENGE_CARD_FLIP_DURATION + CONFIG.CHALLENGE_CARD_REVEAL_DELAY);
-        
-        // Step 4: Clean up and restore original state - use different timing for challenger vs non-challenger
+
+        // Step 4: Clean up - don't restore for challenger, server will handle state update
         const displayDuration = isChallenger ? CONFIG.CHALLENGE_CARD_DISPLAY_DURATION : CONFIG.CHALLENGE_CARD_DISPLAY_DURATION_NON_CHALLENGER;
         const extraTime = isChallenger ? CONFIG.CHALLENGE_CARD_EXTRA_TIME : CONFIG.CHALLENGE_CARD_EXTRA_TIME_NON_CHALLENGER;
-        
+
         setTimeout(() => {
             console.log("Starting cleanup and restore");
-            
-            cardElement.style.transform = '';
-            cardElement.style.transition = '';
-            cardElement.style.position = '';
-            cardElement.innerHTML = originalContent;
-            cardElement.className = originalClasses;
-            
+
+            if (!isChallenger) {
+                cardElement.style.transform = '';
+                cardElement.style.transition = '';
+                cardElement.style.position = '';
+                cardElement.innerHTML = originalContent;
+                cardElement.className = originalClasses;
+            } else {
+                console.log("Skipping card restoration for challenger - server will handle state update");
+            }
+
             console.log("Challenge card animation completed");
             resolve();
-            
+
         }, displayDuration + extraTime);
     });
 }

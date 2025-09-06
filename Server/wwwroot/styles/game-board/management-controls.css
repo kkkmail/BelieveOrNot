@@ -12,7 +12,7 @@
 .game-management-controls .btn {
     font-size: 14px;
     padding: 8px 16px;
-    width: 170px; /* Fixed width to match "Start New Game" button */
+    width: 180px; /* Fixed width to match "Start New Game" button */
     text-align: center;
 }
 
