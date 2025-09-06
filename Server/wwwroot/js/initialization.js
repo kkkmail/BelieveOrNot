@@ -7,6 +7,7 @@ import {initializeConnection} from "./core/initializeConnection.js";
 import {initCustomAlert} from "./utils/initCustomAlert.js";
 import {initCustomConfirm} from "./utils/initCustomConfirm.js";
 import {initializeSetupForm} from "./utils/initializeSetupForm.js";
+import {updateActionsDisplay} from "./display/updateActionsDisplay.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("DOM loaded, starting initialization...");
@@ -28,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Set up game board event listeners after HTML is loaded
     setupGameBoardEventListeners();
+
+    // IMPORTANT: Call updateActionsDisplay to show "Other Games" button on home page
+    updateActionsDisplay();
 
     // Then initialize the connection (this will attempt reconnection if needed)
     await initializeConnection();

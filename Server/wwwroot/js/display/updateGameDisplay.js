@@ -7,7 +7,11 @@ import {updateRankDropdown} from "../utils/updateRankDropdown.js";
 import {updateTablePileDisplay} from "./updateTablePileDisplay.js";
 
 export function updateGameDisplay() {
-    if (!gameState) return;
+    if (!gameState) {
+        // On home page (no game state), update actions to show Other Games button
+        updateActionsDisplay();
+        return;
+    }
 
     // Store previous play info BEFORE updating display (for challenge animation)
     const previousPlayCards = document.getElementById('previousPlayCards');
@@ -56,7 +60,7 @@ export function updateGameDisplay() {
     // Update hand
     updateHandDisplay();
 
-    // Update actions (this handles start button display)
+    // IMPORTANT: Update actions display when we have game state
     updateActionsDisplay();
 
     // Update scores
