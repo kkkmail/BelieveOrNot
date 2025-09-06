@@ -12,7 +12,7 @@
 .game-management-controls .btn {
     font-size: 14px;
     padding: 8px 16px;
-    min-width: 120px;
+    width: 170px; /* Fixed width to match "Start New Game" button */
     text-align: center;
 }
 
@@ -30,10 +30,10 @@
         top: 60px;
         right: 10px;
     }
-    
+
     .game-management-controls .btn {
         font-size: 12px;
         padding: 6px 12px;
-        min-width: 100px;
+        width: 150px; /* Fixed width for mobile to accommodate "Other Games" */
     }
 }
