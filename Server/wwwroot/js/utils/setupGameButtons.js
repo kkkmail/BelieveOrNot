@@ -13,6 +13,8 @@ export function setupGameButtons() {
     const endRoundBtn = document.getElementById('endRoundBtn');
     const endGameBtn = document.getElementById('endGameBtn');
     const newGameBtn = document.getElementById('newGameBtn');
+    const otherGamesBtn = document.getElementById('otherGamesBtn');
+    const helpBtn = document.getElementById('helpBtn');
 
     if (startRoundBtn && !startRoundBtn.hasAttribute('data-listener')) {
         startRoundBtn.setAttribute('data-listener', 'true');
@@ -78,5 +80,27 @@ export function setupGameButtons() {
             newGame();
         });
         console.log("New game button listener added");
+    }
+
+    if (otherGamesBtn && !otherGamesBtn.hasAttribute('data-listener')) {
+        otherGamesBtn.setAttribute('data-listener', 'true');
+        otherGamesBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("Other games button clicked");
+            window.open('other-games.html', '_blank');
+        });
+        console.log("Other games button listener added");
+    }
+
+    if (helpBtn && !helpBtn.hasAttribute('data-listener')) {
+        helpBtn.setAttribute('data-listener', 'true');
+        helpBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("Help button clicked");
+            window.open('help.html', '_blank');
+        });
+        console.log("Help button listener added");
     }
 }

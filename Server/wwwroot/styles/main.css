@@ -57,3 +57,39 @@ body {
 .connection-status.disconnected {
     background: #dc3545;
 }
+
+/* Help button styles */
+.help-button {
+    position: fixed;
+    top: 20px;
+    right: 140px; /* Position to the right of connection status */
+    background: #17a2b8;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.help-button:hover {
+    background: #138496;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .help-button {
+        right: 120px;
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}

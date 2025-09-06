@@ -11,6 +11,7 @@ export function updateActionsDisplay() {
     const endRoundBtn = document.getElementById('endRoundBtn');
     const endGameBtn = document.getElementById('endGameBtn');
     const newGameBtn = document.getElementById('newGameBtn');
+    const otherGamesBtn = document.getElementById('otherGamesBtn');
     const tableMessage = document.getElementById('tableMessage');
     const tableControls = document.getElementById('tableControls');
 
@@ -22,6 +23,7 @@ export function updateActionsDisplay() {
     if (endRoundBtn) endRoundBtn.classList.add('hidden');
     if (endGameBtn) endGameBtn.classList.add('hidden');
     if (newGameBtn) newGameBtn.classList.add('hidden');
+    if (otherGamesBtn) otherGamesBtn.classList.add('hidden');
 
     // Reset table controls styling
     if (tableControls) {
@@ -181,6 +183,12 @@ export function updateActionsDisplay() {
         if (newGameBtn) {
             newGameBtn.classList.remove('hidden');
         }
+        
+        // Show other games button alongside new game
+        if (otherGamesBtn) {
+            otherGamesBtn.classList.remove('hidden');
+        }
+        
         return;
     }
 }
