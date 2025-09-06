@@ -42,12 +42,13 @@ body {
 .connection-status {
     position: fixed;
     top: 20px;
-    right: 20px;
+    right: 50px; /* Move connection status away from edge to make room for help button */
     padding: 10px 15px;
     border-radius: 20px;
     color: white;
     font-size: 14px;
     font-weight: 600;
+    z-index: 1001;
 }
 
 .connection-status.connected {
@@ -58,11 +59,11 @@ body {
     background: #dc3545;
 }
 
-/* Help button styles */
+/* Help button styles - positioned to the right of connection status */
 .help-button {
     position: fixed;
-    top: 20px;
-    right: 140px; /* Position to the right of connection status */
+    top: 22px; /* Align with connection status */
+    right: 20px; /* Position to the right of connection status (closer to edge) */
     background: #17a2b8;
     color: white;
     border: none;
@@ -86,8 +87,12 @@ body {
 }
 
 @media (max-width: 768px) {
+    .connection-status {
+        right: 70px; /* Maintain gap on mobile */
+    }
+    
     .help-button {
-        right: 120px;
+        right: 10px;
         width: 28px;
         height: 28px;
         font-size: 14px;

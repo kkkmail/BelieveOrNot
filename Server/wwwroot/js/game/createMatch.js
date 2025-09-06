@@ -1,9 +1,10 @@
 // js/game/createMatch.js
 import {showMessage} from "../utils/showMessage.js";
 import {showGameBoard} from "./showGameBoard.js";
-import {connection, playerId, currentMatch, setCurrentMatch, setPlayerId, clientId} from "../core/variables.js";
+import {connection, playerId, currentMatch, setCurrentMatch, setPlayerId, clientId, setGameState} from "../core/variables.js";
 import {setMatchIdInUrl} from "../utils/urlManager.js";
 import {storePlayerName} from "../utils/clientIdUtils.js";
+import {updateGameDisplay} from "../display/updateGameDisplay.js";
 
 export async function createMatch() {
     const playerName = document.getElementById('playerName').value.trim();
@@ -29,6 +30,7 @@ export async function createMatch() {
         });
 
         setCurrentMatch(result);
+        setGameState(result); // IMPORTANT: Set the game state
 
         // Creator is always the first player, so use index 0
         if (result.players && result.players.length > 0) {
@@ -48,6 +50,10 @@ export async function createMatch() {
         setMatchIdInUrl(result.matchId);
 
         showGameBoard();
+        
+        // IMPORTANT: Update the display after setting game state
+        updateGameDisplay();
+        
         showMessage(`Game created! Share the URL or Match ID with others to join.`);
 
         // Show start button if enough players

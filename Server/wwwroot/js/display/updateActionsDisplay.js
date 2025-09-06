@@ -31,8 +31,13 @@ export function updateActionsDisplay() {
         tableControls.classList.remove('active-turn');
     }
 
+    // HOME PAGE: Show other games button when not in any game
     if (!gameState || !playerId) {
         if (tableMessage) tableMessage.textContent = 'Waiting for game...';
+        
+        if (otherGamesBtn) {
+            otherGamesBtn.classList.remove('hidden');
+        }
         return;
     }
 
@@ -50,10 +55,19 @@ export function updateActionsDisplay() {
         if (isCreator && endGameBtn && gameState.players && gameState.players.length > 0) {
             endGameBtn.classList.remove('hidden');
         }
+
+        // Show new game button ONLY if creator is alone (no other players have joined)
+        if (isCreator && gameState.players && gameState.players.length === 1) {
+            if (newGameBtn) {
+                newGameBtn.classList.remove('hidden');
+            }
+        }
+        
+        // NO other games button once a game has been created (even while waiting)
         return;
     }
 
-    if (gameState.phase === 1) { // InProgress
+    if (gameState.phase === 1) { // InProgress - NO escape buttons during active play
         if (isCreator && endRoundBtn) {
             endRoundBtn.classList.remove('hidden');
         }
@@ -169,6 +183,8 @@ export function updateActionsDisplay() {
         if (isCreator && endGameBtn) {
             endGameBtn.classList.remove('hidden');
         }
+        
+        // NO other games button during round end - must continue or end game properly
         return;
     }
 
@@ -179,12 +195,12 @@ export function updateActionsDisplay() {
 
         if (tableMessage) tableMessage.textContent = 'Game ended';
         
-        // Show new game button for finished game
+        console.log("GAME ENDED: Showing both New Game and Other Games buttons");
+        
+        // GAME ENDED: Show both new game and other games buttons
         if (newGameBtn) {
             newGameBtn.classList.remove('hidden');
         }
-        
-        // Show other games button alongside new game
         if (otherGamesBtn) {
             otherGamesBtn.classList.remove('hidden');
         }

@@ -26,6 +26,7 @@ export async function initializeConnection() {
     hub.on("StateUpdate", (state, clientCmdIdEcho) => {
         console.log("=== STATE UPDATE RECEIVED ===", state);
         setGameState(state);
+        // IMPORTANT: Update display when state changes
         updateGameDisplay();
     });
 
