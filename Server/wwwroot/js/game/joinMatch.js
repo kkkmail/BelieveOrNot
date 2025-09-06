@@ -15,28 +15,34 @@ export async function joinMatch() {
         return;
     }
 
+    // Hide Other Games button immediately when joining
+    const otherGamesBtn = document.getElementById('otherGamesBtn');
+    if (otherGamesBtn) {
+        otherGamesBtn.classList.add('hidden');
+    }
+
     // Store the player name in cookie for future sessions
     storePlayerName(playerName);
 
     try {
         const result = await connection.invoke("JoinExistingMatch", matchId, playerName, clientId);
-        
+
         if (result.success) {
             setCurrentMatch(result.match);
             setPlayerId(result.playerId);
-            
+
             console.log("Set playerId to:", playerId, "for player:", result.assignedName);
 
             if (result.assignedName !== playerName) {
                 console.log(`Name changed from "${playerName}" to "${result.assignedName}" due to duplicate`);
-                
+
                 // Store the assigned name instead of the original name
                 storePlayerName(result.assignedName);
-                
+
                 // Format the message with HTML styling
                 const originalName = `<span style="font-weight: bold; font-style: italic;">${playerName}</span>`;
                 const newName = `<span style="font-weight: bold; font-style: italic;">${result.assignedName}</span>`;
-                
+
                 await customAlert(
                     `Your name was changed to ${newName} because ${originalName} was already taken.`,
                     'Name Changed'
@@ -53,7 +59,7 @@ export async function joinMatch() {
         }
     } catch (err) {
         console.error("Failed to join match:", err);
-        
+
         let errorMessage = "Failed to join match";
         if (err.message) {
             if (err.message.includes("already started")) {
@@ -66,7 +72,7 @@ export async function joinMatch() {
                 errorMessage = err.message;
             }
         }
-        
+
         await customAlert(errorMessage, 'Join Failed');
     }
 }

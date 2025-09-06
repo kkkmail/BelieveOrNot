@@ -4,6 +4,9 @@ import {getSuitSymbol} from "../cards/getSuitSymbol.js";
 import {CONFIG} from "../utils/config.js";
 
 export function updateActionsDisplay() {
+    console.log("=== updateActionsDisplay called ===");
+    console.log("gameState, playerId:", {gameState, playerId});
+
     const playBtn = document.getElementById('playBtn');
     const confirmChallengeBtn = document.getElementById('confirmChallengeBtn');
     const rankSelector = document.getElementById('rankSelector');
@@ -32,7 +35,7 @@ export function updateActionsDisplay() {
     }
 
     // HOME PAGE: Show only "Other Games" button when not in any game
-    if (!gameState || !playerId) {
+    if (!gameState) {
         if (tableMessage) tableMessage.textContent = 'Waiting for game...';
 
         console.log("HOME PAGE: Showing only Other Games button");
@@ -48,6 +51,9 @@ export function updateActionsDisplay() {
     // Handle different game phases
     if (gameState.phase === 0) { // WaitingForPlayers - Game started but round has not started
         if (tableMessage) tableMessage.textContent = 'Waiting for players to join...';
+
+        // Explicitly hide Other Games button for all players in waiting phase
+        if (otherGamesBtn) otherGamesBtn.classList.add('hidden');
 
         if (isCreator) {
             if (gameState.players && gameState.players.length >= 2) {
