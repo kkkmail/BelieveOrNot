@@ -40,3 +40,35 @@ public enum KingGamePhase
     RoundEnd,
     GameEnd
 }
+
+public enum KingPenaltyCardFilter
+{
+    None,
+    Hearts,
+    BoysJacksAndKings,
+    Queens,
+    KingOfHearts,
+    Everything
+}
+
+public enum KingEarlyEndCondition
+{
+    None,
+    AllTricksPlayed,
+    AllHeartsPlayed,
+    AllBoysPlayed,
+    AllQueensPlayed,
+    KingOfHeartsPlayed
+}
+
+public enum KingScoreCalculator
+{
+    TricksCount,
+    HeartsCount,
+    BoysCount,
+    QueensCount,
+    LastTwoTricks,
+    KingOfHearts,
+    Everything,
+    PositiveTricks
+}

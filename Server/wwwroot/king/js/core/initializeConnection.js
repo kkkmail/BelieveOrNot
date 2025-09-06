@@ -18,7 +18,7 @@ export async function initializeConnection() {
     }
 
     const hub = new s.HubConnectionBuilder()
-        .withUrl("/kinghub")
+        .withUrl("/kingHub")
         .withAutomaticReconnect()
         .build();
 

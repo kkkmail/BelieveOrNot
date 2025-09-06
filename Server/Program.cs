@@ -51,25 +51,10 @@ if (staticFilesEnabled)
 // Map hubs for both games - use different paths to avoid conflicts
 var hubPath = app.Configuration.GetValue<string>("ServerSettings:SignalRHubPath") ?? "/game";
 app.MapHub<GameHub>(hubPath);
-app.MapHub<KingHub>("/kinghub"); // Changed from /king to /kinghub
+app.MapHub<KingHub>("/kingHub"); // Fixed to use proper casing
 
-// Add explicit routing for King game - handle both /king and /king/
-app.MapGet("/king", async context =>
-{
-    var indexPath = Path.Combine(builder.Environment.WebRootPath, "king", "index.html");
-    if (File.Exists(indexPath))
-    {
-        context.Response.ContentType = "text/html";
-        await context.Response.SendFileAsync(indexPath);
-    }
-    else
-    {
-        context.Response.StatusCode = 404;
-        await context.Response.WriteAsync("King game not found");
-    }
-});
-
-app.MapGet("/king/", async context =>
+// Simple King game route - just serve the index.html
+app.MapGet("/king/index.html", async context =>
 {
     var indexPath = Path.Combine(builder.Environment.WebRootPath, "king", "index.html");
     if (File.Exists(indexPath))

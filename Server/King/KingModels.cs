@@ -40,13 +40,15 @@ public class KingMatch
     public List<KingTrick> CurrentRoundTricks { get; set; } = new();
     public KingGamePhase Phase { get; set; } = KingGamePhase.WaitingForPlayers;
     public int CurrentPlayerIndex { get; set; } = 0;
-    public int LeaderPlayerIndex { get; set; } = 0; // Player who leads current round
+    public int LeaderPlayerIndex { get; set; } = 0;
     public KingSuit? CurrentTrump { get; set; }
-    public int TrumpSetterIndex { get; set; } = 0; // Player who sets trump for current round
+    public int TrumpSetterIndex { get; set; } = 0;
     public List<KingCard> CurrentTrick { get; set; } = new();
-    public List<int> CurrentTrickPlayerOrder { get; set; } = new(); // Player indices
+    public List<int> CurrentTrickPlayerOrder { get; set; } = new();
     public int CurrentGameNumber { get; set; } = 1;
     public bool MustDiscardKingOfHearts { get; set; } = false;
+    public List<KingSuit> AvailableTrumpSuits { get; set; } = new();
+    public Guid CreatorPlayerId { get; set; }
     
     public KingGameRound? CurrentRound => CurrentRoundIndex < GameRounds.Count ? GameRounds[CurrentRoundIndex] : null;
 }
@@ -54,7 +56,7 @@ public class KingMatch
 public class KingGameSettings
 {
     public bool IncludeDontTakeAnything { get; set; } = false;
-    public bool EightCollectingRounds { get; set; } = true; // 8 vs 4 collecting rounds
+    public bool EightCollectingRounds { get; set; } = true;
 }
 
 public class KingGameStateDto
@@ -70,15 +72,17 @@ public class KingGameStateDto
     public int LeaderPlayerIndex { get; set; }
     public KingSuit? CurrentTrump { get; set; }
     public int TrumpSetterIndex { get; set; }
-    public List<KingCard>? YourHand { get; set; }
     public List<KingCard> CurrentTrick { get; set; } = new();
     public List<int> CurrentTrickPlayerOrder { get; set; } = new();
-    public Guid? CreatorPlayerId { get; set; }
+    public Guid CreatorPlayerId { get; set; }
     public int TotalRounds { get; set; }
     public bool CanSelectTrump { get; set; }
+    public bool WaitingForTrumpSelection { get; set; }
+    public bool MustDiscardKingOfHearts { get; set; }
     public List<KingSuit> AvailableTrumpSuits { get; set; } = new();
-    public bool MustDiscardKingOfHearts { get; set; } = false;
-    public bool WaitingForTrumpSelection { get; set; } = false;
+    public KingEarlyEndCondition EarlyEndCondition { get; set; }
+    public KingScoreCalculator ScoreCalculator { get; set; }
+    public List<KingCard> YourHand { get; set; } = new();
     public KingEventDto? Event { get; set; }
 }
 
@@ -97,5 +101,4 @@ public class KingEventDto
     public string Type { get; set; } = string.Empty;
     public string DisplayMessage { get; set; } = string.Empty;
     public object? Data { get; set; }
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 }

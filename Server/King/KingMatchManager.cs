@@ -6,128 +6,78 @@ namespace BelieveOrNot.Server.King;
 public class KingMatchManager : IKingMatchManager
 {
     private readonly ConcurrentDictionary<Guid, KingMatch> _matches = new();
-    private readonly Random _random = new();
 
     public KingMatch? GetMatch(Guid matchId)
     {
-        _matches.TryGetValue(matchId, out var match);
-        return match;
+        return _matches.TryGetValue(matchId, out var match) ? match : null;
     }
 
     public KingMatch CreateMatch(string playerName, KingGameSettings? settings = null, string clientId = "")
     {
-        var gameSettings = settings ?? new KingGameSettings();
-        
         var match = new KingMatch
         {
-            Settings = gameSettings,
+            Id = Guid.NewGuid(),
+            Settings = settings ?? new KingGameSettings(),
             GameRounds = KingGameRound.CreateStandardGameRounds(
-                gameSettings.IncludeDontTakeAnything, 
-                gameSettings.EightCollectingRounds),
-            Players = new List<KingPlayer>
-            {
-                new KingPlayer 
-                {
-                    Name = playerName,
-                    ClientId = clientId,
-                    LastSeen = DateTime.UtcNow,
-                    Position = 0 // Creator always gets position 0 (left side)
-                }
-            }
+                settings?.IncludeDontTakeAnything ?? false,
+                settings?.EightCollectingRounds ?? true)
         };
 
-        _matches.TryAdd(match.Id, match);
+        var player = new KingPlayer
+        {
+            Id = Guid.NewGuid(),
+            Name = playerName,
+            ClientId = clientId,
+            Position = 0
+        };
+
+        match.Players.Add(player);
+        match.CreatorPlayerId = player.Id;
+
+        _matches[match.Id] = match;
         return match;
     }
 
     public KingMatch JoinMatch(Guid matchId, string playerName, string clientId = "")
     {
-        var match = GetMatch(matchId) ?? throw new InvalidOperationException("Match not found");
-
-        if (match.Phase != KingGamePhase.WaitingForPlayers)
+        var match = GetMatch(matchId);
+        if (match == null)
         {
-            throw new InvalidOperationException("Cannot join match in progress");
+            throw new InvalidOperationException("Match not found");
         }
 
         if (match.Players.Count >= 4)
         {
-            throw new InvalidOperationException("Match is full (4 players required)");
+            throw new InvalidOperationException("Match is full");
         }
 
-        // Handle duplicate names
-        var uniqueName = EnsureUniqueName(match, playerName);
-
-        var newPlayer = new KingPlayer 
+        if (match.Phase != KingGamePhase.WaitingForPlayers)
         {
-            Name = uniqueName,
+            throw new InvalidOperationException("Match has already started");
+        }
+
+        // Check if player with this clientId already exists
+        var existingPlayer = match.Players.FirstOrDefault(p => p.ClientId == clientId);
+        if (existingPlayer != null)
+        {
+            existingPlayer.IsConnected = true;
+            existingPlayer.LastSeen = DateTime.UtcNow;
+            return match;
+        }
+
+        // Ensure unique name
+        var finalName = EnsureUniqueName(match, playerName);
+
+        var player = new KingPlayer
+        {
+            Id = Guid.NewGuid(),
+            Name = finalName,
             ClientId = clientId,
-            LastSeen = DateTime.UtcNow
+            Position = match.Players.Count
         };
 
-        match.Players.Add(newPlayer);
-
-        // Assign positions when we have all 4 players
-        if (match.Players.Count == 4)
-        {
-            AssignPlayerPositions(match);
-        }
-
+        match.Players.Add(player);
         return match;
-    }
-
-    public void AssignPlayerPositions(KingMatch match)
-    {
-        if (match.Players.Count != 4)
-        {
-            throw new InvalidOperationException("Need exactly 4 players to assign positions");
-        }
-
-        // Creator stays at position 0 (left), randomly assign others to positions 1,2,3
-        var creator = match.Players[0];
-        creator.Position = 0;
-
-        var otherPlayers = match.Players.Skip(1).ToList();
-        var availablePositions = new List<int> { 1, 2, 3 };
-
-        // Shuffle the available positions
-        for (int i = availablePositions.Count - 1; i > 0; i--)
-        {
-            int j = _random.Next(i + 1);
-            (availablePositions[i], availablePositions[j]) = (availablePositions[j], availablePositions[i]);
-        }
-
-        // Assign positions
-        for (int i = 0; i < otherPlayers.Count; i++)
-        {
-            otherPlayers[i].Position = availablePositions[i];
-        }
-
-        // Sort players by position for consistent ordering
-        match.Players.Sort((a, b) => a.Position.CompareTo(b.Position));
-
-        Console.WriteLine($"Player positions assigned: {string.Join(", ", match.Players.Select(p => $"{p.Name}({p.Position})"))}");
-    }
-
-    private string EnsureUniqueName(KingMatch match, string desiredName)
-    {
-        var existingNames = match.Players.Select(p => p.Name).ToHashSet();
-
-        if (!existingNames.Contains(desiredName))
-        {
-            return desiredName;
-        }
-
-        int counter = 2;
-        string uniqueName;
-        do
-        {
-            uniqueName = $"{desiredName} ({counter})";
-            counter++;
-        }
-        while (existingNames.Contains(uniqueName));
-
-        Console.WriteLine($"Duplicate name '{desiredName}' changed to '{uniqueName}'");
-        return uniqueName;
     }
 
     public void RemoveMatch(Guid matchId)
@@ -137,6 +87,39 @@ public class KingMatchManager : IKingMatchManager
 
     public List<KingMatch> GetActiveMatches()
     {
-        return _matches.Values.ToList();
+        return _matches.Values
+            .Where(m => m.Phase != KingGamePhase.GameEnd)
+            .ToList();
+    }
+
+    public void AssignPlayerPositions(KingMatch match)
+    {
+        for (int i = 0; i < match.Players.Count; i++)
+        {
+            match.Players[i].Position = i;
+        }
+    }
+
+    private string EnsureUniqueName(KingMatch match, string desiredName)
+    {
+        var existingNames = match.Players.Select(p => p.Name.ToLower()).ToHashSet();
+        
+        if (!existingNames.Contains(desiredName.ToLower()))
+        {
+            return desiredName;
+        }
+
+        // Try numbered variants
+        for (int i = 2; i <= 99; i++)
+        {
+            var numberedName = $"{desiredName} ({i})";
+            if (!existingNames.Contains(numberedName.ToLower()))
+            {
+                return numberedName;
+            }
+        }
+
+        // Fallback
+        return $"{desiredName} ({Guid.NewGuid().ToString()[..8]})";
     }
 }

@@ -4,12 +4,6 @@ namespace BelieveOrNot.Server.King;
 public class KingGameEngine : IKingGameEngine
 {
     private readonly Random _random = new();
-    private readonly IKingMatchManager _matchManager;
-
-    public KingGameEngine(IKingMatchManager matchManager)
-    {
-        _matchManager = matchManager;
-    }
 
     public KingGameStateDto StartNewRound(KingMatch match)
     {
@@ -43,20 +37,20 @@ public class KingGameEngine : IKingGameEngine
         if (currentRound.RequiresTrumpSelection)
         {
             match.TrumpSetterIndex = (match.CurrentRoundIndex - match.GameRounds.Count(r => !r.IsCollectingPhase)) % 4;
-            // Trump will be set when the trump setter makes their selection
             match.CurrentTrump = null;
+            match.AvailableTrumpSuits = new List<KingSuit> { KingSuit.Hearts, KingSuit.Diamonds, KingSuit.Clubs, KingSuit.Spades };
         }
         else
         {
             match.CurrentTrump = null;
+            match.AvailableTrumpSuits.Clear();
         }
 
         var state = CreateGameStateDto(match, Guid.Empty);
         state.Event = new KingEventDto
         {
             Type = "RoundStart",
-            DisplayMessage = $"Round {match.CurrentRoundIndex + 1}: {currentRound.Name} started!",
-            Data = new { RoundIndex = match.CurrentRoundIndex, RoundName = currentRound.Name }
+            DisplayMessage = $"Round {match.CurrentRoundIndex + 1}: {currentRound.Name} started!"
         };
 
         return state;
@@ -70,16 +64,6 @@ public class KingGameEngine : IKingGameEngine
             throw new InvalidOperationException("Player not found");
         }
 
-        if (match.Phase != KingGamePhase.InProgress)
-        {
-            throw new InvalidOperationException("Game is not in progress");
-        }
-
-        if (match.CurrentPlayerIndex != GetPlayerIndex(match, playerId))
-        {
-            throw new InvalidOperationException("Not your turn");
-        }
-
         if (!IsValidPlay(match, player, card))
         {
             throw new InvalidOperationException("Invalid card play");
@@ -88,13 +72,13 @@ public class KingGameEngine : IKingGameEngine
         // Remove card from player's hand
         player.Hand.Remove(card);
 
-        // Add to current trick
+        // Add card to current trick
         match.CurrentTrick.Add(card);
-        match.CurrentTrickPlayerOrder.Add(match.CurrentPlayerIndex);
+        match.CurrentTrickPlayerOrder.Add(GetPlayerIndex(match, playerId));
 
-        var eventMessage = $"{player.Name} played {card}";
+        string eventMessage = $"{player.Name} played {card}";
 
-        // Check if trick is complete
+        // Check if trick is complete (4 cards)
         if (match.CurrentTrick.Count == 4)
         {
             var trick = CompleteTrick(match);
@@ -144,6 +128,7 @@ public class KingGameEngine : IKingGameEngine
         }
 
         match.CurrentTrump = trump;
+        match.AvailableTrumpSuits.Clear();
 
         var player = match.Players[playerIndex];
         var state = CreateGameStateDto(match, playerId);
@@ -169,44 +154,20 @@ public class KingGameEngine : IKingGameEngine
             return false;
         }
 
-        // If this is the first card of the trick, any card is valid except Hearts in Hearts round
         if (match.CurrentTrick.Count == 0)
         {
-            var currentRound = match.CurrentRound;
-            if (currentRound?.Type == KingRoundType.DontTakeHearts)
-            {
-                // Cannot lead with Hearts unless no other suit available
-                if (card.Suit == KingSuit.Hearts)
-                {
-                    return !player.Hand.Any(c => c.Suit != KingSuit.Hearts);
-                }
-            }
-            return true;
+            return true; // First card of trick, any card is valid
         }
 
-        // Must follow suit if possible
         var leadSuit = match.CurrentTrick[0].Suit;
-        if (card.Suit == leadSuit)
+        var hasLeadSuit = player.Hand.Any(c => c.Suit == leadSuit);
+
+        if (hasLeadSuit && card.Suit != leadSuit)
         {
-            return true;
+            return false; // Must follow suit if possible
         }
 
-        // If cannot follow suit, check for special King of Hearts rule
-        if (!player.Hand.Any(c => c.Suit == leadSuit))
-        {
-            var currentRound = match.CurrentRound;
-            if (currentRound?.Type == KingRoundType.DontTakeKingOfHearts && !currentRound.IsCollectingPhase)
-            {
-                // Must discard King of Hearts if have it and cannot follow suit
-                if (player.Hand.Any(c => c.IsKingOfHearts) && !card.IsKingOfHearts)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     private KingTrick CompleteTrick(KingMatch match)
@@ -223,7 +184,10 @@ public class KingGameEngine : IKingGameEngine
         // Determine winner
         trick.Winner = DetermineWinner(trick);
 
+        // Add to completed tricks
         match.CurrentRoundTricks.Add(trick);
+
+        // Clear current trick
         match.CurrentTrick.Clear();
         match.CurrentTrickPlayerOrder.Clear();
 
@@ -232,47 +196,55 @@ public class KingGameEngine : IKingGameEngine
 
     private KingPlayer DetermineWinner(KingTrick trick)
     {
-        var winningCardIndex = 0;
         var winningCard = trick.Cards[0];
+        var winningPlayerIndex = 0;
 
         for (int i = 1; i < trick.Cards.Count; i++)
         {
             var card = trick.Cards[i];
-            
+
             // Trump beats non-trump
             if (trick.Trump.HasValue)
             {
-                var isCurrentTrump = card.Suit == trick.Trump.Value;
-                var isWinningTrump = winningCard.Suit == trick.Trump.Value;
-
-                if (isCurrentTrump && !isWinningTrump)
+                if (card.Suit == trick.Trump.Value && winningCard.Suit != trick.Trump.Value)
                 {
                     winningCard = card;
-                    winningCardIndex = i;
+                    winningPlayerIndex = i;
                 }
-                else if (isCurrentTrump && isWinningTrump && card.Rank > winningCard.Rank)
+                else if (card.Suit == trick.Trump.Value && winningCard.Suit == trick.Trump.Value)
                 {
-                    winningCard = card;
-                    winningCardIndex = i;
+                    // Both trump, higher rank wins
+                    if (card.Rank > winningCard.Rank)
+                    {
+                        winningCard = card;
+                        winningPlayerIndex = i;
+                    }
                 }
-                else if (!isCurrentTrump && !isWinningTrump && card.Suit == trick.LeadSuit && card.Rank > winningCard.Rank)
+                else if (winningCard.Suit != trick.Trump.Value && card.Suit == trick.LeadSuit && winningCard.Suit == trick.LeadSuit)
                 {
-                    winningCard = card;
-                    winningCardIndex = i;
+                    // Both following lead suit, higher rank wins
+                    if (card.Rank > winningCard.Rank)
+                    {
+                        winningCard = card;
+                        winningPlayerIndex = i;
+                    }
                 }
             }
             else
             {
-                // No trump - highest card of lead suit wins
-                if (card.Suit == trick.LeadSuit && card.Rank > winningCard.Rank)
+                // No trump, must follow lead suit
+                if (card.Suit == trick.LeadSuit && winningCard.Suit == trick.LeadSuit)
                 {
-                    winningCard = card;
-                    winningCardIndex = i;
+                    if (card.Rank > winningCard.Rank)
+                    {
+                        winningCard = card;
+                        winningPlayerIndex = i;
+                    }
                 }
             }
         }
 
-        return trick.PlayOrder[winningCardIndex];
+        return trick.PlayOrder[winningPlayerIndex];
     }
 
     private bool ShouldEndRound(KingMatch match)
@@ -287,9 +259,13 @@ public class KingGameEngine : IKingGameEngine
         }
 
         // Check early end condition
-        if (currentRound.CanEndEarly && currentRound.EarlyEndCondition != null)
+        if (currentRound.CanEndEarly)
         {
-            return currentRound.EarlyEndCondition(match.CurrentRoundTricks);
+            var earlyEndCondition = currentRound.GetEarlyEndCondition();
+            if (earlyEndCondition != null)
+            {
+                return earlyEndCondition(match.CurrentRoundTricks);
+            }
         }
 
         return false;
@@ -298,15 +274,19 @@ public class KingGameEngine : IKingGameEngine
     private void EndRound(KingMatch match)
     {
         match.Phase = KingGamePhase.RoundEnd;
-        
+
         var currentRound = match.CurrentRound;
-        if (currentRound?.ScoreCalculator != null)
+        if (currentRound != null)
         {
-            // Calculate scores for this round
-            foreach (var player in match.Players)
+            var scoreCalculator = currentRound.GetScoreCalculator();
+            if (scoreCalculator != null)
             {
-                var roundScore = currentRound.ScoreCalculator(player, match.CurrentRoundTricks);
-                player.Score += roundScore;
+                // Calculate scores for this round
+                foreach (var player in match.Players)
+                {
+                    var roundScore = scoreCalculator(player, match.CurrentRoundTricks);
+                    player.Score += roundScore;
+                }
             }
         }
 
@@ -321,7 +301,8 @@ public class KingGameEngine : IKingGameEngine
     private KingGameStateDto CreateGameStateDto(KingMatch match, Guid requestingPlayerId)
     {
         var currentRound = match.CurrentRound;
-        
+        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == requestingPlayerId);
+
         var state = new KingGameStateDto
         {
             MatchId = match.Id,
@@ -343,28 +324,18 @@ public class KingGameEngine : IKingGameEngine
             LeaderPlayerIndex = match.LeaderPlayerIndex,
             CurrentTrump = match.CurrentTrump,
             TrumpSetterIndex = match.TrumpSetterIndex,
-            CurrentTrick = match.CurrentTrick,
-            CurrentTrickPlayerOrder = match.CurrentTrickPlayerOrder,
-            CreatorPlayerId = match.Players.FirstOrDefault()?.Id,
+            CurrentTrick = new List<KingCard>(match.CurrentTrick),
+            CurrentTrickPlayerOrder = new List<int>(match.CurrentTrickPlayerOrder),
+            CreatorPlayerId = match.CreatorPlayerId,
             TotalRounds = match.GameRounds.Count,
-            MustDiscardKingOfHearts = match.MustDiscardKingOfHearts
+            CanSelectTrump = currentRound?.RequiresTrumpSelection == true && match.TrumpSetterIndex == GetPlayerIndex(match, requestingPlayerId) && match.CurrentTrump == null,
+            WaitingForTrumpSelection = currentRound?.RequiresTrumpSelection == true && match.CurrentTrump == null,
+            MustDiscardKingOfHearts = match.MustDiscardKingOfHearts,
+            AvailableTrumpSuits = new List<KingSuit>(match.AvailableTrumpSuits),
+            EarlyEndCondition = currentRound?.EarlyEndConditionType ?? KingEarlyEndCondition.None,
+            ScoreCalculator = currentRound?.ScoreCalculatorType ?? KingScoreCalculator.TricksCount,
+            YourHand = requestingPlayer?.Hand ?? new List<KingCard>()
         };
-
-        // Set player's hand
-        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == requestingPlayerId);
-        if (requestingPlayer != null)
-        {
-            state.YourHand = requestingPlayer.Hand.ToList();
-        }
-
-        // Trump selection logic
-        if (currentRound?.RequiresTrumpSelection == true)
-        {
-            var playerIndex = GetPlayerIndex(match, requestingPlayerId);
-            state.CanSelectTrump = playerIndex == match.TrumpSetterIndex && match.CurrentTrump == null;
-            state.WaitingForTrumpSelection = match.CurrentTrump == null;
-            state.AvailableTrumpSuits = Enum.GetValues<KingSuit>().ToList();
-        }
 
         return state;
     }
@@ -374,7 +345,9 @@ public class KingGameEngine : IKingGameEngine
         for (int i = 0; i < match.Players.Count; i++)
         {
             if (match.Players[i].Id == playerId)
+            {
                 return i;
+            }
         }
         return -1;
     }

@@ -11,9 +11,91 @@ public class KingGameRound
     public bool CanEndEarly { get; set; }
     public bool IsCollectingPhase { get; set; }
     public bool RequiresTrumpSelection { get; set; }
-    public Func<KingCard, bool>? PenaltyCardFilter { get; set; }
-    public Func<List<KingTrick>, bool>? EarlyEndCondition { get; set; }
-    public Func<KingPlayer, List<KingTrick>, int>? ScoreCalculator { get; set; }
+    
+    // Replace Func properties with enums
+    public KingPenaltyCardFilter PenaltyCardFilterType { get; set; } = KingPenaltyCardFilter.None;
+    public KingEarlyEndCondition EarlyEndConditionType { get; set; } = KingEarlyEndCondition.None;
+    public KingScoreCalculator ScoreCalculatorType { get; set; } = KingScoreCalculator.TricksCount;
+
+    // Helper methods to get the actual functions from enums
+    public Func<KingCard, bool>? GetPenaltyCardFilter()
+    {
+        return PenaltyCardFilterType switch
+        {
+            KingPenaltyCardFilter.None => null,
+            KingPenaltyCardFilter.Hearts => card => card.Suit == KingSuit.Hearts,
+            KingPenaltyCardFilter.BoysJacksAndKings => card => card.Rank == KingRank.Jack || card.Rank == KingRank.King,
+            KingPenaltyCardFilter.Queens => card => card.Rank == KingRank.Queen,
+            KingPenaltyCardFilter.KingOfHearts => card => card.Rank == KingRank.King && card.Suit == KingSuit.Hearts,
+            KingPenaltyCardFilter.Everything => _ => true,
+            _ => null
+        };
+    }
+
+    public Func<List<KingTrick>, bool>? GetEarlyEndCondition()
+    {
+        return EarlyEndConditionType switch
+        {
+            KingEarlyEndCondition.None => null,
+            KingEarlyEndCondition.AllTricksPlayed => tricks => tricks.Count >= 8,
+            KingEarlyEndCondition.AllHeartsPlayed => tricks => tricks.SelectMany(t => t.Cards).Count(c => c.Suit == KingSuit.Hearts) >= 8,
+            KingEarlyEndCondition.AllBoysPlayed => tricks => tricks.SelectMany(t => t.Cards).Count(c => c.Rank == KingRank.Jack || c.Rank == KingRank.King) >= 8,
+            KingEarlyEndCondition.AllQueensPlayed => tricks => tricks.SelectMany(t => t.Cards).Count(c => c.Rank == KingRank.Queen) >= 4,
+            KingEarlyEndCondition.KingOfHeartsPlayed => tricks => tricks.SelectMany(t => t.Cards).Any(c => c.Rank == KingRank.King && c.Suit == KingSuit.Hearts),
+            _ => null
+        };
+    }
+
+    public Func<KingPlayer, List<KingTrick>, int>? GetScoreCalculator()
+    {
+        return ScoreCalculatorType switch
+        {
+            KingScoreCalculator.TricksCount => (player, tricks) => PointsPerItem * tricks.Count(t => t.Winner.Id == player.Id),
+            KingScoreCalculator.HeartsCount => (player, tricks) => 
+            {
+                var heartsWon = tricks.Where(t => t.Winner.Id == player.Id)
+                    .SelectMany(t => t.Cards)
+                    .Count(c => c.Suit == KingSuit.Hearts);
+                return PointsPerItem * heartsWon;
+            },
+            KingScoreCalculator.BoysCount => (player, tricks) =>
+            {
+                var boysWon = tricks.Where(t => t.Winner.Id == player.Id)
+                    .SelectMany(t => t.Cards)
+                    .Count(c => c.Rank == KingRank.Jack || c.Rank == KingRank.King);
+                return PointsPerItem * boysWon;
+            },
+            KingScoreCalculator.QueensCount => (player, tricks) =>
+            {
+                var queensWon = tricks.Where(t => t.Winner.Id == player.Id)
+                    .SelectMany(t => t.Cards)
+                    .Count(c => c.Rank == KingRank.Queen);
+                return PointsPerItem * queensWon;
+            },
+            KingScoreCalculator.LastTwoTricks => (player, tricks) =>
+            {
+                var tricksWon = tricks.Where(t => t.Winner.Id == player.Id).ToList();
+                var lastTwoTricks = tricks.TakeLast(2).ToList();
+                var lastTwoWon = tricksWon.Intersect(lastTwoTricks).Count();
+                return PointsPerItem * lastTwoWon;
+            },
+            KingScoreCalculator.KingOfHearts => (player, tricks) =>
+            {
+                var hasKingOfHearts = tricks.Where(t => t.Winner.Id == player.Id)
+                    .SelectMany(t => t.Cards)
+                    .Any(c => c.Rank == KingRank.King && c.Suit == KingSuit.Hearts);
+                return hasKingOfHearts ? PointsPerItem : 0;
+            },
+            KingScoreCalculator.Everything => (player, tricks) =>
+            {
+                var tricksWon = tricks.Count(t => t.Winner.Id == player.Id);
+                var cardsWon = tricks.Where(t => t.Winner.Id == player.Id).SelectMany(t => t.Cards).Count();
+                return PointsPerItem * (tricksWon + cardsWon);
+            },
+            KingScoreCalculator.PositiveTricks => (player, tricks) => Math.Abs(PointsPerItem) * tricks.Count(t => t.Winner.Id == player.Id),
+            _ => (player, tricks) => 0
+        };
+    }
 
     public static List<KingGameRound> CreateStandardGameRounds(bool includeDontTakeAnything, bool eightCollectingRounds)
     {
@@ -30,8 +112,8 @@ public class KingGameRound
             CanEndEarly = true,
             IsCollectingPhase = false,
             RequiresTrumpSelection = false,
-            EarlyEndCondition = tricks => tricks.Count >= 8,
-            ScoreCalculator = (player, tricks) => -2 * tricks.Count(t => t.Winner.Id == player.Id)
+            EarlyEndConditionType = KingEarlyEndCondition.AllTricksPlayed,
+            ScoreCalculatorType = KingScoreCalculator.TricksCount
         });
 
         rounds.Add(new KingGameRound
@@ -44,19 +126,9 @@ public class KingGameRound
             CanEndEarly = true,
             IsCollectingPhase = false,
             RequiresTrumpSelection = false,
-            PenaltyCardFilter = card => card.Suit == KingSuit.Hearts,
-            EarlyEndCondition = tricks => 
-            {
-                var heartsTaken = tricks.SelectMany(t => t.Cards).Count(c => c.Suit == KingSuit.Hearts);
-                return heartsTaken >= 8; // All 8 Hearts in 32-card deck
-            },
-            ScoreCalculator = (player, tricks) =>
-            {
-                var heartsWon = tricks.Where(t => t.Winner.Id == player.Id)
-                    .SelectMany(t => t.Cards)
-                    .Count(c => c.Suit == KingSuit.Hearts);
-                return -2 * heartsWon;
-            }
+            PenaltyCardFilterType = KingPenaltyCardFilter.Hearts,
+            EarlyEndConditionType = KingEarlyEndCondition.AllHeartsPlayed,
+            ScoreCalculatorType = KingScoreCalculator.HeartsCount
         });
 
         rounds.Add(new KingGameRound
@@ -69,19 +141,9 @@ public class KingGameRound
             CanEndEarly = true,
             IsCollectingPhase = false,
             RequiresTrumpSelection = false,
-            PenaltyCardFilter = card => card.Rank == KingRank.Jack || card.Rank == KingRank.King,
-            EarlyEndCondition = tricks =>
-            {
-                var boysTaken = tricks.SelectMany(t => t.Cards).Count(c => c.Rank == KingRank.Jack || c.Rank == KingRank.King);
-                return boysTaken >= 8; // All Boys in 32-card deck
-            },
-            ScoreCalculator = (player, tricks) =>
-            {
-                var boysWon = tricks.Where(t => t.Winner.Id == player.Id)
-                    .SelectMany(t => t.Cards)
-                    .Count(c => c.Rank == KingRank.Jack || c.Rank == KingRank.King);
-                return -2 * boysWon;
-            }
+            PenaltyCardFilterType = KingPenaltyCardFilter.BoysJacksAndKings,
+            EarlyEndConditionType = KingEarlyEndCondition.AllBoysPlayed,
+            ScoreCalculatorType = KingScoreCalculator.BoysCount
         });
 
         rounds.Add(new KingGameRound
@@ -94,19 +156,9 @@ public class KingGameRound
             CanEndEarly = true,
             IsCollectingPhase = false,
             RequiresTrumpSelection = false,
-            PenaltyCardFilter = card => card.Rank == KingRank.Queen,
-            EarlyEndCondition = tricks =>
-            {
-                var queensTaken = tricks.SelectMany(t => t.Cards).Count(c => c.Rank == KingRank.Queen);
-                return queensTaken >= 4; // All Queens in deck
-            },
-            ScoreCalculator = (player, tricks) =>
-            {
-                var queensWon = tricks.Where(t => t.Winner.Id == player.Id)
-                    .SelectMany(t => t.Cards)
-                    .Count(c => c.Rank == KingRank.Queen);
-                return -4 * queensWon;
-            }
+            PenaltyCardFilterType = KingPenaltyCardFilter.Queens,
+            EarlyEndConditionType = KingEarlyEndCondition.AllQueensPlayed,
+            ScoreCalculatorType = KingScoreCalculator.QueensCount
         });
 
         rounds.Add(new KingGameRound
@@ -119,13 +171,7 @@ public class KingGameRound
             CanEndEarly = false,
             IsCollectingPhase = false,
             RequiresTrumpSelection = false,
-            ScoreCalculator = (player, tricks) =>
-            {
-                var tricksWon = tricks.Where(t => t.Winner.Id == player.Id).ToList();
-                var lastTwoTricks = tricks.TakeLast(2).ToList();
-                var lastTwoWon = tricksWon.Intersect(lastTwoTricks).Count();
-                return -8 * lastTwoWon;
-            }
+            ScoreCalculatorType = KingScoreCalculator.LastTwoTricks
         });
 
         rounds.Add(new KingGameRound
@@ -138,21 +184,11 @@ public class KingGameRound
             CanEndEarly = true,
             IsCollectingPhase = false,
             RequiresTrumpSelection = false,
-            PenaltyCardFilter = card => card.Rank == KingRank.King && card.Suit == KingSuit.Hearts,
-            EarlyEndCondition = tricks =>
-            {
-                return tricks.SelectMany(t => t.Cards).Any(c => c.Rank == KingRank.King && c.Suit == KingSuit.Hearts);
-            },
-            ScoreCalculator = (player, tricks) =>
-            {
-                var hasKingOfHearts = tricks.Where(t => t.Winner.Id == player.Id)
-                    .SelectMany(t => t.Cards)
-                    .Any(c => c.Rank == KingRank.King && c.Suit == KingSuit.Hearts);
-                return hasKingOfHearts ? -16 : 0;
-            }
+            PenaltyCardFilterType = KingPenaltyCardFilter.KingOfHearts,
+            EarlyEndConditionType = KingEarlyEndCondition.KingOfHeartsPlayed,
+            ScoreCalculatorType = KingScoreCalculator.KingOfHearts
         });
 
-        // Optional round
         if (includeDontTakeAnything)
         {
             rounds.Add(new KingGameRound
@@ -160,51 +196,34 @@ public class KingGameRound
                 RoundNumber = 7,
                 Type = KingRoundType.DontTakeAnything,
                 Name = "Don't Take Anything",
-                Description = "Avoid all penalties combined (-96 points total)",
-                PointsPerItem = -96,
-                CanEndEarly = false,
+                Description = "Avoid taking any tricks or cards (-2 points each)",
+                PointsPerItem = -2,
+                CanEndEarly = true,
                 IsCollectingPhase = false,
                 RequiresTrumpSelection = false,
-                ScoreCalculator = (player, tricks) =>
-                {
-                    var tricksWon = tricks.Where(t => t.Winner.Id == player.Id).ToList();
-                    var cardsWon = tricksWon.SelectMany(t => t.Cards).ToList();
-
-                    int penalty = 0;
-                    penalty += tricksWon.Count * -2; // Tricks
-                    penalty += cardsWon.Count(c => c.Suit == KingSuit.Hearts) * -2; // Hearts
-                    penalty += cardsWon.Count(c => c.Rank == KingRank.Jack || c.Rank == KingRank.King) * -2; // Boys
-                    penalty += cardsWon.Count(c => c.Rank == KingRank.Queen) * -4; // Queens
-                    
-                    var lastTwoTricks = tricks.TakeLast(2).ToList();
-                    var lastTwoWon = tricksWon.Intersect(lastTwoTricks).Count();
-                    penalty += lastTwoWon * -8; // Last two tricks
-                    
-                    var hasKingOfHearts = cardsWon.Any(c => c.Rank == KingRank.King && c.Suit == KingSuit.Hearts);
-                    penalty += hasKingOfHearts ? -16 : 0; // King of Hearts
-
-                    return penalty;
-                }
+                PenaltyCardFilterType = KingPenaltyCardFilter.Everything,
+                EarlyEndConditionType = KingEarlyEndCondition.AllTricksPlayed,
+                ScoreCalculatorType = KingScoreCalculator.Everything
             });
         }
 
         // Phase 2: Collecting rounds
-        int collectingRounds = eightCollectingRounds ? 8 : 4;
+        int collectingRoundCount = eightCollectingRounds ? 8 : 4;
         int startingRoundNumber = rounds.Count + 1;
 
-        for (int i = 0; i < collectingRounds; i++)
+        for (int i = 0; i < collectingRoundCount; i++)
         {
             rounds.Add(new KingGameRound
             {
                 RoundNumber = startingRoundNumber + i,
                 Type = KingRoundType.CollectTricks,
                 Name = $"Collect Tricks {i + 1}",
-                Description = "Collect as many tricks as possible (+3 points per trick)",
-                PointsPerItem = 3,
+                Description = "Try to win as many tricks as possible (+2 points per trick)",
+                PointsPerItem = 2,
                 CanEndEarly = false,
                 IsCollectingPhase = true,
                 RequiresTrumpSelection = true,
-                ScoreCalculator = (player, tricks) => 3 * tricks.Count(t => t.Winner.Id == player.Id)
+                ScoreCalculatorType = KingScoreCalculator.PositiveTricks
             });
         }
 
