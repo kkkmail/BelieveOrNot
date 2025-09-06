@@ -9,13 +9,3 @@ public interface IKingGameEngine
     KingGameStateDto CreateGameStateDtoForPlayer(KingMatch match, Guid playerId);
     bool IsValidPlay(KingMatch match, KingPlayer player, KingCard card);
 }
-
-public interface IKingMatchManager
-{
-    KingMatch? GetMatch(Guid matchId);
-    KingMatch CreateMatch(string playerName, KingGameSettings? settings = null, string clientId = "");
-    KingMatch JoinMatch(Guid matchId, string playerName, string clientId = "");
-    void RemoveMatch(Guid matchId);
-    List<KingMatch> GetActiveMatches();
-    void AssignPlayerPositions(KingMatch match);
-}

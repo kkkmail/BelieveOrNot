@@ -38,7 +38,7 @@ if (staticFilesEnabled)
 {
     app.UseDefaultFiles();
     app.UseStaticFiles();
-    
+
     // Add static file serving for King game subfolder
     app.UseStaticFiles(new StaticFileOptions
     {
@@ -76,7 +76,7 @@ app.MapPost("/game/check-match", (MatchCheckRequest request, IMatchManager match
     {
         return Results.Ok(new { exists = false });
     }
-    
+
     var match = matchManager.GetMatch(matchId);
     return Results.Ok(new { exists = match != null });
 });
@@ -87,7 +87,7 @@ app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager m
     {
         return Results.Ok(new { exists = false });
     }
-    
+
     var match = matchManager.GetMatch(matchId);
     return Results.Ok(new { exists = match != null });
 });
@@ -95,7 +95,3 @@ app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager m
 app.Run();
 
 // Helper class for match checking
-public class MatchCheckRequest
-{
-    public string MatchId { get; set; } = string.Empty;
-}

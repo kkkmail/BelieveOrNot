@@ -60,7 +60,7 @@ export async function routeToCorrectGame(matchId) {
             const result = await kingResponse.value.json();
             if (result.exists) {
                 console.log('Match found in King, redirecting...');
-                window.location.href = `/kingGame/?game=king&match=${matchId}`;
+                window.location.href = `/king/index.html?game=king&match=${matchId}`;
                 return true;
             }
         }
