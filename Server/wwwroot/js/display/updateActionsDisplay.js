@@ -50,12 +50,15 @@ export function updateActionsDisplay() {
         if (tableMessage) tableMessage.textContent = 'Waiting for players to join...';
 
         if (isCreator) {
-            console.log("CREATOR - Game started: Showing Start Round and End Game buttons");
-            if (startRoundBtn) {
-                startRoundBtn.classList.remove('hidden');
-                startRoundBtn.textContent = 'Start Round';
+            if (gameState.players && gameState.players.length >= 2) {
+                console.log("CREATOR - Game started: Showing Start Round button");
+                if (startRoundBtn) {
+                    startRoundBtn.classList.remove('hidden');
+                    startRoundBtn.textContent = 'Start Round';
+                }
             }
             if (endGameBtn) {
+                console.log("CREATOR - Game started: Showing End Game button");
                 endGameBtn.classList.remove('hidden');
             }
         } else {
