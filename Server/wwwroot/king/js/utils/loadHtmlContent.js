@@ -1,13 +1,13 @@
 // Server/wwwroot/king/js/utils/loadHtmlContent.js
 export async function loadHtmlContent() {
     try {
-        // Load setup form
-        const setupResponse = await fetch('setup-form.html');
+        // Load King setup form from correct path
+        const setupResponse = await fetch('/king/setup-form.html');
         const setupHtml = await setupResponse.text();
         document.getElementById('gameSetup').innerHTML = setupHtml;
 
-        // Load game board
-        const boardResponse = await fetch('game-board.html');
+        // Load King game board from correct path
+        const boardResponse = await fetch('/king/game-board.html');
         const boardHtml = await boardResponse.text();
         document.getElementById('gameBoard').innerHTML = boardHtml;
 

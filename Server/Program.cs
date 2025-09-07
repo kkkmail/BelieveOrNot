@@ -40,7 +40,7 @@ if (staticFilesEnabled)
     app.UseDefaultFiles();
     app.UseStaticFiles();
 
-    // Add static file serving for King game subfolder
+    // Add static file serving for King game subfolder (for CSS/JS files only)
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(
@@ -53,22 +53,6 @@ if (staticFilesEnabled)
 var hubPath = app.Configuration.GetValue<string>("ServerSettings:SignalRHubPath") ?? "/game";
 app.MapHub<GameHub>(hubPath);
 app.MapHub<KingHub>("/kingHub");
-
-// Simple King game route - just serve the index.html
-app.MapGet("/king/index.html", async context =>
-{
-    var indexPath = Path.Combine(builder.Environment.WebRootPath, "king", "index.html");
-    if (File.Exists(indexPath))
-    {
-        context.Response.ContentType = "text/html";
-        await context.Response.SendFileAsync(indexPath);
-    }
-    else
-    {
-        context.Response.StatusCode = 404;
-        await context.Response.WriteAsync("King game not found");
-    }
-});
 
 // Add API endpoints to check match existence for routing
 app.MapPost("/game/check-match", (MatchCheckRequest request, IMatchManager matchManager) =>

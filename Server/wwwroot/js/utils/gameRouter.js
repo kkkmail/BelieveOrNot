@@ -59,8 +59,8 @@ export async function routeToCorrectGame(matchId) {
         if (kingResponse.status === 'fulfilled' && kingResponse.value.ok) {
             const result = await kingResponse.value.json();
             if (result.exists) {
-                console.log('Match found in King, redirecting...');
-                window.location.href = `/king/index.html?game=king&match=${matchId}`;
+                console.log('Match found in King, redirecting to unified page...');
+                window.location.href = `/?game=king&match=${matchId}`;
                 return true;
             }
         }
@@ -81,4 +81,24 @@ export function setGameInUrl(gameType) {
         url.searchParams.delete('game');
     }
     window.history.replaceState({}, '', url);
+}
+
+export function setMatchIdInUrl(matchId) {
+    const url = new URL(window.location);
+    url.searchParams.set('match', matchId);
+    window.history.replaceState({}, '', url);
+    console.log('Match ID set in URL:', matchId);
+}
+
+export function clearMatchIdFromUrl() {
+    const url = new URL(window.location);
+    url.searchParams.delete('match');
+    window.history.replaceState({}, '', url);
+    console.log('Match ID cleared from URL');
+}
+
+export function generateShareableUrl(matchId) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('match', matchId);
+    return url.toString();
 }

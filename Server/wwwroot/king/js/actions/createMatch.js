@@ -1,7 +1,6 @@
 // Server/wwwroot/king/js/actions/createMatch.js
 import { connection, playerId, currentMatch, setCurrentMatch, setPlayerId, clientId, setGameState } from "../core/variables.js";
 import { showGameBoard } from "../utils/showGameBoard.js";
-import { setMatchIdInUrl } from "../../../js/utils/urlManager.js";
 import { storePlayerName } from "../../../js/utils/clientIdUtils.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
@@ -40,8 +39,12 @@ export async function createMatch() {
             console.error("No players found in King match result");
         }
 
-        // Set match ID in URL for easy sharing and reconnection
-        setMatchIdInUrl(result.matchId);
+        // Set match ID in URL using unified structure
+        const url = new URL(window.location.origin);
+        url.searchParams.set('game', 'king');
+        url.searchParams.set('match', result.matchId);
+        window.history.replaceState({}, '', url);
+        console.log('King match URL set to unified structure:', url.toString());
 
         showGameBoard();
         updateGameDisplay();

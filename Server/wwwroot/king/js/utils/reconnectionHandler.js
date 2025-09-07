@@ -35,6 +35,7 @@ export async function attemptReconnection() {
             return true;
         } else {
             console.log('King reconnection failed:', result.message);
+            // Don't show error - let user join normally
             return false;
         }
     } catch (err) {

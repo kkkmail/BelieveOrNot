@@ -50,8 +50,12 @@ export async function joinMatch() {
                 );
             }
 
-            // Set match ID in URL for reconnection
-            setMatchIdInUrl(matchId);
+            // Set match ID in URL for reconnection using unified structure
+            const url = new URL(window.location.origin);
+            url.searchParams.set('game', 'king');
+            url.searchParams.set('match', matchId);
+            window.history.replaceState({}, '', url);
+            console.log('King match URL updated to unified structure:', url.toString());
 
             showGameBoard();
             console.log("Joined King game successfully");

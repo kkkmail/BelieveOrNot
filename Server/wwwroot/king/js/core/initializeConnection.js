@@ -3,7 +3,7 @@ import { setConnection, setGameState, setClientId } from "./variables.js";
 import { updateConnectionStatus } from "./updateConnectionStatus.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { getOrCreateClientId } from "../../../js/utils/clientIdUtils.js";
-import { attemptReconnection, handleDisconnection, handleReconnection } from "../utils/reconnectionHandler.js";
+import { handleDisconnection, handleReconnection } from "../utils/reconnectionHandler.js";
 
 export async function initializeConnection() {
     // Get or create persistent client ID
@@ -53,11 +53,10 @@ export async function initializeConnection() {
         updateConnectionStatus("connected");
         console.log("King SignalR Connected");
 
-        // Attempt reconnection if match ID is in URL
-        const reconnected = await attemptReconnection();
-        if (!reconnected) {
-            console.log("No reconnection needed or failed, showing setup form");
-        }
+        // NO automatic reconnection attempt for King
+        // Users should explicitly use Join button even with match ID in URL
+        console.log("King connection ready - use Join button to join a game");
+        
     } catch (err) {
         console.error("King connection failed:", err);
         updateConnectionStatus("disconnected");
