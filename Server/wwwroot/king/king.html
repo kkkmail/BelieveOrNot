@@ -36,6 +36,24 @@
     <link rel="stylesheet" href="styles/king-table.css">
     <link rel="stylesheet" href="styles/king-game-board.css">
     <link rel="stylesheet" href="styles/king-responsive.css">
+    
+    <!-- Additional disabled card styling for King -->
+    <style>
+    /* Enhanced disabled card styling for King game */
+    .hand-card.disabled {
+        opacity: 0.4 !important;
+        filter: grayscale(100%) !important;
+        pointer-events: none !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        transition: none !important;
+    }
+    
+    .hand-card.disabled:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    </style>
 </head>
 <body>
     <div class="container">

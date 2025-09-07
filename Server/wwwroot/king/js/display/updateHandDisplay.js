@@ -93,7 +93,7 @@ function getCardDisabledReason(gameState, card, isMyTurn) {
     }
 
     if (!gameState?.currentTrick) {
-        return "Wait for your turn";
+        return "Wait for trick to start";
     }
 
     const currentRound = gameState.currentRound;
@@ -101,22 +101,22 @@ function getCardDisabledReason(gameState, card, isMyTurn) {
         return "No active round";
     }
 
-    // Check Hearts leading restriction
-    if (currentRound.cannotLeadHearts && card.suit === 'Hearts' && gameState.currentTrick.cards.length === 0) {
-        const hasNonHearts = gameState.yourHand?.some(c => c.suit !== 'Hearts');
-        if (hasNonHearts) {
-            return "Cannot lead with Hearts when other suits available";
-        }
-    }
-
-    // Check suit following requirement
-    if (gameState.currentTrick.cards.length > 0) {
+    // Check if following suit and this card doesn't match lead suit
+    if (gameState.currentTrick.cards && gameState.currentTrick.cards.length > 0) {
         const leadSuit = gameState.currentTrick.ledSuit;
         if (leadSuit && card.suit !== leadSuit) {
             const hasSameSuit = gameState.yourHand?.some(c => c.suit === leadSuit);
             if (hasSameSuit) {
                 return `Must follow suit: ${leadSuit}`;
             }
+        }
+    }
+
+    // Check Hearts leading restriction
+    if (gameState.currentTrick.cards.length === 0 && currentRound.cannotLeadHearts && card.suit === 'Hearts') {
+        const hasNonHearts = gameState.yourHand?.some(c => c.suit !== 'Hearts');
+        if (hasNonHearts) {
+            return "Cannot lead with Hearts when other suits available";
         }
     }
 

@@ -106,9 +106,10 @@ export class KingMoveValidator {
             
             if (!canFollowSuit) {
                 console.log("INVALID FOLLOW: Must play", leadSuit, "but trying to play", card.suit);
+                return false; // FIXED: Actually return false for invalid follow
             }
             
-            return canFollowSuit;
+            return true;
         }
 
         // No cards of lead suit - can play any card
