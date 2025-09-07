@@ -1,4 +1,4 @@
-// King/KingMoveValidator.cs
+// Server/King/KingMoveValidator.cs
 namespace BelieveOrNot.Server.King;
 
 public static class KingMoveValidator

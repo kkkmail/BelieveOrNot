@@ -1,4 +1,4 @@
-// King/KingGameEngine.cs
+// Server/King/KingGameEngine.cs
 namespace BelieveOrNot.Server.King;
 
 public class KingGameEngine : IKingGameEngine
@@ -66,9 +66,10 @@ public class KingGameEngine : IKingGameEngine
             throw new InvalidOperationException("Player not found");
         }
 
+        // Validate the move using the same logic as the client
         if (!KingMoveValidator.IsValidCardPlay(match, player, card))
         {
-            throw new InvalidOperationException("Invalid card play");
+            throw new InvalidOperationException("Invalid card play: " + GetInvalidMoveReason(match, player, card));
         }
 
         // Remove card from player's hand
@@ -113,6 +114,52 @@ public class KingGameEngine : IKingGameEngine
         return CreateGameStateDto(match);
     }
 
+    private string GetInvalidMoveReason(KingMatch match, Player player, Card card)
+    {
+        if (match.Phase != GamePhase.InProgress)
+            return "Game is not in progress";
+
+        if (match.CurrentPlayer.Id != player.Id)
+            return "It's not your turn";
+
+        if (!player.Hand.Contains(card))
+            return "You don't have this card";
+
+        var currentRound = match.CurrentRound;
+        if (currentRound == null)
+            return "No active round";
+
+        var currentTrick = match.CurrentTrick;
+        if (currentTrick == null)
+            return "No active trick";
+
+        // Check lead restrictions
+        if (currentTrick.Cards.Count == 0)
+        {
+            if (currentRound.CannotLeadHearts && card.IsHeart())
+            {
+                var nonHeartCards = player.Hand.Where(c => !c.IsHeart()).ToList();
+                if (nonHeartCards.Any())
+                {
+                    return "Cannot lead with Hearts when other suits are available";
+                }
+            }
+        }
+        else
+        {
+            // Check suit following
+            var leadSuit = currentTrick.LedSuit!.Value;
+            var sameSuitCards = player.Hand.Where(c => c.GetSuit() == leadSuit).ToList();
+            
+            if (sameSuitCards.Any() && card.GetSuit() != leadSuit)
+            {
+                return $"Must follow suit: {leadSuit}";
+            }
+        }
+
+        return "Unknown validation error";
+    }
+
     public KingGameStateDto SelectTrump(KingMatch match, Guid playerId, Suit trumpSuit)
     {
         var player = match.Players.FirstOrDefault(p => p.Id == playerId);
@@ -154,6 +201,22 @@ public class KingGameEngine : IKingGameEngine
             var playerIndex = i % 4;
             match.Players[playerIndex].Hand.Add(deck[i]);
         }
+
+        // Sort each player's hand after dealing
+        foreach (var player in match.Players)
+        {
+            SortPlayerHand(player);
+        }
+    }
+
+    private void SortPlayerHand(Player player)
+    {
+        // Sort by suit first (using enum order: Spades, Clubs, Diamonds, Hearts)
+        // Then by rank (7, 8, 9, 10, J, Q, K, A)
+        player.Hand = player.Hand
+            .OrderBy(c => c.GetSuit())
+            .ThenBy(c => c.GetRank())
+            .ToList();
     }
 
     private void StartNewTrick(KingMatch match)

@@ -1,6 +1,6 @@
 /* Server/wwwroot/king/styles/king-table.css */
 
-/* King Table Area */
+/* King Table Area - keep original size */
 .king-table-area {
     margin: 20px 0;
     padding: 20px;
@@ -9,10 +9,10 @@
     border: 3px solid #28a745;
     text-align: center;
     position: relative;
-    height: 500px; /* Increased height for full-size cards */
+    height: 500px;
 }
 
-/* Circular Table Layout */
+/* Circular Table Layout - keep original size */
 .king-table {
     position: relative;
     width: 600px;
@@ -44,25 +44,25 @@
 
 /* Position players around the table */
 .player-position.top {
-    top: -100px; /* Moved further up to accommodate larger cards */
+    top: -100px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.right {
-    right: -100px; /* Moved further right */
+    right: -100px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .player-position.bottom {
-    bottom: -100px; /* Moved further down to accommodate larger cards */
+    bottom: -100px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.left {
-    left: -100px; /* Moved further left */
+    left: -100px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -150,48 +150,31 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Table Center - Current Trick with full-size cards */
+/* Table Center - area for played cards (inherits standard card styling) */
 .table-center {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 250px;
-    height: 200px;
+    width: 320px;
+    height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 15px;
 }
 
+/* Container for played cards - cards inherit standard styling */
 .trick-cards {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     justify-content: center;
     flex-wrap: wrap;
     align-items: center;
 }
 
-/* Full-size cards in trick */
-.trick-cards .card {
-    width: 45px;
-    height: 65px;
-    background: white;
-    border: 2px solid #333;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 4px;
-    font-size: 12px;
-    font-weight: bold;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.3s ease;
-}
-
-.trick-cards .card.animate-entry {
+/* Card animations */
+.card.animate-entry {
     animation: cardEntry 0.5s ease-out;
 }
 
@@ -207,19 +190,19 @@
 }
 
 /* Card positioning for each player */
-.trick-cards .card.from-top {
+.card.from-top {
     order: 1;
 }
 
-.trick-cards .card.from-right {
+.card.from-right {
     order: 2;
 }
 
-.trick-cards .card.from-bottom {
+.card.from-bottom {
     order: 3;
 }
 
-.trick-cards .card.from-left {
+.card.from-left {
     order: 4;
 }
 
