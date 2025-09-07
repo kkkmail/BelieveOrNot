@@ -25,12 +25,14 @@ export function updateHandDisplay() {
 
     console.log("=== HAND DISPLAY DEBUG ===");
     console.log("playerId:", playerId);
+    console.log("typeof playerId:", typeof playerId);
     console.log("currentPlayerIndex:", gameState.currentPlayerIndex);
     console.log("current player:", gameState.players?.[gameState.currentPlayerIndex]);
     console.log("isMyTurn:", isMyTurn);
     console.log("gameState.phase:", gameState.phase);
     console.log("waitingForTrumpSelection:", gameState.waitingForTrumpSelection);
 
+    // Use cards in the exact order they come from server (already sorted)
     gameState.yourHand.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.className = 'card hand-card';

@@ -10,6 +10,8 @@ export function toggleCardSelection(cardIndex) {
     console.log("current selectedCard:", selectedCard);
     console.log("gameState.phase:", gameState?.phase);
     console.log("waitingForTrumpSelection:", gameState?.waitingForTrumpSelection);
+    console.log("playerId from import:", playerId);
+    console.log("typeof playerId:", typeof playerId);
 
     // Check if game is in valid state for card selection
     if (!gameState || gameState.phase !== 1) { // Not in progress
@@ -23,7 +25,7 @@ export function toggleCardSelection(cardIndex) {
         return;
     }
 
-    // Get the card being selected (no sorting, use original order)
+    // Get the card being selected (use original order from server)
     const card = gameState.yourHand?.[cardIndex];
     if (!card) {
         console.log("Card selection failed: Card not found at index", cardIndex);
@@ -33,7 +35,7 @@ export function toggleCardSelection(cardIndex) {
     console.log("Card being selected:", card);
 
     // Check if this card can be played
-    const canPlay = KingMoveValidator.canPlayCard(gameState, card, gameState.playerId);
+    const canPlay = KingMoveValidator.canPlayCard(gameState, card, playerId);
     console.log("Can play this card:", canPlay);
     
     if (!canPlay) {
