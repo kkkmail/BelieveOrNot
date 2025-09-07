@@ -1,4 +1,4 @@
-// Server/GameEngine_SubmitMove.cs
+// GameEngine_SubmitMove.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameEngine

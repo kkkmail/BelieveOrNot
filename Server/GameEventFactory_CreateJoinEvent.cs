@@ -1,4 +1,4 @@
-// Server/GameEventFactory_CreateJoinEvent.cs
+// GameEventFactory_CreateJoinEvent.cs
 namespace BelieveOrNot.Server;
 
 public static partial class GameEventFactory

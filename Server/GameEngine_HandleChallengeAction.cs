@@ -1,4 +1,4 @@
-// Server/GameEngine_HandleChallengeAction.cs
+// GameEngine_HandleChallengeAction.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameEngine

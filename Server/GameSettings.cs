@@ -1,3 +1,4 @@
+// GameSettings.cs
 namespace BelieveOrNot.Server;
 
 public class GameSettings

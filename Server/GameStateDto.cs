@@ -1,3 +1,4 @@
+// GameStateDto.cs
 namespace BelieveOrNot.Server;
 
 public class GameStateDto

@@ -1,4 +1,4 @@
-// Server/GameEngine_AutoDisposeFourOfAKind.cs
+// GameEngine_AutoDisposeFourOfAKind.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameEngine

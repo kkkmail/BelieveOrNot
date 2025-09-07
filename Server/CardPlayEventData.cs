@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// CardPlayEventData.cs
+namespace BelieveOrNot.Server;
 
 public class CardPlayEventData
 {

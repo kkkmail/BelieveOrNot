@@ -1,4 +1,4 @@
-// Server/MessageFormatter.cs
+// MessageFormatter.cs
 // Server-side message formatting that generates HTML directly
 
 namespace BelieveOrNot.Server;

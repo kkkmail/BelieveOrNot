@@ -1,4 +1,4 @@
-// Server/GameHub_SubmitMove.cs
+// GameHub_SubmitMove.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameHub

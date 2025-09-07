@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// RoundEndEventData.cs
+namespace BelieveOrNot.Server;
 
 public class RoundEndEventData
 {

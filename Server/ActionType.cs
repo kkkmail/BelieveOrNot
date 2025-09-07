@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// ActionType.cs
+namespace BelieveOrNot.Server;
 
 public enum ActionType
 {

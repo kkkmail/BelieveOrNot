@@ -1,4 +1,4 @@
-// Server/ReconnectionRequest.cs
+// ReconnectionRequest.cs
 namespace BelieveOrNot.Server;
 
 public class ReconnectionRequest

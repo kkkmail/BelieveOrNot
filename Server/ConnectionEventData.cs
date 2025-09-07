@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// ConnectionEventData.cs
+namespace BelieveOrNot.Server;
 
 public class ConnectionEventData
 {

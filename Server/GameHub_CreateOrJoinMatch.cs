@@ -1,4 +1,4 @@
-// Server/GameHub_CreateOrJoinMatch.cs
+// GameHub_CreateOrJoinMatch.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameHub

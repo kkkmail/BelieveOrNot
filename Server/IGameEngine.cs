@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// IGameEngine.cs
+namespace BelieveOrNot.Server;
 
 public interface IGameEngine
 {

@@ -1,4 +1,4 @@
-// Server/GameEngine.cs
+// GameEngine.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameEngine : IGameEngine

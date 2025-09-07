@@ -1,4 +1,4 @@
-// Server/GameEventFactory_CreateConnectionEvent.cs
+// GameEventFactory_CreateConnectionEvent.cs
 namespace BelieveOrNot.Server;
 
 public static partial class GameEventFactory

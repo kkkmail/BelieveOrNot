@@ -1,4 +1,4 @@
-// Server/GameEngine_AdvanceToNextActivePlayer.cs
+// GameEngine_AdvanceToNextActivePlayer.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameEngine

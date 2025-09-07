@@ -1,4 +1,4 @@
-// Server/GameHub.cs
+// GameHub.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameHub : Hub

@@ -1,3 +1,4 @@
+// ChallengeEventData.cs
 namespace BelieveOrNot.Server;
 
 public class ChallengeEventData

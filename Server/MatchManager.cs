@@ -1,4 +1,4 @@
-// Server/MatchManager.cs
+// MatchManager.cs
 
 using System.Collections.Concurrent;
 

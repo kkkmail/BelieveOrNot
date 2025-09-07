@@ -1,4 +1,4 @@
-// Server/GameEngine_StartNewRound.cs
+// GameEngine_StartNewRound.cs
 namespace BelieveOrNot.Server;
 
 public partial class GameEngine

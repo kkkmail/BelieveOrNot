@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// Card.cs
+namespace BelieveOrNot.Server;
 
 public record Card(string Rank, string Suit)
 {

@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// JoinEventData.cs
+namespace BelieveOrNot.Server;
 
 public class JoinEventData
 {

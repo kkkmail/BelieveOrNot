@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// ReconnectionResponse.cs
+namespace BelieveOrNot.Server;
 
 public class ReconnectionResponse
 {

@@ -1,4 +1,4 @@
-// Server/IMatchManager.cs
+// IMatchManager.cs
 namespace BelieveOrNot.Server;
 
 public interface IMatchManager

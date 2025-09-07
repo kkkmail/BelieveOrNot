@@ -1,4 +1,4 @@
-﻿// Server/Player.cs
+// Player.cs
 namespace BelieveOrNot.Server;
 
 public class Player

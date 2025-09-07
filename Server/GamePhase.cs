@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// GamePhase.cs
+namespace BelieveOrNot.Server;
 
 public enum GamePhase
 {

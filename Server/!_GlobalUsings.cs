@@ -1,4 +1,4 @@
-// Server/!_GlobalUsings.cs
+// !_GlobalUsings.cs
 // Global using directives for the entire project
 
 global using System;

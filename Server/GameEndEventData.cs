@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server;
+// GameEndEventData.cs
+namespace BelieveOrNot.Server;
 
 public class GameEndEventData
 {
