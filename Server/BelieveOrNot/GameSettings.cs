@@ -1,4 +1,4 @@
-// GameSettings.cs
+// BelieveOrNot/GameSettings.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class GameSettings

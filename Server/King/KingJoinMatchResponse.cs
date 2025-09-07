@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server.King;
+// King/KingJoinMatchResponse.cs
+namespace BelieveOrNot.Server.King;
 
 public class KingJoinMatchResponse
 {

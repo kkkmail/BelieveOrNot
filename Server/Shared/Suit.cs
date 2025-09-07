@@ -1,4 +1,4 @@
-// Suit.cs
+// Shared/Suit.cs
 namespace BelieveOrNot.Server.Shared;
 
 public enum Suit

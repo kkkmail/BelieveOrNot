@@ -1,4 +1,4 @@
-// Rank.cs
+// Shared/Rank.cs
 namespace BelieveOrNot.Server.Shared;
 
 public enum Rank

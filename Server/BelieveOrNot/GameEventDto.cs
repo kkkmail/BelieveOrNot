@@ -1,4 +1,4 @@
-// GameEventDto.cs
+// BelieveOrNot/GameEventDto.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class GameEventDto

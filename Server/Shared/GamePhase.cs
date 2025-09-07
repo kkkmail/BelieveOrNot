@@ -1,4 +1,4 @@
-// GamePhase.cs
+// Shared/GamePhase.cs
 namespace BelieveOrNot.Server.Shared;
 
 public enum GamePhase

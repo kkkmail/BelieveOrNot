@@ -1,4 +1,4 @@
-// DeckSize.cs
+// Shared/DeckSize.cs
 namespace BelieveOrNot.Server.Shared;
 
 public enum DeckSize

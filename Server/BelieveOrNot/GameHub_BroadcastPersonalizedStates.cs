@@ -1,4 +1,4 @@
-// GameHub_BroadcastPersonalizedStates.cs
+// BelieveOrNot/GameHub_BroadcastPersonalizedStates.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public partial class GameHub

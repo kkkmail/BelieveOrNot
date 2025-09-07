@@ -1,4 +1,4 @@
-// JoinMatchResponse.cs
+// BelieveOrNot/JoinMatchResponse.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class JoinMatchResponse

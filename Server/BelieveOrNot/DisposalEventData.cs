@@ -1,4 +1,4 @@
-// DisposalEventData.cs
+// BelieveOrNot/DisposalEventData.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class DisposalEventData

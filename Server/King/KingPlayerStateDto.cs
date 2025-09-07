@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server.King;
+// King/KingPlayerStateDto.cs
+namespace BelieveOrNot.Server.King;
 
 public class KingPlayerStateDto
 {

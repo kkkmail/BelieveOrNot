@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server.King;
+// King/PlayedCard.cs
+namespace BelieveOrNot.Server.King;
 
 public class PlayedCard
 {

@@ -1,6 +1,4 @@
 // King/Trick.cs
-using BelieveOrNot.Server.Shared;
-
 namespace BelieveOrNot.Server.King;
 
 public class Trick

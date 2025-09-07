@@ -1,4 +1,4 @@
-// GameEngine_EndRound.cs
+// BelieveOrNot/GameEngine_EndRound.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public partial class GameEngine

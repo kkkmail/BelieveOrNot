@@ -1,4 +1,4 @@
-// King/KingRequests.cs
+// King/KingCreateMatchRequest.cs
 namespace BelieveOrNot.Server.King;
 
 public class KingCreateMatchRequest

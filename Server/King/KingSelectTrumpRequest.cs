@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server.King;
+// King/KingSelectTrumpRequest.cs
+namespace BelieveOrNot.Server.King;
 
 public class KingSelectTrumpRequest
 {

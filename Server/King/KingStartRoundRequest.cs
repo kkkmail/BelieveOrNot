@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server.King;
+// King/KingStartRoundRequest.cs
+namespace BelieveOrNot.Server.King;
 
 public class KingStartRoundRequest
 {

@@ -1,4 +1,4 @@
-// SubmitMoveRequest.cs
+// BelieveOrNot/SubmitMoveRequest.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class SubmitMoveRequest

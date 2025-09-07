@@ -1,4 +1,4 @@
-// GameHub_ReconnectToMatch.cs
+// BelieveOrNot/GameHub_ReconnectToMatch.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public partial class GameHub

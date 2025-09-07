@@ -1,4 +1,4 @@
-// DeckBuilder.cs
+// Shared/DeckBuilder.cs
 namespace BelieveOrNot.Server.Shared;
 
 public static class DeckBuilder

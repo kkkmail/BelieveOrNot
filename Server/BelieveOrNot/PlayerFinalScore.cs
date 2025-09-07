@@ -1,4 +1,4 @@
-// PlayerFinalScore.cs
+// BelieveOrNot/PlayerFinalScore.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class PlayerFinalScore

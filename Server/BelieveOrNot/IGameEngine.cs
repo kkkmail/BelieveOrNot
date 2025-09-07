@@ -1,4 +1,4 @@
-// IGameEngine.cs
+// BelieveOrNot/IGameEngine.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public interface IGameEngine

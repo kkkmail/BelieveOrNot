@@ -1,4 +1,4 @@
-// GameEventFactory_CreateGameEndEvent.cs
+// BelieveOrNot/GameEventFactory_CreateGameEndEvent.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public static partial class GameEventFactory

@@ -1,4 +1,4 @@
-// GameHub_EndRound.cs
+// BelieveOrNot/GameHub_EndRound.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public partial class GameHub

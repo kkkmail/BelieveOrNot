@@ -1,4 +1,4 @@
-// ChallengeEventData.cs
+// BelieveOrNot/ChallengeEventData.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class ChallengeEventData

@@ -1,4 +1,4 @@
-// CreateMatchRequest.cs
+// BelieveOrNot/CreateMatchRequest.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class CreateMatchRequest

@@ -1,4 +1,4 @@
-// GameEngine_CreateGameStateDto.cs
+// BelieveOrNot/GameEngine_CreateGameStateDto.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public partial class GameEngine

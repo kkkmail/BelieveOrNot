@@ -1,4 +1,4 @@
-// ReconnectionResponse.cs
+// BelieveOrNot/ReconnectionResponse.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class ReconnectionResponse

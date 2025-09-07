@@ -1,4 +1,4 @@
-// RankExtensions.cs
+// Shared/RankExtensions.cs
 namespace BelieveOrNot.Server.Shared;
 
 public static class RankExtensions

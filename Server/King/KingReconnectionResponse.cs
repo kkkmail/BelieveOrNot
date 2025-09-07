@@ -1,4 +1,5 @@
-﻿namespace BelieveOrNot.Server.King;
+// King/KingReconnectionResponse.cs
+namespace BelieveOrNot.Server.King;
 
 public class KingReconnectionResponse
 {

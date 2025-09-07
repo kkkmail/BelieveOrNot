@@ -1,4 +1,4 @@
-// ConnectionEventData.cs
+// BelieveOrNot/ConnectionEventData.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class ConnectionEventData

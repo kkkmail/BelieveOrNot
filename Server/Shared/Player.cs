@@ -1,4 +1,4 @@
-// Player.cs
+// Shared/Player.cs
 namespace BelieveOrNot.Server.Shared;
 
 public class Player

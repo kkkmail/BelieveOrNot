@@ -1,4 +1,4 @@
-// GameStateDto.cs
+// BelieveOrNot/GameStateDto.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
 public class GameStateDto
