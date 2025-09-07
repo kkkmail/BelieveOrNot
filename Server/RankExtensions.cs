@@ -1,3 +1,4 @@
+// RankExtensions.cs
 namespace BelieveOrNot.Server;
 
 public static class RankExtensions

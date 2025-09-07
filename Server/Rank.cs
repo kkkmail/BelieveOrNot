@@ -1,3 +1,4 @@
+// Rank.cs
 namespace BelieveOrNot.Server;
 
 public enum Rank
