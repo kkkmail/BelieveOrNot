@@ -20,7 +20,7 @@ export function updateHandDisplay() {
 
     // Get current player info
     const currentPlayer = gameState.players?.find(p => p.id === playerId);
-    const isMyTurn = gameState.currentPlayerIndex !== undefined && 
+    const isMyTurn = gameState.currentPlayerIndex !== undefined &&
                      gameState.players?.[gameState.currentPlayerIndex]?.id === playerId;
 
     console.log("=== HAND DISPLAY DEBUG ===");
@@ -36,20 +36,20 @@ export function updateHandDisplay() {
     gameState.yourHand.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.className = 'card hand-card';
-        
-        // Check if this card can be played
-        const canPlay = isMyTurn && 
-                       !gameState.waitingForTrumpSelection && 
+
+        // Check if this card can be played (must validate each individual card)
+        const canPlay = isMyTurn &&
+                       !gameState.waitingForTrumpSelection &&
                        KingMoveValidator.canPlayCard(gameState, card, playerId);
-        
-        console.log(`Card ${index} (${card.rank} of ${card.suit}): canPlay=${canPlay}, isMyTurn=${isMyTurn}, waitingForTrump=${gameState.waitingForTrumpSelection}`);
-        
+
+        console.log(`Card ${index} (${card.rank} of ${card.suit}): canPlay=${canPlay}, isMyTurn=${isMyTurn}, waitingForTrump=${gameState.waitingForTrumpSelection}, validatorResult=${KingMoveValidator.canPlayCard(gameState, card, playerId)}`);
+
         // Add selected class if this card is selected
         if (selectedCard === index) {
             cardElement.classList.add('selected');
             console.log(`Card ${index} is SELECTED`);
         }
-        
+
         // Disable unplayable cards (BelieveOrNot pattern)
         if (!canPlay) {
             cardElement.classList.add('disabled');
