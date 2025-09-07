@@ -3,8 +3,8 @@ namespace BelieveOrNot.Server.Shared;
 
 public enum Suit
 {
-    Hearts,
-    Diamonds, 
+    Spades,
     Clubs,
-    Spades
+    Diamonds,
+    Hearts,
 }

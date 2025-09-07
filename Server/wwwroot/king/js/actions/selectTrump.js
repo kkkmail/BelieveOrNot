@@ -1,5 +1,5 @@
 // Server/wwwroot/king/js/actions/selectTrump.js
-import { connection, gameState, playerId, setSelectedTrumpSuit } from "../core/variables.js";
+import { connection, gameState, playerId } from "../core/variables.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
 
 export async function selectTrump(trumpSuit) {
@@ -13,18 +13,22 @@ export async function selectTrump(trumpSuit) {
         return;
     }
 
+    console.log("Selecting trump suit:", trumpSuit);
+
     try {
-        await connection.invoke("SelectTrump", {
+        const trumpRequest = {
             matchId: gameState.matchId,
             playerId: playerId,
             trumpSuit: trumpSuit
-        });
+        };
+
+        console.log("Trump selection request:", trumpRequest);
+
+        await connection.invoke("SelectTrump", trumpRequest);
         
-        // Clear selected trump after successful selection
-        setSelectedTrumpSuit(null);
         console.log("Trump selected successfully:", trumpSuit);
     } catch (err) {
         console.error("Failed to select trump:", err);
-        await customAlert("Failed to select trump: " + err);
+        await customAlert("Failed to select trump: " + (err.message || err));
     }
 }

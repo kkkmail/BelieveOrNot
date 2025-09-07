@@ -1,79 +1,122 @@
 // Server/wwwroot/king/js/display/updateHandDisplay.js
-import { gameState, playerId, selectedCard, setSelectedCard } from "../core/variables.js";
+import { gameState, playerId, selectedCard } from "../core/variables.js";
 import { getSuitSymbol } from "../../../js/cards/getSuitSymbol.js";
 import { getSuitClass } from "../../../js/cards/getSuitClass.js";
-import { playCard } from "../actions/playCard.js";
+import { toggleCardSelection } from "../cards/toggleCardSelection.js";
+import { KingMoveValidator } from "../utils/KingMoveValidator.js";
 
 export function updateHandDisplay() {
     const handCards = document.getElementById('handCards');
     const handCount = document.getElementById('handCount');
-    
-    if (!handCards || !handCount) return;
-    
-    handCards.innerHTML = '';
 
     if (!gameState?.yourHand) {
+        handCards.innerHTML = '<div class="no-cards">No cards in hand</div>';
         handCount.textContent = '0';
         return;
     }
 
-    // Sort cards by suit and rank for consistent display
-    const sortedHand = [...gameState.yourHand].sort((a, b) => {
-        const suitOrder = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
-        const rankOrder = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        
-        const suitDiff = suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
-        if (suitDiff !== 0) return suitDiff;
-        
-        return rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank);
-    });
+    handCount.textContent = gameState.yourHand.length;
+    handCards.innerHTML = '';
 
-    handCount.textContent = sortedHand.length;
+    // Get current player info
+    const currentPlayer = gameState.players?.find(p => p.id === playerId);
+    const isMyTurn = gameState.currentPlayerIndex !== undefined && 
+                     gameState.players?.[gameState.currentPlayerIndex]?.id === playerId;
 
-    sortedHand.forEach((card, index) => {
+    console.log("=== HAND DISPLAY DEBUG ===");
+    console.log("playerId:", playerId);
+    console.log("currentPlayerIndex:", gameState.currentPlayerIndex);
+    console.log("current player:", gameState.players?.[gameState.currentPlayerIndex]);
+    console.log("isMyTurn:", isMyTurn);
+    console.log("gameState.phase:", gameState.phase);
+    console.log("waitingForTrumpSelection:", gameState.waitingForTrumpSelection);
+
+    gameState.yourHand.forEach((card, index) => {
         const cardElement = document.createElement('div');
-        cardElement.className = `card ${getSuitClass(card.suit)}`;
-
-        cardElement.innerHTML = `
-            <div class="rank">${card.rank}</div>
-            <div class="suit">${getSuitSymbol(card.suit)}</div>
-        `;
-
-        // Check if card is playable
-        const isMyTurn = gameState.phase === 1 && 
-                        gameState.players && 
-                        gameState.players[gameState.currentPlayerIndex]?.id === playerId;
+        cardElement.className = 'card hand-card';
         
-        const canPlayCard = isMyTurn && !gameState.waitingForTrumpSelection;
-
-        if (canPlayCard) {
-            cardElement.classList.add('playable');
-            cardElement.addEventListener('click', () => {
-                if (selectedCard && selectedCard.rank === card.rank && selectedCard.suit === card.suit) {
-                    // Deselect if clicking the same card
-                    setSelectedCard(null);
-                    cardElement.classList.remove('selected');
-                } else {
-                    // Clear previous selection
-                    document.querySelectorAll('.hand-cards .card.selected').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-                    
-                    // Select this card
-                    setSelectedCard(card);
-                    cardElement.classList.add('selected');
-                    
-                    // Auto-play the card (King is auto-play on click)
-                    playCard(card);
-                }
-            });
+        // Check if this card can be played
+        const canPlay = isMyTurn && 
+                       !gameState.waitingForTrumpSelection && 
+                       KingMoveValidator.canPlayCard(gameState, card, playerId);
+        
+        console.log(`Card ${index} (${card.rank} of ${card.suit}): canPlay=${canPlay}, isMyTurn=${isMyTurn}, waitingForTrump=${gameState.waitingForTrumpSelection}`);
+        
+        // Add selected class if this card is selected
+        if (selectedCard === index) {
+            cardElement.classList.add('selected');
+            console.log(`Card ${index} is SELECTED`);
+        }
+        
+        // Disable unplayable cards (BelieveOrNot pattern)
+        if (!canPlay) {
+            cardElement.classList.add('disabled');
         }
 
-        // Show selection state
-        if (selectedCard && selectedCard.rank === card.rank && selectedCard.suit === card.suit) {
-            cardElement.classList.add('selected');
+        const suitSymbol = getSuitSymbol(card.suit);
+        const suitClass = getSuitClass(card.suit);
+
+        cardElement.innerHTML = `
+            <div class="rank ${suitClass}">${card.rank}</div>
+            <div class="suit ${suitClass}">${suitSymbol}</div>
+        `;
+
+        // Add click handler only for playable cards (BelieveOrNot pattern)
+        if (canPlay) {
+            cardElement.style.cursor = 'pointer';
+            cardElement.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log(`Card ${index} clicked - calling toggleCardSelection`);
+                toggleCardSelection(index);
+            });
+        } else {
+            cardElement.style.cursor = 'not-allowed';
+            cardElement.title = getCardDisabledReason(gameState, card, isMyTurn);
         }
 
         handCards.appendChild(cardElement);
     });
+
+    console.log("selectedCard:", selectedCard);
+}
+
+function getCardDisabledReason(gameState, card, isMyTurn) {
+    if (!isMyTurn) {
+        return "Wait for your turn";
+    }
+
+    if (gameState.waitingForTrumpSelection) {
+        return "Choose trump suit first";
+    }
+
+    if (!gameState?.currentTrick) {
+        return "Wait for your turn";
+    }
+
+    const currentRound = gameState.currentRound;
+    if (!currentRound) {
+        return "No active round";
+    }
+
+    // Check Hearts leading restriction
+    if (currentRound.cannotLeadHearts && card.suit === 'Hearts' && gameState.currentTrick.cards.length === 0) {
+        const hasNonHearts = gameState.yourHand?.some(c => c.suit !== 'Hearts');
+        if (hasNonHearts) {
+            return "Cannot lead with Hearts when other suits available";
+        }
+    }
+
+    // Check suit following requirement
+    if (gameState.currentTrick.cards.length > 0) {
+        const leadSuit = gameState.currentTrick.ledSuit;
+        if (leadSuit && card.suit !== leadSuit) {
+            const hasSameSuit = gameState.yourHand?.some(c => c.suit === leadSuit);
+            if (hasSameSuit) {
+                return `Must follow suit: ${leadSuit}`;
+            }
+        }
+    }
+
+    return "Card cannot be played";
 }

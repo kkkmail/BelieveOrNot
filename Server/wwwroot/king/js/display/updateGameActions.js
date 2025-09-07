@@ -1,106 +1,114 @@
 // Server/wwwroot/king/js/display/updateGameActions.js
-import { gameState, playerId } from "../core/variables.js";
+import { gameState, playerId, selectedCard } from "../core/variables.js";
 
 export function updateGameActions() {
-    const startRoundBtn = document.getElementById('startRoundBtn');
-    const otherGamesBtn = document.getElementById('otherGamesBtn');
-    const trumpSelectionArea = document.getElementById('trumpSelectionArea');
-    const turnMessage = document.getElementById('turnMessage');
+    console.log("🎯 updateGameActions() CALLED!!!");
+    
+    // Look for buttons in both game board AND management controls
+    const startRoundBtn = document.getElementById('startRoundBtn'); // In management controls
+    const endRoundBtn = document.getElementById('endRoundBtn'); // In game board
+    const playCardBtn = document.getElementById('playCardBtn'); // In game board
+    const turnMessage = document.getElementById('turnMessage'); // In game board
+    const otherGamesBtn = document.getElementById('otherGamesBtn'); // In management controls
 
-    // Hide all buttons by default
-    if (startRoundBtn) startRoundBtn.classList.add('hidden');
-    if (otherGamesBtn) otherGamesBtn.classList.add('hidden');
-    if (trumpSelectionArea) trumpSelectionArea.classList.add('hidden');
+    console.log("DOM elements found:", {
+        startRoundBtn: !!startRoundBtn,
+        endRoundBtn: !!endRoundBtn,
+        playCardBtn: !!playCardBtn,
+        turnMessage: !!turnMessage,
+        otherGamesBtn: !!otherGamesBtn
+    });
+
+    // Hide all buttons initially
+    [startRoundBtn, endRoundBtn, playCardBtn, otherGamesBtn].forEach(btn => {
+        if (btn) btn.classList.add('hidden');
+    });
 
     if (!gameState) {
-        // Home page - show Other Games button
-        if (otherGamesBtn) {
-            otherGamesBtn.classList.remove('hidden');
-        }
-        if (turnMessage) {
-            turnMessage.textContent = 'Create or join a King game to start playing';
-        }
+        if (turnMessage) turnMessage.textContent = "Loading...";
         return;
     }
 
-    const isCreator = playerId && gameState.players && gameState.players[0]?.id === playerId;
-    const currentPlayer = gameState.players?.[gameState.currentPlayerIndex];
-    const isMyTurn = currentPlayer?.id === playerId;
+    console.log("=== KING GAME ACTIONS DEBUG ===");
+    console.log("gameState.phase:", gameState.phase);
+    console.log("playerId:", playerId);
+    console.log("gameState.players:", gameState.players);
 
+    // Check if current player is creator (first player in the array OR has isCreator property)
+    const currentPlayer = gameState.players?.find(p => p.id === playerId);
+    const isCreator = currentPlayer?.isCreator || (gameState.players && gameState.players[0]?.id === playerId);
+    const isMyTurn = gameState.currentPlayerIndex !== undefined && 
+                     gameState.players?.[gameState.currentPlayerIndex]?.id === playerId;
+
+    console.log("currentPlayer:", currentPlayer);
+    console.log("isCreator:", isCreator);
+    console.log("gameState.players.length:", gameState.players?.length);
+
+    // Check button styles
+    if (startRoundBtn) {
+        console.log("startRoundBtn classes:", startRoundBtn.className);
+        console.log("startRoundBtn style.display:", startRoundBtn.style.display);
+        console.log("startRoundBtn computed style:", window.getComputedStyle(startRoundBtn).display);
+    }
+
+    // Show buttons based on game phase and player status
     if (gameState.phase === 0) { // WaitingForPlayers
         if (turnMessage) {
             turnMessage.textContent = `Waiting for players to join (${gameState.players?.length || 0}/4)`;
         }
 
-        if (isCreator && gameState.players?.length === 4) {
-            if (startRoundBtn) {
-                startRoundBtn.classList.remove('hidden');
-                startRoundBtn.textContent = 'Start Round';
-            }
-        }
-        return;
-    }
-
-    if (gameState.phase === 1) { // InProgress
-        if (gameState.waitingForTrumpSelection) {
-            // Show trump selection for the appropriate player
-            const currentRound = gameState.currentRound;
-            const isTrumpChooser = currentRound?.trumpChooser === playerId;
-
-            if (isTrumpChooser) {
-                if (trumpSelectionArea) {
-                    trumpSelectionArea.classList.remove('hidden');
-                }
-                if (turnMessage) {
-                    turnMessage.textContent = 'Choose trump suit for this collecting round';
+        if (isCreator) {
+            console.log("CREATOR DETECTED - Players:", gameState.players?.length);
+            if (gameState.players?.length === 4) {
+                console.log("4 PLAYERS JOINED - SHOWING START BUTTON");
+                if (startRoundBtn) {
+                    console.log("REMOVING HIDDEN CLASS FROM START BUTTON");
+                    startRoundBtn.classList.remove('hidden');
+                    startRoundBtn.textContent = 'Start Round';
+                    console.log("Start button classes after removing hidden:", startRoundBtn.className);
                 }
             } else {
-                if (turnMessage) {
-                    const chooserName = gameState.players?.find(p => p.id === currentRound?.trumpChooser)?.name || 'Someone';
-                    turnMessage.textContent = `Waiting for ${chooserName} to choose trump suit`;
-                }
-            }
-            return;
-        }
-
-        // Normal play
-        if (isMyTurn) {
-            if (turnMessage) {
-                turnMessage.textContent = 'Your turn - click a card to play it';
-                turnMessage.className = 'turn-message current-turn-highlight';
+                console.log("NOT ENOUGH PLAYERS YET");
             }
         } else {
-            if (turnMessage) {
-                turnMessage.textContent = `Waiting for ${currentPlayer?.name || 'current player'} to play`;
-                turnMessage.className = 'turn-message';
-            }
+            console.log("NOT CREATOR - NO BUTTONS");
         }
         return;
-    }
-
-    if (gameState.phase === 2) { // RoundEnd
-        if (turnMessage) {
-            turnMessage.textContent = 'Round ended - waiting for next round';
-        }
-
+    } 
+    else if (gameState.phase === 1) { // InProgress
+        // Show end round button for game creator (similar to BelieveOrNot)
         if (isCreator) {
-            if (startRoundBtn) {
-                startRoundBtn.classList.remove('hidden');
-                startRoundBtn.textContent = 'Start Next Round';
+            endRoundBtn?.classList.remove('hidden');
+        }
+
+        if (gameState.waitingForTrumpSelection) {
+            if (isMyTurn) {
+                if (turnMessage) turnMessage.textContent = "Choose trump suit";
+            } else {
+                const currentPlayerName = gameState.players?.[gameState.currentPlayerIndex]?.name || "Unknown";
+                if (turnMessage) turnMessage.textContent = `Waiting for ${currentPlayerName} to choose trump`;
             }
+        } 
+        else if (isMyTurn) {
+            // Show play card button if a card is selected (BelieveOrNot pattern)
+            if (selectedCard !== null) {
+                console.log("CARD SELECTED - SHOWING PLAY BUTTON, selectedCard:", selectedCard);
+                playCardBtn?.classList.remove('hidden');
+            }
+            if (turnMessage) turnMessage.textContent = "Your turn - select a card to play";
+        } 
+        else {
+            const currentPlayerName = gameState.players?.[gameState.currentPlayerIndex]?.name || "Unknown";
+            if (turnMessage) turnMessage.textContent = `Waiting for ${currentPlayerName}`;
         }
-        return;
-    }
-
-    if (gameState.phase === 3) { // GameEnd
-        if (turnMessage) {
-            turnMessage.textContent = 'Game completed!';
+    } 
+    else if (gameState.phase === 2) { // RoundEnd
+        if (isCreator) {
+            startRoundBtn?.classList.remove('hidden');
         }
-
-        // Show Other Games button for everyone
-        if (otherGamesBtn) {
-            otherGamesBtn.classList.remove('hidden');
-        }
-        return;
+        if (turnMessage) turnMessage.textContent = "Round ended";
+    } 
+    else if (gameState.phase === 3) { // GameEnd
+        if (turnMessage) turnMessage.textContent = "Game finished!";
     }
 }

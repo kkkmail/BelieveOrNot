@@ -8,12 +8,8 @@
     border-radius: 15px;
     border: 3px solid #28a745;
     text-align: center;
-}
-
-.king-table-area h3 {
-    margin: 0 0 20px 0;
-    color: #333;
-    font-size: 1.5em;
+    position: relative;
+    height: 500px; /* Increased height for full-size cards */
 }
 
 /* Circular Table Layout */
@@ -48,25 +44,25 @@
 
 /* Position players around the table */
 .player-position.top {
-    top: -80px;
+    top: -100px; /* Moved further up to accommodate larger cards */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.right {
-    right: -80px;
+    right: -100px; /* Moved further right */
     top: 50%;
     transform: translateY(-50%);
 }
 
 .player-position.bottom {
-    bottom: -80px;
+    bottom: -100px; /* Moved further down to accommodate larger cards */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.left {
-    left: -80px;
+    left: -100px; /* Moved further left */
     top: 50%;
     transform: translateY(-50%);
 }
@@ -154,144 +150,110 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Table Center - Current Trick */
+/* Table Center - Current Trick with full-size cards */
 .table-center {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 200px;
-    height: 150px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
-    border: 2px dashed #28a745;
+    width: 250px;
+    height: 200px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 10px;
 }
 
-.trick-label {
-    font-weight: bold;
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
 .trick-cards {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 10px;
-    min-height: 60px;
     align-items: center;
 }
 
+/* Full-size cards in trick */
 .trick-cards .card {
-    width: 30px;
-    height: 45px;
-    font-size: 8px;
-    border-radius: 4px;
+    width: 45px;
+    height: 65px;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2px;
-}
-
-.trick-cards .card .rank {
-    font-size: 10px;
-    margin-bottom: 1px;
-}
-
-.trick-cards .card .suit {
-    font-size: 8px;
-}
-
-.trick-info {
+    justify-content: space-between;
+    padding: 4px;
     font-size: 12px;
-    color: #666;
-    text-align: center;
-    font-style: italic;
-}
-
-/* Disconnected player styling */
-.player-position.disconnected {
-    opacity: 0.6;
-    border-color: #dc3545;
-}
-
-.player-position.disconnected .player-name::after {
-    content: " ⚠️";
-    color: #dc3545;
-}
-
-/* Empty positions */
-.player-position.empty {
-    opacity: 0.4;
-    border-style: dashed;
-}
-
-.player-position.empty .player-name {
-    color: #999;
-    font-style: italic;
-}
-
-/* Trump suit indicator */
-.trump-indicator {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255, 215, 0, 0.9);
-    padding: 5px 10px;
-    border-radius: 15px;
-    border: 2px solid #ffd700;
     font-weight: bold;
-    font-size: 14px;
-    color: #333;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
 }
 
-.trump-indicator .trump-symbol {
-    font-size: 16px;
-    margin-right: 5px;
+.trick-cards .card.animate-entry {
+    animation: cardEntry 0.5s ease-out;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .king-table {
-        width: 450px;
-        height: 300px;
-        border-radius: 150px;
+@keyframes cardEntry {
+    0% {
+        transform: scale(0.8) translateY(-20px);
+        opacity: 0;
     }
-    
-    .player-position {
-        min-width: 100px;
-        padding: 10px;
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
     }
-    
-    .player-position.top,
-    .player-position.bottom {
-        transform: translateX(-50%) scale(0.9);
+}
+
+/* Card positioning for each player */
+.trick-cards .card.from-top {
+    order: 1;
+}
+
+.trick-cards .card.from-right {
+    order: 2;
+}
+
+.trick-cards .card.from-bottom {
+    order: 3;
+}
+
+.trick-cards .card.from-left {
+    order: 4;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.status-indicator.connected {
+    background: #28a745;
+}
+
+.status-indicator.disconnected {
+    background: #dc3545;
+}
+
+/* Turn indicators */
+.current-turn {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
     }
-    
-    .player-position.left,
-    .player-position.right {
-        transform: translateY(-50%) scale(0.9);
+    50% {
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6);
+        border-color: #20c997;
     }
-    
-    .table-center {
-        width: 150px;
-        height: 120px;
-    }
-    
-    .player-name {
-        font-size: 12px;
-        max-width: 80px;
-    }
-    
-    .player-stats {
-        font-size: 10px;
+    100% {
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
     }
 }

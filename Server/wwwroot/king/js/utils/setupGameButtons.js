@@ -1,17 +1,15 @@
 // Server/wwwroot/king/js/utils/setupGameButtons.js
 import { startRound } from "../actions/startRound.js";
-import { newGame } from "../actions/newGame.js";
+import { endRound } from "../actions/endRound.js";
+import { playCard } from "../actions/playCard.js";
 import { selectTrump } from "../actions/selectTrump.js";
-import { showOtherGamesModal } from "../../../js/utils/showOtherGamesModal.js";
-import { showHelpModal } from "../../../js/utils/showHelpModal.js";
 import { copyMatchId } from "./copyMatchId.js";
 
 export function setupGameButtons() {
-    const startRoundBtn = document.getElementById('startRoundBtn');
-    const otherGamesBtn = document.getElementById('otherGamesBtn');
-    const helpBtn = document.getElementById('helpBtn');
-    const copyMatchIdBtn = document.getElementById('copyMatchIdBtn');
+    console.log("Setting up King game buttons...");
 
+    // Start Round button
+    const startRoundBtn = document.getElementById('startRoundBtn');
     if (startRoundBtn && !startRoundBtn.hasAttribute('data-listener')) {
         startRoundBtn.setAttribute('data-listener', 'true');
         startRoundBtn.addEventListener('click', function (event) {
@@ -23,28 +21,34 @@ export function setupGameButtons() {
         console.log("King start round button listener added");
     }
 
-    if (otherGamesBtn && !otherGamesBtn.hasAttribute('data-listener')) {
-        otherGamesBtn.setAttribute('data-listener', 'true');
-        otherGamesBtn.addEventListener('click', function (event) {
+    // End Round button
+    const endRoundBtn = document.getElementById('endRoundBtn');
+    if (endRoundBtn && !endRoundBtn.hasAttribute('data-listener')) {
+        endRoundBtn.setAttribute('data-listener', 'true');
+        endRoundBtn.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            console.log("King other games button clicked");
-            showOtherGamesModal();
+            console.log("King end round button clicked");
+            endRound();
         });
-        console.log("King other games button listener added");
+        console.log("King end round button listener added");
     }
 
-    if (helpBtn && !helpBtn.hasAttribute('data-listener')) {
-        helpBtn.setAttribute('data-listener', 'true');
-        helpBtn.addEventListener('click', function (event) {
+    // Play Card button
+    const playCardBtn = document.getElementById('playCardBtn');
+    if (playCardBtn && !playCardBtn.hasAttribute('data-listener')) {
+        playCardBtn.setAttribute('data-listener', 'true');
+        playCardBtn.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            console.log("King help button clicked");
-            showHelpModal();
+            console.log("King play card button clicked");
+            playCard();
         });
-        console.log("King help button listener added");
+        console.log("King play card button listener added");
     }
 
+    // Copy Match ID button
+    const copyMatchIdBtn = document.getElementById('copyMatchIdBtn');
     if (copyMatchIdBtn && !copyMatchIdBtn.hasAttribute('data-listener')) {
         copyMatchIdBtn.setAttribute('data-listener', 'true');
         copyMatchIdBtn.addEventListener('click', function (event) {

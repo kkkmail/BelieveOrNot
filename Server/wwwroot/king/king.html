@@ -1,4 +1,4 @@
-<!-- Server/wwwroot/king/index.html -->
+<!-- Server/wwwroot/king/king.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +11,25 @@
     <!-- Shared styles from parent directory -->
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/responsive.css">
+    
+    <!-- Card styles (shared with BelieveOrNot) -->
+    <link rel="stylesheet" href="../styles/cards/back.css">
     <link rel="stylesheet" href="../styles/cards/base.css">
+    <link rel="stylesheet" href="../styles/cards/joker.css">
+    <link rel="stylesheet" href="../styles/cards/previous-play.css">
+    <link rel="stylesheet" href="../styles/cards/responsive.css">
     <link rel="stylesheet" href="../styles/cards/suits.css">
     <link rel="stylesheet" href="../styles/cards/typography.css">
-    <link rel="stylesheet" href="../styles/cards/responsive.css">
+    
+    <!-- Component styles -->
     <link rel="stylesheet" href="../styles/components/buttons.css">
     <link rel="stylesheet" href="../styles/components/forms.css">
     <link rel="stylesheet" href="../styles/components/messages.css">
+
+    <!-- Game board styles (shared) -->
+    <link rel="stylesheet" href="../styles/game-board/core.css">
+    <link rel="stylesheet" href="../styles/game-board/hand.css">
+    <link rel="stylesheet" href="../styles/game-board/management-controls.css">
 
     <!-- King-specific styles -->
     <link rel="stylesheet" href="styles/king-main.css">
@@ -69,8 +81,12 @@
     <script type="module" src="js/actions/joinMatch.js"></script>
     <script type="module" src="js/actions/startRound.js"></script>
     <script type="module" src="js/actions/playCard.js"></script>
+    <script type="module" src="js/actions/endRound.js"></script>
     <script type="module" src="js/actions/selectTrump.js"></script>
     <script type="module" src="js/actions/newGame.js"></script>
+    
+    <!-- Cards -->
+    <script type="module" src="js/cards/toggleCardSelection.js"></script>
     
     <!-- Display -->
     <script type="module" src="js/display/updateGameDisplay.js"></script>
@@ -91,6 +107,7 @@
     <script type="module" src="js/utils/showGameBoard.js"></script>
     <script type="module" src="js/utils/copyMatchId.js"></script>
     <script type="module" src="js/utils/gameRouter.js"></script>
+    <script type="module" src="js/utils/KingMoveValidator.js"></script>
     
     <!-- Shared utilities from parent directory -->
     <script type="module" src="../js/utils/customAlert.js"></script>
