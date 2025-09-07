@@ -1,0 +1,290 @@
+/* Server/wwwroot/king/styles/king-responsive.css */
+
+/* Mobile and tablet responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .game-header h1 {
+        font-size: 2em;
+    }
+
+    .status-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .king-table-area {
+        padding: 15px;
+    }
+
+    .trump-buttons {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .trump-btn {
+        width: 200px;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+
+    .hand-cards {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .score-table {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .round-info-area {
+        padding: 15px;
+    }
+
+    .round-name {
+        font-size: 16px;
+    }
+
+    .round-description {
+        font-size: 13px;
+    }
+
+    .message-area {
+        min-height: 180px;
+        max-height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.8em;
+    }
+
+    .game-header p {
+        font-size: 1em;
+    }
+
+    .game-setup,
+    .game-board {
+        padding: 20px;
+    }
+
+    .king-table {
+        width: 350px;
+        height: 250px;
+        border-radius: 125px;
+    }
+
+    .player-position {
+        min-width: 80px;
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .player-position.top,
+    .player-position.bottom {
+        top: -70px;
+        transform: translateX(-50%) scale(0.8);
+    }
+
+    .player-position.bottom {
+        bottom: -70px;
+    }
+
+    .player-position.left,
+    .player-position.right {
+        transform: translateY(-50%) scale(0.8);
+    }
+
+    .player-position.left {
+        left: -70px;
+    }
+
+    .player-position.right {
+        right: -70px;
+    }
+
+    .table-center {
+        width: 120px;
+        height: 100px;
+        padding: 5px;
+    }
+
+    .trick-label {
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .trick-cards .card {
+        width: 25px;
+        height: 35px;
+    }
+
+    .trick-cards .card .rank {
+        font-size: 8px;
+    }
+
+    .trick-cards .card .suit {
+        font-size: 6px;
+    }
+
+    .trump-btn {
+        width: 150px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .hand-cards .card {
+        width: 70px;
+        height: 100px;
+    }
+
+    .hand-cards .card .rank {
+        font-size: 26px;
+    }
+
+    .hand-cards .card .suit {
+        font-size: 20px;
+    }
+
+    .score-item {
+        min-width: 100px;
+        padding: 10px;
+    }
+
+    .round-info-area {
+        padding: 10px;
+    }
+
+    .penalty-list {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .penalty-item {
+        flex-direction: row;
+        gap: 10px;
+    }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .king-table-area {
+        margin: 10px 0;
+    }
+
+    .king-table {
+        width: 500px;
+        height: 300px;
+    }
+
+    .player-position.top,
+    .player-position.bottom {
+        transform: translateX(-50%) scale(0.9);
+    }
+
+    .player-position.left,
+    .player-position.right {
+        transform: translateY(-50%) scale(0.9);
+    }
+
+    .round-info-area,
+    .scoring-area {
+        margin: 15px 0;
+    }
+
+    .message-area {
+        min-height: 150px;
+        max-height: 180px;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 320px) {
+    .king-table {
+        width: 280px;
+        height: 200px;
+        border-radius: 100px;
+    }
+
+    .player-position {
+        min-width: 70px;
+        padding: 5px;
+    }
+
+    .player-position.top,
+    .player-position.bottom {
+        top: -60px;
+        transform: translateX(-50%) scale(0.7);
+    }
+
+    .player-position.bottom {
+        bottom: -60px;
+    }
+
+    .player-position.left {
+        left: -60px;
+        transform: translateY(-50%) scale(0.7);
+    }
+
+    .player-position.right {
+        right: -60px;
+        transform: translateY(-50%) scale(0.7);
+    }
+
+    .table-center {
+        width: 100px;
+        height: 80px;
+    }
+
+    .trump-btn {
+        width: 120px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .hand-cards .card {
+        width: 60px;
+        height: 85px;
+    }
+
+    .player-name {
+        font-size: 10px;
+        max-width: 60px;
+    }
+
+    .player-stats {
+        font-size: 9px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .top-controls,
+    .game-management-controls,
+    .trump-selection-area,
+    .game-actions,
+    .hand-area {
+        display: none !important;
+    }
+
+    .game-board {
+        box-shadow: none;
+        background: white;
+    }
+
+    .king-table {
+        border: 2px solid #000;
+        background: white;
+    }
+
+    .player-position {
+        border: 1px solid #000;
+        background: white;
+    }
+}

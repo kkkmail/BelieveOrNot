@@ -1,0 +1,258 @@
+/* Server/wwwroot/king/styles/king-main.css */
+
+/* Game Board Styles */
+.game-board {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: none;
+}
+
+/* Trump Selection Area */
+.trump-selection-area {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+    text-align: center;
+}
+
+.trump-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.trump-btn {
+    padding: 15px 25px;
+    border: 3px solid;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.trump-btn.hearts {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.trump-btn.diamonds {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.trump-btn.clubs {
+    border-color: #333;
+    color: #333;
+}
+
+.trump-btn.spades {
+    border-color: #333;
+    color: #333;
+}
+
+.trump-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.trump-btn.hearts:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.trump-btn.diamonds:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.trump-btn.clubs:hover {
+    background: #333;
+    color: white;
+}
+
+.trump-btn.spades:hover {
+    background: #333;
+    color: white;
+}
+
+/* Round Information */
+.round-info-area {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(23, 162, 184, 0.1);
+    border-radius: 10px;
+    border-left: 4px solid #17a2b8;
+}
+
+.round-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.round-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.round-rules {
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+}
+
+/* Game Actions */
+.game-actions {
+    margin: 20px 0;
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 10px;
+    border: 2px solid #007bff;
+}
+
+.turn-message {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 10px;
+}
+
+/* Hand Area */
+.hand-area {
+    margin-top: 30px;
+}
+
+.hand-cards {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* Card hover effects for playable cards */
+.hand-cards .card.playable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hand-cards .card.playable:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}
+
+.hand-cards .card.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+    transform: translateY(-15px);
+}
+
+/* Scoring Area */
+.scoring-area {
+    margin-top: 30px;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.scoring-area h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.score-table {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.score-item {
+    text-align: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-width: 120px;
+    border: 2px solid transparent;
+}
+
+.score-item.creator {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, #fff9c4, #ffeaa7);
+}
+
+.score-item .player-name {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.score-item .score {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.score-item .score.positive {
+    color: #28a745;
+}
+
+.score-item .score.negative {
+    color: #dc3545;
+}
+
+.score-item .score.zero {
+    color: #333;
+}
+
+.score-item .hand-count {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.status-indicator.connected {
+    background: #28a745;
+}
+
+.status-indicator.disconnected {
+    background: #dc3545;
+}
+
+/* Turn indicators */
+.current-turn {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6);
+        border-color: #20c997;
+    }
+    100% {
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+}
