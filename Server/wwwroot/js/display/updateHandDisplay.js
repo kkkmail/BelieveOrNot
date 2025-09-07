@@ -1,3 +1,4 @@
+// js/display/updateHandDisplay.js
 import {gameState, selectedCards} from "../core/variables.js";
 import {toggleCardSelection} from "../cards/toggleCardSelection.js";
 import {getSuitSymbol} from "../cards/getSuitSymbol.js";

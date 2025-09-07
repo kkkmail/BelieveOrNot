@@ -1,3 +1,4 @@
+// js/utils/updateRankDropdown.js
 import {gameState} from "../core/variables.js";
 
 export function updateRankDropdown() {

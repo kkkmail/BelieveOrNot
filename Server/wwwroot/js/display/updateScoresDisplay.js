@@ -1,3 +1,4 @@
+// js/display/updateScoresDisplay.js
 import {gameState} from "../core/variables.js";
 
 export function updateScoresDisplay() {

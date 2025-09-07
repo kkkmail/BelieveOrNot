@@ -1,3 +1,4 @@
+/* styles/game-board/animations.css */
 @keyframes pulse-glow {
     0% {
         box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);

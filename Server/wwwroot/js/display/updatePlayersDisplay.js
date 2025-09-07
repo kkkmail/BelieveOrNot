@@ -1,3 +1,4 @@
+// js/display/updatePlayersDisplay.js
 import {gameState, playerId} from "../core/variables.js";
 
 export function updatePlayersDisplay() {

@@ -1,3 +1,4 @@
+// js/actions/hideChallenge.js
 import {setSelectedChallengeIndex} from "../core/variables.js";
 import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";

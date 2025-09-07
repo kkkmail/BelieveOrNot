@@ -1,5 +1,5 @@
 using BelieveOrNot.Server;
-using BelieveOrNot.Server.King;
+// using BelieveOrNot.Server.King;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +13,9 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<IMatchManager, MatchManager>();
 builder.Services.AddSingleton<IGameEngine, GameEngine>();
 
-// Add services for King
-builder.Services.AddSingleton<IKingMatchManager, KingMatchManager>();
-builder.Services.AddSingleton<IKingGameEngine, KingGameEngine>();
+// // Add services for King
+// builder.Services.AddSingleton<IKingMatchManager, KingMatchManager>();
+// builder.Services.AddSingleton<IKingGameEngine, KingGameEngine>();
 
 builder.Services.AddCors(options =>
 {
@@ -51,7 +51,7 @@ if (staticFilesEnabled)
 // Map hubs for both games - use different paths to avoid conflicts
 var hubPath = app.Configuration.GetValue<string>("ServerSettings:SignalRHubPath") ?? "/game";
 app.MapHub<GameHub>(hubPath);
-app.MapHub<KingHub>("/kingHub"); // Fixed to use proper casing
+// app.MapHub<KingHub>("/kingHub"); // Fixed to use proper casing
 
 // Simple King game route - just serve the index.html
 app.MapGet("/king/index.html", async context =>
@@ -81,16 +81,16 @@ app.MapPost("/game/check-match", (MatchCheckRequest request, IMatchManager match
     return Results.Ok(new { exists = match != null });
 });
 
-app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager matchManager) =>
-{
-    if (!Guid.TryParse(request.MatchId, out var matchId))
-    {
-        return Results.Ok(new { exists = false });
-    }
-
-    var match = matchManager.GetMatch(matchId);
-    return Results.Ok(new { exists = match != null });
-});
+// app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager matchManager) =>
+// {
+//     if (!Guid.TryParse(request.MatchId, out var matchId))
+//     {
+//         return Results.Ok(new { exists = false });
+//     }
+//
+//     var match = matchManager.GetMatch(matchId);
+//     return Results.Ok(new { exists = match != null });
+// });
 
 app.Run();
 

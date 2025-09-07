@@ -1,3 +1,4 @@
+// js/utils/showEventHistory.js
 export function showEventHistory() {
     const messageArea = document.getElementById('messageArea');
 

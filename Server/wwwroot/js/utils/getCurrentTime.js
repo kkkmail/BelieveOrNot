@@ -1,3 +1,4 @@
+// js/utils/getCurrentTime.js
 // Get current formatted time
 import {formatTime} from "./formatTime.js";
 

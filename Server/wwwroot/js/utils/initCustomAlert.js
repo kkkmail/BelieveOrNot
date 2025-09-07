@@ -1,3 +1,4 @@
+// js/utils/initCustomAlert.js
 import {customAlert} from "./customAlert.js";
 
 export function initCustomAlert() {
