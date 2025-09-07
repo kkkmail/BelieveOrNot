@@ -1,5 +1,5 @@
 // Server/wwwroot/king/js/actions/joinMatch.js
-import { connection, setCurrentMatch, setPlayerId, clientId } from "../core/variables.js";
+import { connection, setCurrentMatch, setPlayerId, setGameState, clientId } from "../core/variables.js";
 import { showGameBoard } from "../utils/showGameBoard.js";
 import { setMatchIdInUrl } from "../../../js/utils/urlManager.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
@@ -29,6 +29,7 @@ export async function joinMatch() {
 
         if (result.success) {
             setCurrentMatch(result.match);
+            setGameState(result.match); // Set gameState as well for consistency
             setPlayerId(result.playerId);
 
             console.log("Set King playerId to:", result.playerId, "for player:", result.assignedName);
@@ -68,13 +69,11 @@ export async function joinMatch() {
                 errorMessage = "The King game you're trying to join no longer exists or has ended.";
             } else if (err.message.includes("full")) {
                 errorMessage = "This King game is full (4 players maximum).";
-            } else if (err.message.includes("Invalid match ID")) {
-                errorMessage = "Invalid match ID format. Please check the match ID and try again.";
             } else {
-                errorMessage = err.message;
+                errorMessage = "Failed to join King match: " + err.message;
             }
         }
 
-        await customAlert(errorMessage, 'Join Failed');
+        await customAlert(errorMessage);
     }
 }

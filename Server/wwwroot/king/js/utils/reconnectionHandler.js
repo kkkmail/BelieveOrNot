@@ -35,18 +35,19 @@ export async function attemptReconnection() {
             return true;
         } else {
             console.log('King reconnection failed:', result.message);
-            await customAlert(result.message, 'Reconnection Failed');
             return false;
         }
     } catch (err) {
         console.error('King reconnection error:', err);
         
         if (err.message.includes('Match not found')) {
-            await customAlert('The King game you were trying to rejoin no longer exists or has ended.', 'Game Not Found');
+            console.log('The King game no longer exists');
         } else if (err.message.includes('Game already started')) {
-            await customAlert('This King game has already started and new players cannot join.', 'Game Started');
+            console.log('This King game has already started');
+        } else if (err.message.includes('not found in this King game')) {
+            console.log('Player not found in this King game');
         } else {
-            await customAlert('Could not reconnect to the King game. You can create a new game or join a different one.', 'Reconnection Failed');
+            console.log('Could not reconnect to the King game');
         }
         
         return false;

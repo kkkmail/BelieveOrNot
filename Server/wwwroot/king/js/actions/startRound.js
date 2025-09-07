@@ -1,16 +1,16 @@
 // Server/wwwroot/king/js/actions/startRound.js
-import { connection, currentMatch, playerId } from "../core/variables.js";
+import { connection, gameState, playerId } from "../core/variables.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
 
 export async function startRound() {
-    if (!currentMatch || !playerId) {
+    if (!gameState || !playerId) {
         await customAlert('Cannot start round: match or player not found');
         return;
     }
 
     try {
         await connection.invoke("StartRound", {
-            matchId: currentMatch.id,
+            matchId: gameState.matchId,
             playerId: playerId
         });
         console.log("King round started successfully");
