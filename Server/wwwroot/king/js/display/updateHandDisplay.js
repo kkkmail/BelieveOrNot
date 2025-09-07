@@ -37,12 +37,16 @@ export function updateHandDisplay() {
         const cardElement = document.createElement('div');
         cardElement.className = 'card hand-card';
 
-        // Check if this card can be played (must validate each individual card)
-        const canPlay = isMyTurn &&
-                       !gameState.waitingForTrumpSelection &&
-                       KingMoveValidator.canPlayCard(gameState, card, playerId);
-
-        console.log(`Card ${index} (${card.rank} of ${card.suit}): canPlay=${canPlay}, isMyTurn=${isMyTurn}, waitingForTrump=${gameState.waitingForTrumpSelection}, validatorResult=${KingMoveValidator.canPlayCard(gameState, card, playerId)}`);
+        // For active player: validate each card individually against game rules
+        let canPlay = false;
+        
+        if (isMyTurn && !gameState.waitingForTrumpSelection && gameState.phase === 1) {
+            // Call validator for each individual card to check if it can be played
+            canPlay = KingMoveValidator.canPlayCard(gameState, card, playerId);
+            console.log(`Card ${index} (${card.rank} of ${card.suit}): canPlay=${canPlay}`);
+        } else {
+            console.log(`Card ${index} (${card.rank} of ${card.suit}): not active turn, canPlay=false`);
+        }
 
         // Add selected class if this card is selected
         if (selectedCard === index) {
@@ -50,9 +54,10 @@ export function updateHandDisplay() {
             console.log(`Card ${index} is SELECTED`);
         }
 
-        // Disable unplayable cards (BelieveOrNot pattern)
+        // Disable unplayable cards - add disabled class and visual styling
         if (!canPlay) {
             cardElement.classList.add('disabled');
+            console.log(`Card ${index} is DISABLED`);
         }
 
         const suitSymbol = getSuitSymbol(card.suit);
@@ -63,7 +68,7 @@ export function updateHandDisplay() {
             <div class="suit ${suitClass}">${suitSymbol}</div>
         `;
 
-        // Add click handler only for playable cards (BelieveOrNot pattern)
+        // Add click handler only for playable cards
         if (canPlay) {
             cardElement.style.cursor = 'pointer';
             cardElement.addEventListener('click', function (event) {
@@ -92,8 +97,8 @@ function getCardDisabledReason(gameState, card, isMyTurn) {
         return "Choose trump suit first";
     }
 
-    if (!gameState?.currentTrick) {
-        return "Wait for trick to start";
+    if (gameState.phase !== 1) {
+        return "Game not in progress";
     }
 
     const currentRound = gameState.currentRound;
@@ -101,19 +106,26 @@ function getCardDisabledReason(gameState, card, isMyTurn) {
         return "No active round";
     }
 
+    const currentTrick = gameState.currentTrick;
+
     // Check if following suit and this card doesn't match lead suit
-    if (gameState.currentTrick.cards && gameState.currentTrick.cards.length > 0) {
-        const leadSuit = gameState.currentTrick.ledSuit;
-        if (leadSuit && card.suit !== leadSuit) {
-            const hasSameSuit = gameState.yourHand?.some(c => c.suit === leadSuit);
-            if (hasSameSuit) {
-                return `Must follow suit: ${leadSuit}`;
+    if (currentTrick && currentTrick.cards && currentTrick.cards.length > 0) {
+        const leadSuitEnum = currentTrick.ledSuit;
+        if (leadSuitEnum !== null && leadSuitEnum !== undefined) {
+            // Convert enum value to string name using the same mapping as KingMoveValidator
+            const leadSuit = KingMoveValidator.getSuitName(leadSuitEnum);
+            if (leadSuit && card.suit !== leadSuit) {
+                const hasSameSuit = gameState.yourHand?.some(c => c.suit === leadSuit);
+                if (hasSameSuit) {
+                    return `Must follow suit: ${leadSuit}`;
+                }
             }
         }
     }
 
     // Check Hearts leading restriction
-    if (gameState.currentTrick.cards.length === 0 && currentRound.cannotLeadHearts && card.suit === 'Hearts') {
+    if ((!currentTrick || !currentTrick.cards || currentTrick.cards.length === 0) && 
+        currentRound.cannotLeadHearts && card.suit === 'Hearts') {
         const hasNonHearts = gameState.yourHand?.some(c => c.suit !== 'Hearts');
         if (hasNonHearts) {
             return "Cannot lead with Hearts when other suits available";
