@@ -114,14 +114,20 @@ function updateTrumpSelection() {
     const trumpSelection = document.getElementById('trumpSelection');
     if (!trumpSelection) return;
 
-    if (gameState.canSelectTrump) {
+    if (gameState.phase === 1 && 
+        gameState.isCollectingPhase && 
+        gameState.trumpSetterIndex === getMyPlayerIndex() && 
+        !gameState.currentTrump) {
+        
         trumpSelection.classList.remove('hidden');
         
         // Setup trump selection buttons
-        const trumpButtons = trumpSelection.querySelectorAll('.trump-btn');
-        trumpButtons.forEach(btn => {
-            const suit = btn.getAttribute('data-suit');
-            btn.onclick = () => selectTrump(suit);
+        const trumpBtns = trumpSelection.querySelectorAll('.trump-btn');
+        trumpBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const suit = btn.dataset.suit;
+                selectTrump(suit);
+            });
         });
     } else {
         trumpSelection.classList.add('hidden');
@@ -132,47 +138,40 @@ function updateActionButtons() {
     const startRoundBtn = document.getElementById('startRoundBtn');
     const actionMessage = document.getElementById('actionMessage');
     
-    if (!actionMessage) return;
-
-    // Show start button only for creator when waiting for players with 4 players
     if (startRoundBtn) {
         const isCreator = gameState.creatorPlayerId === playerId;
-        const hasEnoughPlayers = gameState.players && gameState.players.length === 4;
-        const canStart = gameState.phase === 0 && isCreator && hasEnoughPlayers;
+        const canStart = gameState.phase === 0 && gameState.players && gameState.players.length === 4;
         
-        if (canStart) {
+        if (isCreator && canStart) {
             startRoundBtn.classList.remove('hidden');
         } else {
             startRoundBtn.classList.add('hidden');
         }
     }
 
-    // Update action message
-    if (gameState.phase === 0) {
-        if (gameState.players && gameState.players.length < 4) {
-            actionMessage.textContent = `Waiting for players (${gameState.players.length}/4)`;
-        } else {
-            actionMessage.textContent = 'Ready to start! Creator can begin the round.';
+    if (actionMessage) {
+        if (gameState.phase === 0) {
+            if (gameState.players && gameState.players.length < 4) {
+                actionMessage.textContent = `Waiting for players (${gameState.players.length}/4)`;
+            } else {
+                actionMessage.textContent = 'Ready to start!';
+            }
+        } else if (gameState.phase === 1) {
+            if (gameState.currentPlayerIndex === getMyPlayerIndex()) {
+                if (gameState.isCollectingPhase && gameState.trumpSetterIndex === getMyPlayerIndex() && !gameState.currentTrump) {
+                    actionMessage.textContent = 'Select trump suit';
+                } else {
+                    actionMessage.textContent = 'Your turn - play a card';
+                }
+            } else {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                actionMessage.textContent = `${currentPlayer?.name || 'Unknown'}'s turn`;
+            }
+        } else if (gameState.phase === 2) {
+            actionMessage.textContent = 'Calculating scores...';
+        } else if (gameState.phase === 3) {
+            actionMessage.textContent = 'Game completed!';
         }
-    } else if (gameState.phase === 1) {
-        const currentPlayerIndex = gameState.currentPlayerIndex;
-        const isMyTurn = currentPlayerIndex === getMyPlayerIndex();
-        
-        if (gameState.canSelectTrump) {
-            actionMessage.innerHTML = '👑 <strong>Select trump suit for this round</strong>';
-        } else if (gameState.waitingForTrumpSelection) {
-            const trumpSetter = gameState.players[gameState.trumpSetterIndex];
-            actionMessage.innerHTML = `⏳ Waiting for <strong>${trumpSetter.name}</strong> to select trump`;
-        } else if (isMyTurn) {
-            actionMessage.innerHTML = `🎯 <strong>Your turn!</strong> ${gameState.currentRoundDescription}`;
-        } else {
-            const currentPlayer = gameState.players[currentPlayerIndex];
-            actionMessage.innerHTML = `⏳ Waiting for <strong>${currentPlayer.name}</strong> to play`;
-        }
-    } else if (gameState.phase === 2) {
-        actionMessage.textContent = 'Round ended. Calculating scores...';
-    } else if (gameState.phase === 3) {
-        actionMessage.textContent = 'Game completed!';
     }
 }
 
