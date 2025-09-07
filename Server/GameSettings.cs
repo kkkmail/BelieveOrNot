@@ -1,9 +1,9 @@
-﻿namespace BelieveOrNot.Server;
+namespace BelieveOrNot.Server;
 
 public class GameSettings
 {
     // These are default values - will be overridden by appsettings.json if present
-    public int DeckSize { get; set; } = 52;
+    public DeckSize DeckSize { get; set; } = DeckSize.Full;
     public int JokerCount { get; set; } = 0;
     public bool JokerDisposalEnabled { get; set; } = false;
     public int ScorePerCard { get; set; } = -1;

@@ -22,7 +22,7 @@ public partial class GameEngine
                 Score = p.Score,
                 IsConnected = p.IsConnected
             }).ToList(),
-            DeckSize = match.Settings.DeckSize,
+            DeckSize = (int)match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount,
             DisposedRanks = match.DisposedRanks.ToList(), // Include disposed ranks
             CreatorPlayerId = match.Players[0].Id

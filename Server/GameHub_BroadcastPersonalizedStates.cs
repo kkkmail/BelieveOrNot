@@ -15,7 +15,7 @@ public partial class GameHub
 
                 var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, playerId);
                 playerState.CreatorPlayerId = match.Players[0].Id;
-                playerState.DeckSize = match.Settings.DeckSize;
+                playerState.DeckSize = (int)match.Settings.DeckSize;
                 playerState.JokerCount = match.Settings.JokerCount;
 
                 await Clients.Client(connectionId).SendAsync("StateUpdate", playerState, Guid.Empty);

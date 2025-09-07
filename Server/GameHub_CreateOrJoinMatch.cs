@@ -34,7 +34,7 @@ public partial class GameHub
                 IsConnected = p.IsConnected
             }).ToList(),
             CreatorPlayerId = match.Players[0].Id,
-            DeckSize = match.Settings.DeckSize,
+            DeckSize = (int)match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount
         };
 
