@@ -1,4 +1,3 @@
-// DeckBuilder.cs
 namespace BelieveOrNot.Server;
 
 public static class DeckBuilder
@@ -10,19 +9,13 @@ public static class DeckBuilder
         var cards = new List<Card>();
 
         // Add regular cards based on deck size
-        var ranks = deckSize switch
-        {
-            DeckSize.Small => new[] { "7", "8", "9", "10", "J", "Q", "K", "A" },
-            DeckSize.Medium => new[] { "6", "7", "8", "9", "10", "J", "Q", "K", "A" },
-            DeckSize.Full => new[] { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" },
-            _ => throw new ArgumentException($"Unsupported deck size: {deckSize}")
-        };
+        var ranks = RankExtensions.GetRanksForDeckSize(deckSize);
 
         foreach (var suit in Suits)
         {
             foreach (var rank in ranks)
             {
-                cards.Add(new Card(rank, suit.ToString()));
+                cards.Add(new Card(rank.ToDisplayString(), suit.ToString()));
             }
         }
 

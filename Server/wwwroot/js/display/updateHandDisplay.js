@@ -21,7 +21,7 @@ export function updateHandDisplay() {
         if (a.rank !== 'Joker' && b.rank === 'Joker') return 1;
         if (a.rank === 'Joker' && b.rank === 'Joker') return 0;
 
-        // Sort by rank
+        // Sort by rank using proper card order
         const rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
         const aRankIndex = rankOrder.indexOf(a.rank);
         const bRankIndex = rankOrder.indexOf(b.rank);
