@@ -41,7 +41,10 @@ export function updateGameActions() {
         if (isCreator && gameState.players && gameState.players.length >= 4) {
             startRoundBtn?.classList.remove('hidden');
         }
-        if (tableMessage) tableMessage.textContent = "Waiting for round to start";
+        if (tableMessage) {
+            tableMessage.innerHTML = "Waiting for round to start";
+            tableMessage.style.display = 'block';
+        }
     } 
     else if (gameState.phase === 1) { // InProgress
         if (isCreator) {
@@ -50,7 +53,10 @@ export function updateGameActions() {
         
         if (isMyTurn) {
             if (gameState.waitingForTrumpSelection) {
-                if (tableMessage) tableMessage.innerHTML = "🎯 Your turn - Choose trump suit!";
+                if (tableMessage) {
+                    tableMessage.innerHTML = "🎯 Your turn - Choose trump suit!";
+                    tableMessage.style.display = 'block';
+                }
                 shouldBlink = true;
             } else if (selectedCard !== null) {
                 // Card selected - show play button, HIDE turn message
@@ -62,7 +68,7 @@ export function updateGameActions() {
                 // No card selected - show blinking turn message
                 if (tableMessage) {
                     tableMessage.innerHTML = "🎯 Your turn - Select a card to play";
-                    tableMessage.style.display = 'block'; // Show message
+                    tableMessage.style.display = 'block';
                 }
                 shouldBlink = true;
                 window.playerInteractionState = false;
@@ -82,20 +88,24 @@ export function updateGameActions() {
             startRoundBtn?.classList.remove('hidden');
         }
         if (tableMessage) {
-            tableMessage.textContent = "Round ended";
+            tableMessage.innerHTML = "Round ended";
             tableMessage.style.display = 'block';
         }
     } 
     else if (gameState.phase === 3) { // GameEnd
         if (tableMessage) {
-            tableMessage.textContent = "Game finished!";
+            tableMessage.innerHTML = "Game finished!";
             tableMessage.style.display = 'block';
         }
         otherGamesBtn?.classList.remove('hidden');
     }
 
-    // Apply blinking when appropriate
-    if (shouldBlink && tableControls && !window.playerInteractionState) {
+    // Apply blinking when appropriate - FIXED LOGIC
+    if (shouldBlink && tableControls) {
         tableControls.classList.add('active-turn');
+        console.log("BLINKING ENABLED for current player");
+    } else {
+        tableControls.classList.remove('active-turn');
+        console.log("BLINKING DISABLED");
     }
 }

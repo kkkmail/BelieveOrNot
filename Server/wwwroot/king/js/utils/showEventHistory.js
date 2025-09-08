@@ -12,10 +12,11 @@ export function showEventHistory() {
         window.gameEventHistory = [`${new Date().toLocaleTimeString()}: Welcome to The King! Wait for 3 more players to join.`];
     }
 
-    // Show events in reverse chronological order (newest first at top)
-    const eventsHtml = window.gameEventHistory
+    // Show LAST 8 events in reverse chronological order (newest first at top)
+    const recentEvents = window.gameEventHistory.slice(-8); // Get last 8 events
+    const eventsHtml = recentEvents
         .slice() // Create copy to avoid modifying original
-        .reverse() // Newest messages at top
+        .reverse() // Newest messages at top (like BelieveOrNot)
         .map(event => `<div style="margin: 3px 0; padding: 4px 0; font-size: 0.9em; line-height: 1.3; border-bottom: 1px solid rgba(0,0,0,0.05);">${event}</div>`)
         .join('');
 
@@ -24,5 +25,5 @@ export function showEventHistory() {
     // Keep scroll at top to show newest events
     messageArea.scrollTop = 0;
 
-    console.log("Updated event history display with", window.gameEventHistory.length, "events (newest at top)");
+    console.log("Updated event history display with", recentEvents.length, "recent events (newest at top)");
 }
