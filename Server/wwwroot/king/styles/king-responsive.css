@@ -58,6 +58,32 @@
         min-height: 180px;
         max-height: 220px;
     }
+
+    /* Adjust card slots for mobile - positioned closer to players */
+    .card-slot {
+        width: 70px;
+        height: 100px;
+    }
+
+    .top-slot,
+    .bottom-slot {
+        top: -35px;
+    }
+
+    .bottom-slot {
+        bottom: -35px;
+        top: auto;
+    }
+
+    .left-slot,
+    .right-slot {
+        left: -35px;
+    }
+
+    .right-slot {
+        right: -35px;
+        left: auto;
+    }
 }
 
 @media (max-width: 480px) {
@@ -110,27 +136,15 @@
     }
 
     .table-center {
-        width: 120px;
-        height: 100px;
+        width: 200px;
+        height: 150px;
         padding: 5px;
     }
 
-    .trick-label {
-        font-size: 12px;
-        margin-bottom: 5px;
-    }
-
-    .trick-cards .card {
-        width: 25px;
-        height: 35px;
-    }
-
-    .trick-cards .card .rank {
-        font-size: 8px;
-    }
-
-    .trick-cards .card .suit {
-        font-size: 6px;
+    /* Smaller card slots for small screens */
+    .card-slot {
+        width: 50px;
+        height: 72px;
     }
 
     .trump-btn {
@@ -142,14 +156,6 @@
     .hand-cards .card {
         width: 70px;
         height: 100px;
-    }
-
-    .hand-cards .card .rank {
-        font-size: 26px;
-    }
-
-    .hand-cards .card .suit {
-        font-size: 20px;
     }
 
     .score-item {
@@ -169,38 +175,6 @@
     .penalty-item {
         flex-direction: row;
         gap: 10px;
-    }
-}
-
-/* Landscape mobile adjustments */
-@media (max-width: 768px) and (orientation: landscape) {
-    .king-table-area {
-        margin: 10px 0;
-    }
-
-    .king-table {
-        width: 500px;
-        height: 300px;
-    }
-
-    .player-position.top,
-    .player-position.bottom {
-        transform: translateX(-50%) scale(0.9);
-    }
-
-    .player-position.left,
-    .player-position.right {
-        transform: translateY(-50%) scale(0.9);
-    }
-
-    .round-info-area,
-    .scoring-area {
-        margin: 15px 0;
-    }
-
-    .message-area {
-        min-height: 150px;
-        max-height: 180px;
     }
 }
 
@@ -238,8 +212,14 @@
     }
 
     .table-center {
-        width: 100px;
-        height: 80px;
+        width: 150px;
+        height: 120px;
+    }
+
+    /* Very small card slots */
+    .card-slot {
+        width: 40px;
+        height: 58px;
     }
 
     .trump-btn {
@@ -260,6 +240,38 @@
 
     .player-stats {
         font-size: 9px;
+    }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .king-table-area {
+        margin: 10px 0;
+    }
+
+    .king-table {
+        width: 500px;
+        height: 300px;
+    }
+
+    .player-position.top,
+    .player-position.bottom {
+        transform: translateX(-50%) scale(0.9);
+    }
+
+    .player-position.left,
+    .player-position.right {
+        transform: translateY(-50%) scale(0.9);
+    }
+
+    .round-info-area,
+    .scoring-area {
+        margin: 15px 0;
+    }
+
+    .message-area {
+        min-height: 150px;
+        max-height: 180px;
     }
 }
 
@@ -284,6 +296,11 @@
     }
 
     .player-position {
+        border: 1px solid #000;
+        background: white;
+    }
+
+    .card-slot {
         border: 1px solid #000;
         background: white;
     }

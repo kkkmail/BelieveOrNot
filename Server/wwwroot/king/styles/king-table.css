@@ -1,23 +1,23 @@
 /* Server/wwwroot/king/styles/king-table.css */
 
-/* King Table Area - INCREASED HEIGHT to fit player controls */
+/* King Table Area - Fixed Layout */
 .king-table-area {
     margin: 20px 0;
-    padding: 30px 20px; /* Increased top/bottom padding */
+    padding: 30px 20px;
     background: rgba(0, 100, 0, 0.1);
     border-radius: 15px;
     border: 3px solid #28a745;
     text-align: center;
     position: relative;
-    height: 600px; /* Increased from 500px to 600px */
+    height: 600px;
 }
 
-/* Circular Table Layout - moved down to prevent overflow */
+/* Circular Table Layout */
 .king-table {
     position: relative;
     width: 600px;
     height: 400px;
-    margin: 70px auto 0 auto; /* Moved down by adding top margin */
+    margin: 70px auto 0 auto;
     background: linear-gradient(135deg, #2d5016, #4a7c59);
     border-radius: 200px;
     border: 8px solid #8b4513;
@@ -26,7 +26,7 @@
         0 10px 30px rgba(0,0,0,0.2);
 }
 
-/* Player Positions around the table - MOVED CLOSER to table */
+/* Player Positions around the table */
 .player-position {
     position: absolute;
     display: flex;
@@ -42,27 +42,27 @@
     transition: all 0.3s ease;
 }
 
-/* Position players around the table - RESTORED TO ORIGINAL POSITIONS */
+/* Position players around the table */
 .player-position.top {
-    top: -70px; /* Restored from -30px back to proper distance */
+    top: -70px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.right {
-    right: -70px; /* Restored from -30px back to proper distance */
+    right: -70px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .player-position.bottom {
-    bottom: -70px; /* Restored from -30px back to proper distance */
+    bottom: -70px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.left {
-    left: -70px; /* Restored from -30px back to proper distance */
+    left: -70px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -150,7 +150,7 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Table Center - area for played cards (inherits standard card styling) */
+/* Table Center - Fixed Slots for Trick Cards */
 .table-center {
     position: absolute;
     top: 50%;
@@ -164,13 +164,70 @@
     padding: 15px;
 }
 
-/* Container for played cards - cards inherit standard styling */
-.trick-cards {
+/* Fixed slots container */
+.trick-slots {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
+}
+
+/* Individual card slots positioned closer to players */
+.card-slot {
+    position: absolute;
+    width: 90px;
+    height: 130px;
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+
+/* Slot positions - moved closer to players, further from center */
+.top-slot {
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.right-slot {
+    right: -45px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.bottom-slot {
+    bottom: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.left-slot {
+    left: -45px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Card slot with card styling */
+.card-slot.has-card {
+    border: 2px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Cards in slots inherit standard card styling but are positioned absolutely */
+.card-slot .card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
 
 /* Card animations */
@@ -187,23 +244,6 @@
         transform: scale(1) translateY(0);
         opacity: 1;
     }
-}
-
-/* Card positioning for each player */
-.card.from-top {
-    order: 1;
-}
-
-.card.from-right {
-    order: 2;
-}
-
-.card.from-bottom {
-    order: 3;
-}
-
-.card.from-left {
-    order: 4;
 }
 
 /* Status indicators */
