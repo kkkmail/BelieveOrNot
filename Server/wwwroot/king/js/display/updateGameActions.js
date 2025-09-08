@@ -116,25 +116,28 @@ export function updateGameActions() {
                     tableMessage.style.display = 'block';
                 }
                 shouldBlink = false; // No blinking during trump selection
-            } else if (selectedCard === null) {
-                if (tableMessage) {
-                    tableMessage.innerHTML = "🎯 Your turn - Select a card to play!";
-                    tableMessage.style.display = 'block';
-                }
-                shouldBlink = true;
-            } else {
-                // Card selected, ready to play
-                if (tableMessage) {
-                    tableMessage.innerHTML = "🎯 Card selected - click Play Card!";
-                    tableMessage.style.display = 'block';
-                }
+            } else if (selectedCard !== null) {
+                // Card selected - show play button, COMPLETELY HIDE the message
                 if (playCardBtn) {
                     playCardBtn.classList.remove('hidden');
                 }
+                if (tableMessage) {
+                    tableMessage.innerHTML = ""; // Clear the content
+                    tableMessage.style.display = 'none'; // Hide the element
+                    tableMessage.style.visibility = 'hidden'; // Double ensure it's hidden
+                }
                 shouldBlink = false;
+            } else {
+                // No card selected - show turn message and blink
+                if (tableMessage) {
+                    tableMessage.innerHTML = "🎯 Your turn - Select a card to play!";
+                    tableMessage.style.display = 'block';
+                    tableMessage.style.visibility = 'visible'; // Ensure it's visible
+                }
+                shouldBlink = true;
             }
         } else {
-            // Not my turn
+            // Not my turn - show whose turn it is
             const currentTurnPlayer = gameState.players?.[gameState.currentPlayerIndex];
             if (tableMessage && currentTurnPlayer) {
                 if (gameState.waitingForTrumpSelection) {
@@ -143,6 +146,7 @@ export function updateGameActions() {
                     tableMessage.innerHTML = `${currentTurnPlayer.name}'s turn`;
                 }
                 tableMessage.style.display = 'block';
+                tableMessage.style.visibility = 'visible';
             }
             shouldBlink = false;
         }
