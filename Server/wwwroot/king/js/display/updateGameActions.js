@@ -36,6 +36,12 @@ export function updateGameActions() {
 
     let shouldBlink = false;
 
+    console.log("=== BLINKING DEBUG ===");
+    console.log("isMyTurn:", isMyTurn);
+    console.log("selectedCard:", selectedCard);
+    console.log("waitingForTrumpSelection:", gameState.waitingForTrumpSelection);
+    console.log("shouldBlink will be:", isMyTurn && !gameState.waitingForTrumpSelection && selectedCard === null);
+
     // Game phase handling
     if (gameState.phase === 0) { // WaitingForPlayers
         if (isCreator && gameState.players && gameState.players.length >= 4) {
@@ -61,17 +67,15 @@ export function updateGameActions() {
             } else if (selectedCard !== null) {
                 // Card selected - show play button, HIDE turn message
                 playCardBtn?.classList.remove('hidden');
-                if (tableMessage) tableMessage.style.display = 'none'; // Hide message when button shown
+                if (tableMessage) tableMessage.style.display = 'none';
                 shouldBlink = false;
-                window.playerInteractionState = true;
             } else {
                 // No card selected - show blinking turn message
                 if (tableMessage) {
                     tableMessage.innerHTML = "🎯 Your turn - Select a card to play";
                     tableMessage.style.display = 'block';
                 }
-                shouldBlink = true;
-                window.playerInteractionState = false;
+                shouldBlink = true; // This should make it blink
             }
         } else {
             // Not my turn - show whose turn it is
@@ -100,12 +104,14 @@ export function updateGameActions() {
         otherGamesBtn?.classList.remove('hidden');
     }
 
-    // Apply blinking when appropriate - FIXED LOGIC
+    console.log("Final shouldBlink:", shouldBlink);
+
+    // Apply blinking when appropriate - FORCE BLINKING
     if (shouldBlink && tableControls) {
         tableControls.classList.add('active-turn');
-        console.log("BLINKING ENABLED for current player");
+        console.log("✅ BLINKING ENABLED - added active-turn class");
     } else {
         tableControls.classList.remove('active-turn');
-        console.log("BLINKING DISABLED");
+        console.log("❌ BLINKING DISABLED - removed active-turn class");
     }
 }

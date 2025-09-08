@@ -443,7 +443,7 @@
     color: #666;
 }
 
-/* Animations */
+/* Animations - SAME AS BELIEVEORNOT */
 @keyframes pulse-glow {
     0% {
         box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
@@ -458,10 +458,10 @@
 }
 
 @keyframes blink {
-    0%, 50% {
-        opacity: 1;
+    0%, 50% { 
+        opacity: 1; 
     }
-    25%, 75% {
-        opacity: 0.6;
+    51%, 100% { 
+        opacity: 0.3; 
     }
 }
