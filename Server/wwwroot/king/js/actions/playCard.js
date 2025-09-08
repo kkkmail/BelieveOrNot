@@ -1,8 +1,8 @@
 // Server/wwwroot/king/js/actions/playCard.js
 import { connection, gameState, playerId, selectedCard, setSelectedCard } from "../core/variables.js";
-import { customConfirm } from "../../../js/utils/customConfirm.js";
 import { updateHandDisplay } from "../display/updateHandDisplay.js";
 import { updateGameActions } from "../display/updateGameActions.js";
+import { addToEventHistory } from "../utils/addToEventHistory.js";
 
 export async function playCard() {
     console.log("playCard called, selectedCard:", selectedCard);
@@ -19,21 +19,7 @@ export async function playCard() {
         return;
     }
 
-    // Format card name for confirmation dialog
-    const cardName = `<span style="font-weight: bold; font-size: 1.2em;">${card.rank} of ${card.suit}</span>`;
-
-    // Show confirmation dialog (BelieveOrNot pattern)
-    const confirmed = await customConfirm(
-        `Are you sure you want to play ${cardName}?`,
-        'Play Card'
-    );
-
-    if (!confirmed) {
-        console.log("Card play cancelled by user");
-        return;
-    }
-
-    console.log("User confirmed card play, sending to server...");
+    console.log("Playing card without confirmation:", card);
 
     try {
         const playRequest = {
@@ -48,8 +34,18 @@ export async function playCard() {
 
         console.log("Card played successfully");
         
+        // Add local message (server should also broadcast one)
+        const playerName = gameState.players?.find(p => p.id === playerId)?.name || "You";
+        const cardText = `<span style="font-weight: bold; color: #007bff;">${card.rank} of ${card.suit}</span>`;
+        const message = `🃏 <span style="font-weight: bold; font-style: italic;">${playerName}</span> played ${cardText}`;
+        addToEventHistory(message);
+        
         // Clear selection after successful play
         setSelectedCard(null);
+        
+        // Reset interaction state to allow blinking again
+        window.playerInteractionState = false;
+        
         updateHandDisplay();
         updateGameActions();
         

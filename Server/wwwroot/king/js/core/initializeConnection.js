@@ -1,20 +1,12 @@
 // Server/wwwroot/king/js/core/initializeConnection.js
-import { setConnection, setGameState, setClientId } from "./variables.js";
-import { updateConnectionStatus } from "./updateConnectionStatus.js";
+import { setConnection, setGameState } from "./variables.js";
+import { updateConnectionStatus } from "../../../js/core/updateConnectionStatus.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
-import { getOrCreateClientId } from "../../../js/utils/clientIdUtils.js";
-import { handleDisconnection, handleReconnection } from "../utils/reconnectionHandler.js";
+import { addToEventHistory } from "../utils/addToEventHistory.js";
 
 export async function initializeConnection() {
-    // Get or create persistent client ID
-    const persistentClientId = getOrCreateClientId();
-    setClientId(persistentClientId);
-    console.log("King game using client ID:", persistentClientId);
-
     const s = globalThis.signalR || window.signalR;
-    if (!s) { 
-        throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); 
-    }
+    if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }
 
     const hub = new s.HubConnectionBuilder()
         .withUrl("/kingHub")
@@ -26,39 +18,41 @@ export async function initializeConnection() {
     hub.on("StateUpdate", (state) => {
         console.log("=== KING STATE UPDATE RECEIVED ===", state);
         setGameState(state);
+        // Update display when state changes
         updateGameDisplay();
+    });
+
+    // Handle game events (for message broadcasting)
+    hub.on("GameEvent", (gameEvent) => {
+        console.log("=== KING GAME EVENT RECEIVED ===", gameEvent);
+        addToEventHistory(gameEvent);
     });
 
     // Handle connection events
     hub.onreconnecting((error) => {
-        console.log("King connection lost, attempting to reconnect...", error);
+        console.log("King Hub: Connection lost, attempting to reconnect...", error);
         updateConnectionStatus("disconnected");
-        handleDisconnection();
     });
 
     hub.onreconnected((connectionId) => {
-        console.log("King connection restored!", connectionId);
+        console.log("King Hub: Connection restored!", connectionId);
         updateConnectionStatus("connected");
-        handleReconnection();
     });
 
     hub.onclose((error) => {
-        console.log("King connection closed", error);
+        console.log("King Hub: Connection closed", error);
         updateConnectionStatus("disconnected");
-        handleDisconnection();
     });
 
     try {
         await hub.start();
+        console.log("King Hub: Connected successfully!");
         updateConnectionStatus("connected");
-        console.log("King SignalR Connected");
-
-        // NO automatic reconnection attempt for King
-        // Users should explicitly use Join button even with match ID in URL
-        console.log("King connection ready - use Join button to join a game");
-        
     } catch (err) {
-        console.error("King connection failed:", err);
+        console.error("King Hub: Connection failed:", err);
         updateConnectionStatus("disconnected");
+        throw err;
     }
+
+    return hub;
 }

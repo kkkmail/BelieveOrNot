@@ -15,7 +15,7 @@
     </div>
 </div>
 
-<!-- Game Table Area -->
+<!-- Game Table Area - INCREASED HEIGHT -->
 <div class="king-table-area">
     <!-- Circular table layout with 4 player positions -->
     <div class="king-table" id="kingTable">
@@ -63,11 +63,11 @@
             </div>
             <div class="player-cards" id="playerCards3"></div>
         </div>
-
-        <!-- Table Center - Current Trick with full-size cards -->
+        
+        <!-- Table Center - Trick Cards -->
         <div class="table-center">
             <div class="trick-cards" id="trickCards">
-                <!-- Trick cards will be populated here as full-size cards -->
+                <!-- Played cards appear here -->
             </div>
         </div>
     </div>
@@ -84,16 +84,6 @@
     </div>
 </div>
 
-<!-- Round Information -->
-<div class="round-info-area" id="roundInfoArea">
-    <h3>Round Information</h3>
-    <div class="round-details">
-        <div class="round-name" id="roundName">Waiting for round to start</div>
-        <div class="round-description" id="roundDescription">-</div>
-        <div class="round-rules" id="roundRules"></div>
-    </div>
-</div>
-
 <!-- Your Hand Area -->
 <div class="hand-area">
     <h3>Your Hand (<span id="handCount">0</span> cards)</h3>
@@ -102,10 +92,31 @@
     </div>
 </div>
 
-<!-- Game Actions -->
-<div class="game-actions" id="gameActions">
-    <button class="btn btn-primary hidden" id="playCardBtn">Play Selected Card</button>
-    <div class="turn-message" id="turnMessage">Wait for your turn</div>
+<!-- Game Actions - TABLE CONTROLS (like BelieveOrNot) -->
+<div class="table-controls" id="tableControls">
+    <div class="table-message" id="tableMessage">Wait your turn</div>
+    <div class="table-actions" id="tableActions">
+        <button class="btn btn-primary hidden" id="playCardBtn">Play Selected Card</button>
+    </div>
+</div>
+
+<!-- Message Area - BROADCAST MESSAGES (like BelieveOrNot) -->
+<div class="message-area" id="messageArea">
+    Welcome to The King! Wait for 3 more players to join.
+</div>
+
+<!-- Round Information - COMPACT TWO-COLUMN LAYOUT -->
+<div class="round-info-area" id="roundInfoArea">
+    <h3>Round Information</h3>
+    <div class="round-details">
+        <div class="round-main-info">
+            <div class="round-name" id="roundName">Waiting for round to start</div>
+            <div class="round-description" id="roundDescription">-</div>
+        </div>
+        <div class="round-rules" id="roundRules">
+            <!-- Rules will be populated here -->
+        </div>
+    </div>
 </div>
 
 <!-- Scoring Area -->
@@ -114,9 +125,4 @@
     <div class="score-table" id="scoreTable">
         <!-- Scores will be populated here -->
     </div>
-</div>
-
-<!-- Message Area -->
-<div class="message-area" id="messageArea">
-    Welcome to The King! Wait for 3 more players to join.
 </div>

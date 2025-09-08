@@ -10,17 +10,19 @@ export async function endRound() {
         return;
     }
 
-    // Only game creator can end round (BelieveOrNot pattern)
+    // Check if player is game creator
     const currentPlayer = gameState.players?.find(p => p.id === playerId);
-    if (!currentPlayer?.isCreator) {
+    const isCreator = currentPlayer?.isCreator || (gameState.players && gameState.players[0]?.id === playerId);
+    
+    if (!isCreator) {
         alert('Only the game creator can end the round');
         return;
     }
 
-    // Show confirmation dialog
+    // Show confirmation dialog with correct title
     const confirmed = await customConfirm(
         `Are you sure you want to end the current round?\n\nThis round will not be counted in the final scores.`,
-        'End Round'
+        'The King'  // Fixed title
     );
 
     if (!confirmed) {

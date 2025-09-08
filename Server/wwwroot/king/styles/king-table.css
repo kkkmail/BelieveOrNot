@@ -1,15 +1,15 @@
 /* Server/wwwroot/king/styles/king-table.css */
 
-/* King Table Area - keep original size */
+/* King Table Area - INCREASED HEIGHT to fit player controls */
 .king-table-area {
     margin: 20px 0;
-    padding: 20px;
+    padding: 30px 20px; /* Increased top/bottom padding */
     background: rgba(0, 100, 0, 0.1);
     border-radius: 15px;
     border: 3px solid #28a745;
     text-align: center;
     position: relative;
-    height: 500px;
+    height: 600px; /* Increased from 500px to 600px */
 }
 
 /* Circular Table Layout - keep original size */
@@ -26,7 +26,7 @@
         0 10px 30px rgba(0,0,0,0.2);
 }
 
-/* Player Positions around the table */
+/* Player Positions around the table - MOVED CLOSER to table */
 .player-position {
     position: absolute;
     display: flex;
@@ -42,27 +42,27 @@
     transition: all 0.3s ease;
 }
 
-/* Position players around the table */
+/* Position players around the table - MOVED MUCH FURTHER INSIDE */
 .player-position.top {
-    top: -100px;
+    top: -30px; /* Moved from -50px to -30px (much further inside) */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.right {
-    right: -100px;
+    right: -30px; /* Moved from -50px to -30px (much further inside) */
     top: 50%;
     transform: translateY(-50%);
 }
 
 .player-position.bottom {
-    bottom: -100px;
+    bottom: -30px; /* Moved from -50px to -30px (much further inside) */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.left {
-    left: -100px;
+    left: -30px; /* Moved from -50px to -30px (much further inside) */
     top: 50%;
     transform: translateY(-50%);
 }
