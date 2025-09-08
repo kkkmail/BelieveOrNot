@@ -42,27 +42,27 @@
     transition: all 0.3s ease;
 }
 
-/* Position players around the table - MOVED MUCH FURTHER INSIDE */
+/* Position players around the table - RESTORED TO ORIGINAL POSITIONS */
 .player-position.top {
-    top: -30px; /* Moved from -50px to -30px (much further inside) */
+    top: -70px; /* Restored from -30px back to proper distance */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.right {
-    right: -30px; /* Moved from -50px to -30px (much further inside) */
+    right: -70px; /* Restored from -30px back to proper distance */
     top: 50%;
     transform: translateY(-50%);
 }
 
 .player-position.bottom {
-    bottom: -30px; /* Moved from -50px to -30px (much further inside) */
+    bottom: -70px; /* Restored from -30px back to proper distance */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .player-position.left {
-    left: -30px; /* Moved from -50px to -30px (much further inside) */
+    left: -70px; /* Restored from -30px back to proper distance */
     top: 50%;
     transform: translateY(-50%);
 }
