@@ -12,12 +12,12 @@
     height: 600px; /* Increased from 500px to 600px */
 }
 
-/* Circular Table Layout - keep original size */
+/* Circular Table Layout - moved down to prevent overflow */
 .king-table {
     position: relative;
     width: 600px;
     height: 400px;
-    margin: 0 auto;
+    margin: 70px auto 0 auto; /* Moved down by adding top margin */
     background: linear-gradient(135deg, #2d5016, #4a7c59);
     border-radius: 200px;
     border: 8px solid #8b4513;
