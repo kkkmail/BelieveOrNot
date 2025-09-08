@@ -6,13 +6,19 @@ import { addToEventHistory } from "../utils/addToEventHistory.js";
 export function updateGameActions() {
     console.log("🎯 updateGameActions() CALLED!!!");
     
-    // Look for buttons and controls
+    // Look for buttons and controls - King buttons should be loaded dynamically
     const startRoundBtn = document.getElementById('startRoundBtn');
     const endRoundBtn = document.getElementById('endRoundBtn');
     const playCardBtn = document.getElementById('playCardBtn');
     const tableMessage = document.getElementById('tableMessage');
     const tableControls = document.getElementById('tableControls');
     const otherGamesBtn = document.getElementById('otherGamesBtn');
+
+    console.log("=== BUTTON ELEMENT LOOKUPS ===");
+    console.log("startRoundBtn:", startRoundBtn);
+    console.log("endRoundBtn:", endRoundBtn);
+    console.log("playCardBtn:", playCardBtn);
+    console.log("otherGamesBtn:", otherGamesBtn);
 
     // Hide all buttons initially
     [startRoundBtn, endRoundBtn, playCardBtn, otherGamesBtn].forEach(btn => {
@@ -27,6 +33,8 @@ export function updateGameActions() {
 
     if (!gameState) {
         if (tableMessage) tableMessage.textContent = "Loading...";
+        // Show Other Games button when no game state
+        if (otherGamesBtn) otherGamesBtn.classList.remove('hidden');
         return;
     }
 
@@ -37,115 +45,144 @@ export function updateGameActions() {
 
     let shouldBlink = false;
 
-    console.log("=== BLINKING DEBUG ===");
+    console.log("=== GAME ACTIONS DEBUG ===");
+    console.log("playerId:", playerId);
+    console.log("currentPlayer:", currentPlayer);
+    console.log("isCreator:", isCreator);
+    console.log("players length:", gameState.players?.length);
+    console.log("phase:", gameState.phase);
     console.log("isMyTurn:", isMyTurn);
-    console.log("selectedCard:", selectedCard);
-    console.log("waitingForTrumpSelection:", gameState.waitingForTrumpSelection);
-    console.log("shouldBlink will be:", isMyTurn && !gameState.waitingForTrumpSelection && selectedCard === null);
 
     // Game phase handling
     if (gameState.phase === 0) { // WaitingForPlayers
+        console.log("=== WAITING FOR PLAYERS PHASE ===");
+        
+        // Show start round button for creator when all 4 players have joined
         if (isCreator && gameState.players && gameState.players.length >= 4) {
-            startRoundBtn?.classList.remove('hidden');
+            console.log("CREATOR: All 4 players joined - showing Start Round button");
+            
+            if (startRoundBtn) {
+                startRoundBtn.classList.remove('hidden');
+                console.log("✅ Start Round button shown successfully");
+                console.log("Button classes after show:", startRoundBtn.className);
+            } else {
+                console.error("❌ startRoundBtn not found - King game management controls not loaded properly");
+                console.error("Check that loadHtmlContent.js properly replaced the game-management-controls");
+                
+                // Debug: Show what buttons actually exist
+                const allButtons = document.querySelectorAll('.game-management-controls button');
+                console.log("Available buttons in game-management-controls:");
+                allButtons.forEach(btn => {
+                    console.log(`- ${btn.id}: "${btn.textContent}" (classes: ${btn.className})`);
+                });
+            }
+        } else {
+            console.log("Start Round button not shown:", {
+                isCreator,
+                playerCount: gameState.players?.length,
+                needs4Players: gameState.players?.length >= 4
+            });
         }
+        
+        // Update table message
         if (tableMessage) {
-            tableMessage.innerHTML = "Waiting for round to start";
+            const playerCount = gameState.players ? gameState.players.length : 0;
+            const playersNeeded = 4 - playerCount;
+            
+            if (playerCount < 4) {
+                tableMessage.innerHTML = `Waiting for ${playersNeeded} more player${playersNeeded === 1 ? '' : 's'} to join...`;
+            } else {
+                tableMessage.innerHTML = "All players joined! Ready to start round.";
+            }
             tableMessage.style.display = 'block';
         }
     } 
-    else if (gameState.phase === 1) { // InProgress
+    else if (gameState.phase === 1) { // InProgress - Round started
+        console.log("=== GAME IN PROGRESS PHASE ===");
+        
+        // Show end round button for creator
         if (isCreator) {
-            endRoundBtn?.classList.remove('hidden');
+            console.log("CREATOR: Showing End Round button during game");
+            if (endRoundBtn) {
+                endRoundBtn.classList.remove('hidden');
+            }
         }
         
+        // Handle player turn logic
         if (isMyTurn) {
             if (gameState.waitingForTrumpSelection) {
                 if (tableMessage) {
                     tableMessage.innerHTML = "🎯 Your turn - Choose trump suit!";
                     tableMessage.style.display = 'block';
                 }
-                shouldBlink = true;
-            } else if (selectedCard !== null) {
-                // Card selected - show play button, HIDE turn message
-                playCardBtn?.classList.remove('hidden');
-                if (tableMessage) tableMessage.style.display = 'none';
-                shouldBlink = false;
-            } else {
-                // No card selected - show blinking turn message
+                shouldBlink = false; // No blinking during trump selection
+            } else if (selectedCard === null) {
                 if (tableMessage) {
-                    tableMessage.innerHTML = "🎯 Your turn - Select a card to play";
+                    tableMessage.innerHTML = "🎯 Your turn - Select a card to play!";
                     tableMessage.style.display = 'block';
                 }
-                shouldBlink = true; // This should make it blink
+                shouldBlink = true;
+            } else {
+                // Card selected, ready to play
+                if (tableMessage) {
+                    tableMessage.innerHTML = "🎯 Card selected - click Play Card!";
+                    tableMessage.style.display = 'block';
+                }
+                if (playCardBtn) {
+                    playCardBtn.classList.remove('hidden');
+                }
+                shouldBlink = false;
             }
         } else {
-            // Not my turn - show whose turn it is
-            const currentPlayerName = gameState.players?.[gameState.currentPlayerIndex]?.name || "Unknown";
-            if (tableMessage) {
-                tableMessage.innerHTML = `Waiting for <span style="font-weight: bold; font-style: italic;">${currentPlayerName}</span>`;
+            // Not my turn
+            const currentTurnPlayer = gameState.players?.[gameState.currentPlayerIndex];
+            if (tableMessage && currentTurnPlayer) {
+                if (gameState.waitingForTrumpSelection) {
+                    tableMessage.innerHTML = `${currentTurnPlayer.name} is choosing trump suit...`;
+                } else {
+                    tableMessage.innerHTML = `${currentTurnPlayer.name}'s turn`;
+                }
                 tableMessage.style.display = 'block';
             }
             shouldBlink = false;
         }
     } 
     else if (gameState.phase === 2) { // RoundEnd
+        console.log("=== ROUND END PHASE ===");
+        
+        // Show start round button for creator to start next round
         if (isCreator) {
-            startRoundBtn?.classList.remove('hidden');
+            console.log("CREATOR: Showing Start Round button for next round");
+            if (startRoundBtn) {
+                startRoundBtn.classList.remove('hidden');
+            }
         }
+        
         if (tableMessage) {
-            tableMessage.innerHTML = "Round ended";
+            tableMessage.innerHTML = "Round ended - waiting for next round";
             tableMessage.style.display = 'block';
         }
     } 
     else if (gameState.phase === 3) { // GameEnd
+        console.log("=== GAME END PHASE ===");
+        
         if (tableMessage) {
-            tableMessage.innerHTML = "Game finished!";
+            tableMessage.innerHTML = "Game ended";
             tableMessage.style.display = 'block';
         }
-        otherGamesBtn?.classList.remove('hidden');
-    }
-
-    console.log("Final shouldBlink:", shouldBlink);
-
-    // Apply blinking when appropriate - FORCE BLINKING WITH AGGRESSIVE APPROACH
-    if (shouldBlink && tableControls) {
-        // Force remove first to ensure clean state
-        tableControls.classList.remove('active-turn');
-        // Force add with delay to ensure it takes effect
-        setTimeout(() => {
-            tableControls.classList.add('active-turn');
-            console.log("✅ BLINKING FORCED - active-turn class added with delay");
-            console.log("Element classes:", tableControls.className);
-        }, 10);
-    } else {
-        tableControls.classList.remove('active-turn');
-        console.log("❌ BLINKING DISABLED - removed active-turn class");
-    }
-
-    // Test: Always show at least one recent message
-    if (gameState.phase === 1) {
-        // Add round progress message
-        const currentPlayerName = gameState.players?.[gameState.currentPlayerIndex]?.name || "Unknown";
-        const trickCount = gameState.completedTricks?.length || 0;
-        const testMessage = `🎯 Game in progress - Trick ${trickCount + 1} - <span style="font-weight: bold; font-style: italic;">${currentPlayerName}</span>'s turn`;
         
-        // Only add this message once per turn to avoid spam
-        if (!window.lastTurnMessage || window.lastTurnMessage !== currentPlayerName) {
-            addToEventHistory(testMessage);
-            window.lastTurnMessage = currentPlayerName;
+        // Show Other Games button for everyone when game ends
+        if (otherGamesBtn) {
+            otherGamesBtn.classList.remove('hidden');
         }
     }
 
-    // Add round end broadcasting
-    if (gameState.phase === 2 && !window.roundEndMessageSent) {
-        const roundNumber = (gameState.currentRoundIndex || 0) + 1;
-        const roundEndMessage = `🏁 Round ${roundNumber} ended!`;
-        addToEventHistory(roundEndMessage);
-        window.roundEndMessageSent = true;
+    // Apply blinking if needed
+    if (shouldBlink && tableControls) {
+        tableControls.classList.add('active-turn');
+        console.log("Applied blinking to table controls");
     }
 
-    // Reset round end flag when new round starts
-    if (gameState.phase === 1) {
-        window.roundEndMessageSent = false;
-    }
+    console.log("=== END updateGameActions ===");
+    console.log("Final shouldBlink:", shouldBlink);
 }

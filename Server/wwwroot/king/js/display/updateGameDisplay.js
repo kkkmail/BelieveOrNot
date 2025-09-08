@@ -28,6 +28,9 @@ export function updateGameDisplay() {
     // Update basic game info
     updateBasicGameInfo();
 
+    // Update card area visibility based on game state
+    updateCardAreaVisibility();
+
     // Update all displays
     updateRoundDisplay();
     updatePlayersDisplay();
@@ -62,24 +65,75 @@ function updateBasicGameInfo() {
     if (currentPlayerElement && gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         currentPlayerElement.textContent = currentPlayer.name;
-        currentPlayerElement.className = gameState.players[gameState.currentPlayerIndex]?.id === playerId ? 'current-turn-highlight' : '';
+        currentPlayerElement.className = gameState.players[gameState.currentPlayerIndex]?.id === playerId ?
+            'current-player current-player-me' : 'current-player';
+    }
+}
+
+function updateCardAreaVisibility() {
+    console.log("=== updateCardAreaVisibility() CALLED ===");
+    
+    const handArea = document.querySelector('.hand-area');
+    const trumpSelectionArea = document.getElementById('trumpSelectionArea');
+    const roundInfoArea = document.getElementById('roundInfoArea');
+    
+    console.log("Elements found:");
+    console.log("- handArea:", handArea);
+    console.log("- trumpSelectionArea:", trumpSelectionArea);
+    console.log("- roundInfoArea:", roundInfoArea);
+    
+    // Show card area only when the round has started (phase 1)
+    // The Start Round button is in game-management-controls, not in hand area
+    const shouldShowCardArea = gameState.players && 
+                               gameState.players.length === 4 && 
+                               gameState.phase === 1; // InProgress phase
+
+    console.log("=== CARD AREA VISIBILITY DEBUG ===");
+    console.log("gameState.players:", gameState.players);
+    console.log("shouldShowCardArea:", shouldShowCardArea);
+    console.log("players.length:", gameState.players?.length);
+    console.log("phase:", gameState.phase);
+    console.log("Logic: players.length === 4 && phase === 1");
+
+    if (handArea) {
+        console.log("Hand area current display style:", handArea.style.display);
+        console.log("Hand area computed display:", window.getComputedStyle(handArea).display);
+        
+        if (shouldShowCardArea) {
+            handArea.style.display = 'block';
+            console.log("✅ SHOWING hand area - Round started with 4 players");
+            console.log("Hand area display after setting to block:", handArea.style.display);
+        } else {
+            handArea.style.display = 'none';
+            console.log("❌ HIDING hand area - Round not started or less than 4 players");
+        }
+    } else {
+        console.error("❌ Hand area element not found!");
     }
 
-    // Update trump suit
-    const trumpElement = document.getElementById('trumpSuit');
-    if (trumpElement) {
-        if (gameState.selectedTrumpSuit) {
-            const trumpSymbols = {
-                'Hearts': '♥',
-                'Diamonds': '♦',
-                'Clubs': '♣',
-                'Spades': '♠'
-            };
-            trumpElement.innerHTML = `<span class="trump-display ${gameState.selectedTrumpSuit.toLowerCase()}">
-                ${trumpSymbols[gameState.selectedTrumpSuit]} ${gameState.selectedTrumpSuit}
-            </span>`;
+    // Also hide trump selection area and round info area when card area is hidden
+    if (trumpSelectionArea) {
+        if (shouldShowCardArea) {
+            // Trump selection visibility is controlled by other logic, so just remove forced hiding
+            if (trumpSelectionArea.style.display === 'none') {
+                trumpSelectionArea.style.display = '';
+            }
+            console.log("Trump selection area - removing forced hiding");
         } else {
-            trumpElement.textContent = gameState.waitingForTrumpSelection ? 'Choosing...' : '-';
+            trumpSelectionArea.style.display = 'none';
+            console.log("Trump selection area - hiding");
         }
     }
+
+    if (roundInfoArea) {
+        if (shouldShowCardArea) {
+            roundInfoArea.style.display = 'block';
+            console.log("Round info area - showing");
+        } else {
+            roundInfoArea.style.display = 'none';
+            console.log("Round info area - hiding");
+        }
+    }
+    
+    console.log("=== updateCardAreaVisibility() COMPLETE ===");
 }
