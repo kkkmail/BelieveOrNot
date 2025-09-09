@@ -67,10 +67,10 @@
     transform: translateY(-50%);
 }
 
-/* Current turn highlighting */
+/* Current turn highlighting - keep same background and border as base */
 .player-position.current-turn {
     border-color: #28a745;
-    background: rgba(40, 167, 69, 0.1);
+    background: rgba(255, 255, 255, 0.9);
     transform: translateX(-50%) scale(1.05);
 }
 
@@ -86,7 +86,7 @@
     transform: translateX(-50%) scale(1.05);
 }
 
-/* Game creator styling */
+/* Game creator styling - keeps special appearance */
 .player-position.creator {
     border-color: #ffd700;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 234, 167, 0.3));
@@ -97,10 +97,10 @@
     color: #ffd700;
 }
 
-/* You (current player) styling */
+/* You (current player) styling - standardized background and border */
 .player-position.you {
     border-color: #007bff;
-    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(227, 242, 253, 0.3));
+    background: rgba(255, 255, 255, 0.95);
 }
 
 .player-position.you .player-name::after {

@@ -50,17 +50,14 @@ export function updatePlayersDisplay() {
                 else scoreElement.classList.add('zero');
             }
 
-            // Update card backs display
-            if (cardsContainer && !isMe) {
+            // Update card backs display - show for all players including "You"
+            if (cardsContainer) {
                 cardsContainer.innerHTML = '';
                 for (let j = 0; j < Math.min(player.handCount, 8); j++) {
                     const cardBack = document.createElement('div');
                     cardBack.className = 'player-card-back';
                     cardsContainer.appendChild(cardBack);
                 }
-            } else if (cardsContainer && isMe) {
-                // Clear cards container for current player (hand is shown separately)
-                cardsContainer.innerHTML = '';
             }
         } else {
             // Empty position
