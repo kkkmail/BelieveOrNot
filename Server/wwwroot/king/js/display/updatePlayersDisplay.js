@@ -35,7 +35,11 @@ export function updatePlayersDisplay() {
             const cardsContainer = playerPosition.querySelector('.player-cards');
 
             if (nameElement) {
-                nameElement.textContent = isMe ? 'You' : player.name;
+                let displayName = isMe ? 'You' : player.name;
+                if (isCreator) {
+                    displayName += ' ⭐';
+                }
+                nameElement.textContent = displayName;
             }
 
             if (cardCountElement) {
