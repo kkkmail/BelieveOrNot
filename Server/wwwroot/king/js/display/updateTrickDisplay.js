@@ -2,6 +2,7 @@
 import { gameState } from "../core/variables.js";
 import { getSuitSymbol } from "../../../js/cards/getSuitSymbol.js";
 import { getSuitClass } from "../../../js/cards/getSuitClass.js";
+import { updateHandDisplay } from "./updateHandDisplay.js";
 
 export function updateTrickDisplay() {
     // Clear all card slots first
@@ -13,7 +14,15 @@ export function updateTrickDisplay() {
         }
     }
 
+    // Check if we should clear the trick completion flag
     if (!gameState?.currentTrick?.cards || gameState.currentTrick.cards.length === 0) {
+        // New trick started - clear the flag and update display
+        if (window.trickCompletionInProgress) {
+            console.log("New trick started - clearing trickCompletionInProgress flag");
+            window.trickCompletionInProgress = false;
+            // Update hand display immediately to re-enable cards
+            setTimeout(() => updateHandDisplay(), 50);
+        }
         return; // No cards to display
     }
 

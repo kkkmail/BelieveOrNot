@@ -1,4 +1,4 @@
-// King/IKingGameEngine.cs
+// Server/King/IKingGameEngine.cs
 namespace BelieveOrNot.Server.King;
 
 public interface IKingGameEngine
@@ -8,4 +8,5 @@ public interface IKingGameEngine
     KingGameStateDto SelectTrump(KingMatch match, Guid playerId, Suit trumpSuit);
     KingGameStateDto CreateGameStateDto(KingMatch match);
     KingGameStateDto CreateGameStateDtoForPlayer(KingMatch match, Guid playerId);
+    KingGameStateDto CompleteTrickAndContinue(KingMatch match);
 }

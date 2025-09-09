@@ -91,24 +91,38 @@ public class KingGameEngine : IKingGameEngine
         }
 
         // Check if trick is complete
-        if (currentTrick.IsComplete)
+        if (currentTrick.Cards.Count == 4)
         {
-            CompleteTrick(match);
-
-            // Check for round end conditions
-            if (ShouldEndRound(match))
-            {
-                EndRound(match);
-            }
-            else if (!match.IsRoundComplete)
-            {
-                StartNewTrick(match);
-            }
+            // Mark as complete but don't process yet - just show the 4 cards
+            currentTrick.IsComplete = true;
         }
         else
         {
             // Advance to next player
             AdvanceCurrentPlayer(match);
+        }
+
+        return CreateGameStateDto(match);
+    }
+
+    public KingGameStateDto CompleteTrickAndContinue(KingMatch match)
+    {
+        if (match.CurrentTrick?.IsComplete != true)
+        {
+            return CreateGameStateDto(match);
+        }
+
+        // Complete the trick
+        CompleteTrick(match);
+
+        // Check for round end conditions
+        if (ShouldEndRound(match))
+        {
+            EndRound(match);
+        }
+        else if (!match.IsRoundComplete)
+        {
+            StartNewTrick(match);
         }
 
         return CreateGameStateDto(match);
@@ -150,7 +164,7 @@ public class KingGameEngine : IKingGameEngine
             // Check suit following
             var leadSuit = currentTrick.LedSuit!.Value;
             var sameSuitCards = player.Hand.Where(c => c.GetSuit() == leadSuit).ToList();
-            
+
             if (sameSuitCards.Any() && card.GetSuit() != leadSuit)
             {
                 return $"Must follow suit: {leadSuit}";

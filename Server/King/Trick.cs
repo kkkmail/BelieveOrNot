@@ -1,4 +1,4 @@
-// King/Trick.cs
+// Server/King/Trick.cs
 namespace BelieveOrNot.Server.King;
 
 public class Trick
@@ -7,11 +7,11 @@ public class Trick
     public List<PlayedCard> Cards { get; set; } = new();
     public Guid? WinnerId { get; set; }
     public Suit? LedSuit { get; set; }
-    public bool IsComplete => Cards.Count == 4;
+    public bool IsComplete { get; set; } = false; // Changed from computed to get/set property
 
     public PlayedCard? GetWinningCard(Suit? trumpSuit)
     {
-        if (!IsComplete) return null;
+        if (Cards.Count != 4) return null;
 
         var leadSuit = LedSuit ?? Cards.First().Card.GetSuit();
 

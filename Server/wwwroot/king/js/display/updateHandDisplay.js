@@ -31,6 +31,7 @@ export function updateHandDisplay() {
     console.log("isMyTurn:", isMyTurn);
     console.log("gameState.phase:", gameState.phase);
     console.log("waitingForTrumpSelection:", gameState.waitingForTrumpSelection);
+    console.log("trickCompletionInProgress:", window.trickCompletionInProgress);
 
     // Use cards in the exact order they come from server (already sorted)
     gameState.yourHand.forEach((card, index) => {
@@ -40,7 +41,7 @@ export function updateHandDisplay() {
         // For active player: validate each card individually against game rules
         let canPlay = false;
         
-        if (isMyTurn && !gameState.waitingForTrumpSelection && gameState.phase === 1) {
+        if (isMyTurn && !gameState.waitingForTrumpSelection && gameState.phase === 1 && !window.trickCompletionInProgress) {
             // Call validator for each individual card to check if it can be played
             canPlay = KingMoveValidator.canPlayCard(gameState, card, playerId);
             console.log(`Card ${index} (${card.rank} of ${card.suit}): canPlay=${canPlay}`);
@@ -89,6 +90,10 @@ export function updateHandDisplay() {
 }
 
 function getCardDisabledReason(gameState, card, isMyTurn) {
+    if (window.trickCompletionInProgress) {
+        return "Trick completion in progress";
+    }
+
     if (!isMyTurn) {
         return "Wait for your turn";
     }

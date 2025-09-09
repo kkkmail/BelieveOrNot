@@ -13,6 +13,12 @@ export function toggleCardSelection(cardIndex) {
     console.log("playerId from import:", playerId);
     console.log("typeof playerId:", typeof playerId);
 
+    // Check if trick completion is in progress
+    if (window.trickCompletionInProgress) {
+        console.log("Card selection disabled: Trick completion in progress");
+        return;
+    }
+
     // Check if game is in valid state for card selection
     if (!gameState || gameState.phase !== 1) { // Not in progress
         console.log("Card selection disabled: Game not in progress, phase:", gameState?.phase);

@@ -30,6 +30,16 @@ export async function playCard() {
 
         console.log("Play card request:", playRequest);
 
+        // Check if this will be the 4th card (trick complete)
+        const currentTrickCardCount = gameState.currentTrick?.cards?.length || 0;
+        const willCompleteTrick = currentTrickCardCount === 3; // Will be 4 after our card
+
+        // If this will complete the trick, disable cards IMMEDIATELY
+        if (willCompleteTrick) {
+            console.log("This will be the 4th card - disabling cards immediately");
+            window.trickCompletionInProgress = true;
+        }
+
         await connection.invoke("PlayCard", playRequest);
 
         console.log("Card played successfully");
@@ -66,5 +76,8 @@ export async function playCard() {
     } catch (err) {
         console.error("Failed to play card:", err);
         alert("Failed to play card: " + (err.message || err));
+        
+        // Reset flag if there was an error
+        window.trickCompletionInProgress = false;
     }
 }
