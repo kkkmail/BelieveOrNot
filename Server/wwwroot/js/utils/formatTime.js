@@ -1,3 +1,4 @@
+// js/utils/formatTime.js
 // Consistent time formatting function - use 24-hour format
 export function formatTime(date = new Date()) {
     return date.toLocaleTimeString('en-US', {

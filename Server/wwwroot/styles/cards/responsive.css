@@ -1,3 +1,4 @@
+/* styles/cards/responsive.css */
 @media (max-width: 768px) {
     .card {
         width: 80px;

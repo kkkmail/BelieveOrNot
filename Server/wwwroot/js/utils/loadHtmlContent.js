@@ -1,3 +1,4 @@
+// js/utils/loadHtmlContent.js
 // Load HTML content from external files
 export async function loadHtmlContent() {
     try {

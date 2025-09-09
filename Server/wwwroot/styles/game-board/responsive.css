@@ -1,3 +1,4 @@
+/* styles/game-board/responsive.css */
 @media (max-width: 768px) {
     .table-display {
         flex-direction: column;

@@ -1,0 +1,255 @@
+/* Server/wwwroot/king/styles/king-game-board.css */
+
+/* Game Status */
+.game-status {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.game-status h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.status-info {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Match ID section with copy button */
+.match-id-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-copy {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.btn-copy:hover {
+    background: #138496;
+}
+
+.btn-copy:active {
+    background: #0f6674;
+    transform: scale(0.95);
+}
+
+/* Phase-specific styling */
+.game-status .phase-waiting {
+    color: #ffc107;
+}
+
+.game-status .phase-in-progress {
+    color: #28a745;
+}
+
+.game-status .phase-round-end {
+    color: #17a2b8;
+}
+
+.game-status .phase-game-end {
+    color: #dc3545;
+}
+
+/* Round type indicators */
+.round-type-avoiding {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.round-type-collecting {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Current turn highlighting */
+.current-turn-highlight {
+    color: #007bff;
+    font-weight: bold;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.5; }
+}
+
+/* Trump suit display */
+.trump-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: rgba(255, 215, 0, 0.2);
+    border-radius: 5px;
+    border: 1px solid #ffd700;
+}
+
+.trump-display.hearts {
+    color: #dc3545;
+}
+
+.trump-display.diamonds {
+    color: #dc3545;
+}
+
+.trump-display.clubs {
+    color: #333;
+}
+
+.trump-display.spades {
+    color: #333;
+}
+
+/* Round progress indicator */
+.round-progress {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 200px;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    margin: 5px auto;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    transition: width 0.3s ease;
+}
+
+/* Trick counter */
+.trick-counter {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Early termination warning */
+.early-termination-warning {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid #ffc107;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin: 10px 0;
+    color: #856404;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Special round indicators */
+.round-special-rules {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(23, 162, 184, 0.1);
+    border-left: 4px solid #17a2b8;
+    border-radius: 0 5px 5px 0;
+}
+
+.round-special-rules h4 {
+    margin: 0 0 5px 0;
+    color: #17a2b8;
+    font-size: 14px;
+}
+
+.round-special-rules ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #666;
+    font-size: 12px;
+}
+
+.round-special-rules li {
+    margin: 2px 0;
+}
+
+/* Card count indicators */
+.card-count-indicator {
+    display: inline-block;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    color: #495057;
+    margin-left: 5px;
+}
+
+.card-count-indicator.empty {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Last trick winner indicator */
+.last-trick-winner {
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 5px 0;
+    color: #155724;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Penalty tracking */
+.penalty-tracker {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(220, 53, 69, 0.1);
+    border-left: 4px solid #dc3545;
+    border-radius: 0 5px 5px 0;
+}
+
+.penalty-tracker h4 {
+    margin: 0 0 5px 0;
+    color: #dc3545;
+    font-size: 14px;
+}
+
+.penalty-list {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #666;
+}
+
+.penalty-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.penalty-item .penalty-type {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.penalty-item .penalty-count {
+    color: #333;
+}

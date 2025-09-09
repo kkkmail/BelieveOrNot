@@ -1,3 +1,4 @@
+// js/utils/testBroadcastMessage.js
 // Test function that broadcasts to all players
 import {broadcastMessage} from "./broadcastMessage.js";
 import {gameState} from "../core/variables.js";

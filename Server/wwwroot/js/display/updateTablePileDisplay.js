@@ -1,3 +1,4 @@
+// js/display/updateTablePileDisplay.js
 import {updatePreviousPlayDisplay} from "./updatePreviousPlayDisplay.js";
 import {updateCardPileDisplay} from "./updateCardPileDisplay.js";
 

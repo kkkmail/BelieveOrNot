@@ -1,3 +1,4 @@
+// js/cards/getSuitSymbol.js
 export function getSuitSymbol(suit) {
     switch(suit) {
         case 'Hearts': return '♥️';

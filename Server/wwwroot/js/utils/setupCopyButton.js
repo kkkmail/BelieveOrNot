@@ -1,3 +1,4 @@
+// js/utils/setupCopyButton.js
 // NEW: Setup copy match ID button
 import {copyMatchId} from "./copyMatchId.js";
 

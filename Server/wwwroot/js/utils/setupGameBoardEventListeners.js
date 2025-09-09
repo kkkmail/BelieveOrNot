@@ -1,3 +1,4 @@
+// js/utils/setupGameBoardEventListeners.js
 // NEW: Safer game board event setup that prevents duplicates
 import {setupGameButtons} from "./setupGameButtons.js";
 import {setupChallengeButtons} from "./setupChallengeButtons.js";

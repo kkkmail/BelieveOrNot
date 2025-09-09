@@ -1,0 +1,55 @@
+<!-- Server/wwwroot/king/setup-form.html -->
+<h2 style="text-align: center; margin-bottom: 20px;">Join or Create King Game</h2>
+
+<div class="setup-form">
+    <div class="form-group">
+        <label for="playerName">Your Name:</label>
+        <input type="text" id="playerName" placeholder="Enter your name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="includeAvoidEverythingRound">Include "Don't take anything" round:</label>
+        <select id="includeAvoidEverythingRound">
+            <option value="false" selected>No (6 avoiding rounds)</option>
+            <option value="true">Yes (7 avoiding rounds)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="collectingPhaseRounds">Collecting Phase rounds:</label>
+        <select id="collectingPhaseRounds">
+            <option value="4">4 rounds (each player chooses trump once)</option>
+            <option value="8" selected>8 rounds (each player chooses trump twice)</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary" id="createMatchBtn">Create New King Game</button>
+
+    <div style="text-align: center; margin: 20px 0; color: #666;">
+        <hr style="margin: 10px 0;">
+        <span>Or</span>
+        <hr style="margin: 10px 0;">
+    </div>
+
+    <div class="form-group">
+        <label for="matchId">Match ID to Join:</label>
+        <input type="text" id="matchId" placeholder="Enter match ID or share URL">
+    </div>
+
+    <button class="btn btn-secondary" id="joinMatchBtn">Join Existing King Game</button>
+    
+    <!-- URL sharing info -->
+    <div id="urlInfo" style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 6px; font-size: 14px; text-align: center; display: none;">
+        <p style="margin: 0; color: #1976d2;">
+            <strong>💡 Tip:</strong> You can share the game URL directly with other players!<br>
+            The match ID will be automatically filled from the URL.
+        </p>
+    </div>
+
+    <!-- Game requirements info -->
+    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 6px; font-size: 14px;">
+        <p style="margin: 0; color: #856404;">
+            <strong>⚠️ Note:</strong> The King requires exactly 4 players. The game will start once all 4 players have joined.
+        </p>
+    </div>
+</div>

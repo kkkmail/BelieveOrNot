@@ -1,3 +1,4 @@
+// js/utils/copyMatchId.js
 import {showMessage} from "./showMessage.js";
 
 export async function copyMatchId() {

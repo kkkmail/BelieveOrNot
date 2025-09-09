@@ -1,3 +1,4 @@
+// js/display/updateGameDisplay.js
 import {gameState, setSelectedCards} from "../core/variables.js";
 import {updateScoresDisplay} from "./updateScoresDisplay.js";
 import {updateActionsDisplay} from "./updateActionsDisplay.js";

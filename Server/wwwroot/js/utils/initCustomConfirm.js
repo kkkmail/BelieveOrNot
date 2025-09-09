@@ -1,3 +1,4 @@
+// js/utils/initCustomConfirm.js
 import {customConfirm} from "./customConfirm.js";
 
 export function initCustomConfirm() {

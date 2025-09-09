@@ -1,0 +1,144 @@
+<!-- Server/wwwroot/king/king.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The King - Russian Card Game</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👑</text></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
+    <!-- Shared styles from parent directory -->
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/responsive.css">
+    
+    <!-- Card styles (shared with BelieveOrNot) -->
+    <link rel="stylesheet" href="../styles/cards/back.css">
+    <link rel="stylesheet" href="../styles/cards/base.css">
+    <link rel="stylesheet" href="../styles/cards/joker.css">
+    <link rel="stylesheet" href="../styles/cards/previous-play.css">
+    <link rel="stylesheet" href="../styles/cards/responsive.css">
+    <link rel="stylesheet" href="../styles/cards/suits.css">
+    <link rel="stylesheet" href="../styles/cards/typography.css">
+    
+    <!-- Component styles -->
+    <link rel="stylesheet" href="../styles/components/buttons.css">
+    <link rel="stylesheet" href="../styles/components/forms.css">
+    <link rel="stylesheet" href="../styles/components/messages.css">
+
+    <!-- Game board styles (shared) -->
+    <link rel="stylesheet" href="../styles/game-board/core.css">
+    <link rel="stylesheet" href="../styles/game-board/hand.css">
+    <link rel="stylesheet" href="../styles/game-board/management-controls.css">
+
+    <!-- King-specific styles -->
+    <link rel="stylesheet" href="styles/king-main.css">
+    <link rel="stylesheet" href="styles/king-table.css">
+    <link rel="stylesheet" href="styles/king-game-board.css">
+    <link rel="stylesheet" href="styles/king-responsive.css">
+    
+    <!-- Additional disabled card styling for King -->
+    <style>
+    /* Enhanced disabled card styling for King game */
+    .hand-card.disabled {
+        opacity: 0.4 !important;
+        filter: grayscale(100%) !important;
+        pointer-events: none !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        transition: none !important;
+    }
+    
+    .hand-card.disabled:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Controls -->
+        <div class="top-controls">
+            <div class="connection-status" id="connectionStatus">Connecting...</div>
+            <button class="help-button" id="helpBtn" title="Game Rules & Help">?</button>
+        </div>
+
+        <!-- King Game Management Controls -->
+        <div class="game-management-controls" id="gameManagementControls">
+            <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>
+            <button class="btn btn-warning hidden" id="endRoundBtn">End Round</button>
+            <button class="btn btn-info hidden" id="otherGamesBtn">Other Games</button>
+        </div>
+
+        <!-- Game Header -->
+        <header class="game-header">
+            <h1>👑 The King</h1>
+            <p>Traditional Russian Card Game</p>
+        </header>
+
+        <!-- Game Setup Section -->
+        <section class="game-setup" id="gameSetup">
+            <!-- This content will be loaded from setup-form.html -->
+        </section>
+
+        <!-- Game Board Section -->
+        <section class="game-board" id="gameBoard">
+            <!-- This content will be loaded from game-board.html -->
+        </section>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script type="module" src="js/initialization.js"></script>
+    
+    <!-- Core modules -->
+    <script type="module" src="js/core/initializeConnection.js"></script>
+    <script type="module" src="js/core/variables.js"></script>
+    <script type="module" src="js/core/updateConnectionStatus.js"></script>
+    
+    <!-- Actions -->
+    <script type="module" src="js/actions/createMatch.js"></script>
+    <script type="module" src="js/actions/joinMatch.js"></script>
+    <script type="module" src="js/actions/startRound.js"></script>
+    <script type="module" src="js/actions/playCard.js"></script>
+    <script type="module" src="js/actions/endRound.js"></script>
+    <script type="module" src="js/actions/selectTrump.js"></script>
+    <script type="module" src="js/actions/newGame.js"></script>
+    
+    <!-- Cards -->
+    <script type="module" src="js/cards/toggleCardSelection.js"></script>
+    
+    <!-- Display -->
+    <script type="module" src="js/display/updateGameDisplay.js"></script>
+    <script type="module" src="js/display/updatePlayersDisplay.js"></script>
+    <script type="module" src="js/display/updateHandDisplay.js"></script>
+    <script type="module" src="js/display/updateTrickDisplay.js"></script>
+    <script type="module" src="js/display/updateScoresDisplay.js"></script>
+    <script type="module" src="js/display/updateRoundDisplay.js"></script>
+    <script type="module" src="js/display/updateGameActions.js"></script>
+    
+    <!-- Utils -->
+    <script type="module" src="js/utils/loadHtmlContent.js"></script>
+    <script type="module" src="js/utils/setupEventListeners.js"></script>
+    <script type="module" src="js/utils/setupGameButtons.js"></script>
+    <script type="module" src="js/utils/setupFormButtons.js"></script>
+    <script type="module" src="js/utils/initializeSetupForm.js"></script>
+    <script type="module" src="js/utils/reconnectionHandler.js"></script>
+    <script type="module" src="js/utils/showGameBoard.js"></script>
+    <script type="module" src="js/utils/copyMatchId.js"></script>
+    <script type="module" src="js/utils/gameRouter.js"></script>
+    <script type="module" src="js/utils/KingMoveValidator.js"></script>
+    
+    <!-- Shared utilities from parent directory -->
+    <script type="module" src="../js/utils/customAlert.js"></script>
+    <script type="module" src="../js/utils/customConfirm.js"></script>
+    <script type="module" src="../js/utils/initCustomAlert.js"></script>
+    <script type="module" src="../js/utils/initCustomConfirm.js"></script>
+    <script type="module" src="../js/utils/showHelpModal.js"></script>
+    <script type="module" src="../js/utils/showOtherGamesModal.js"></script>
+    <script type="module" src="../js/utils/clientIdUtils.js"></script>
+    <script type="module" src="../js/utils/urlManager.js"></script>
+    <script type="module" src="../js/utils/gameRouter.js"></script>
+    <script type="module" src="../js/cards/getSuitSymbol.js"></script>
+    <script type="module" src="../js/cards/getSuitClass.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+/* Server/wwwroot/king/styles/king-table.css */
+
+/* King Table Area - Fixed Layout */
+.king-table-area {
+    margin: 20px 0;
+    padding: 30px 20px;
+    background: rgba(0, 100, 0, 0.1);
+    border-radius: 15px;
+    border: 3px solid #28a745;
+    text-align: center;
+    position: relative;
+    height: 600px;
+}
+
+/* Circular Table Layout */
+.king-table {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    margin: 70px auto 0 auto;
+    background: linear-gradient(135deg, #2d5016, #4a7c59);
+    border-radius: 200px;
+    border: 8px solid #8b4513;
+    box-shadow: 
+        inset 0 0 50px rgba(0,0,0,0.3),
+        0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Player Positions around the table - STANDARDIZED FOR ALL */
+.player-position {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    border: 6px solid #ddd;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    min-width: 120px;
+    transition: all 0.3s ease;
+}
+
+/* Position players around the table */
+.player-position.top {
+    top: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-position.right {
+    right: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.player-position.bottom {
+    bottom: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-position.left {
+    left: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Current turn highlighting - SAME BACKGROUND AS BASE */
+.player-position.current-turn {
+    border-color: #28a745;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateX(-50%) scale(1.05);
+}
+
+.player-position.right.current-turn {
+    transform: translateY(-50%) scale(1.05);
+}
+
+.player-position.left.current-turn {
+    transform: translateY(-50%) scale(1.05);
+}
+
+.player-position.bottom.current-turn {
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Game creator styling - SAME BACKGROUND AS OTHERS, ONLY BORDER DIFFERENT */
+.player-position.creator {
+    border-color: #ffd700;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.player-position.creator .player-name::after {
+    content: " ⭐";
+    color: #ffd700;
+}
+
+/* You (current player) styling - SAME BACKGROUND AS OTHERS */
+.player-position.you {
+    border-color: #007bff;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.player-position.you .player-name::after {
+    content: " 👤";
+    color: #007bff;
+}
+
+/* Player info styling */
+.player-info {
+    text-align: center;
+}
+
+.player-name {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-stats {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Player cards (face-down indicators) - SMALLER CARDS TO FIT IN ONE LINE */
+.player-cards {
+    display: flex;
+    gap: 1px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 100px;
+}
+
+.player-card-back {
+    width: 10px;
+    height: 15px;
+    background: linear-gradient(135deg, #8fa4b3, #7189a3);
+    border: 1px solid #5a6c7d;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+}
+
+/* Table Center - Fixed Slots for Trick Cards */
+.table-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+/* Fixed slots container */
+.trick-slots {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Individual card slots positioned closer to players */
+.card-slot {
+    position: absolute;
+    width: 90px;
+    height: 130px;
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+
+/* Slot positions - moved closer to players, further from center */
+.top-slot {
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.right-slot {
+    right: -45px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.bottom-slot {
+    bottom: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.left-slot {
+    left: -45px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Card slot with card styling */
+.card-slot.has-card {
+    border: 2px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Cards in slots inherit standard card styling but are positioned absolutely */
+.card-slot .card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+/* Card animations */
+.card.animate-entry {
+    animation: cardEntry 0.5s ease-out;
+}
+
+@keyframes cardEntry {
+    0% {
+        transform: scale(0.8) translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.status-indicator.connected {
+    background: #28a745;
+}
+
+.status-indicator.disconnected {
+    background: #dc3545;
+}
+
+/* Turn indicators */
+.current-turn {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6);
+        border-color: #20c997;
+    }
+    100% {
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+}

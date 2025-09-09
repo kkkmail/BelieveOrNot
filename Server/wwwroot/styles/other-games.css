@@ -1,3 +1,4 @@
+/* styles/other-games.css */
 /* Other games page styles */
 body.other-games-page {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,7 +12,7 @@ body.other-games-page {
 }
 
 .coming-soon-container {
-    max-width: 600px;
+    max-width: 800px;
     background: white;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -37,6 +38,99 @@ body.other-games-page {
     margin-bottom: 30px;
 }
 
+.available-games {
+    margin: 30px 0;
+    text-align: left;
+}
+
+.available-games h3 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.game-link {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.game-link:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.game-link.featured {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-color: #ff6b35;
+}
+
+.game-link.featured:hover {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+}
+
+.game-icon {
+    font-size: 3em;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.game-info h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.game-info p {
+    margin: 0 0 8px 0;
+    color: #666;
+    line-height: 1.4;
+}
+
+.game-meta {
+    font-size: 0.9em;
+    color: #888;
+    font-style: italic;
+}
+
+.coming-soon-games {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.coming-soon-games h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.coming-soon-games ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.coming-soon-games li {
+    padding: 8px 0;
+    color: #666;
+    font-style: italic;
+}
+
 .coming-soon-back-button {
     display: inline-block;
     background: #007bff;
@@ -46,31 +140,26 @@ body.other-games-page {
     text-decoration: none;
     font-size: 1.1em;
     transition: background 0.3s;
+    margin-top: 20px;
 }
 
 .coming-soon-back-button:hover {
     background: #0056b3;
 }
 
-.preview-games {
-    margin: 30px 0;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
-}
-
-.preview-games h3 {
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.preview-games ul {
-    list-style: none;
-    padding: 0;
-}
-
-.preview-games li {
-    padding: 8px 0;
-    color: #666;
-    font-style: italic;
+@media (max-width: 768px) {
+    .coming-soon-container {
+        padding: 30px 20px;
+    }
+    
+    .game-link {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .game-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
 }

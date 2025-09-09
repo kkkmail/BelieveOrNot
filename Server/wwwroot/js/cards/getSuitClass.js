@@ -1,3 +1,4 @@
+// js/cards/getSuitClass.js
 export function getSuitClass(suit) {
     if (suit === 'Hearts') return 'hearts';
     if (suit === 'Diamonds') return 'diamonds';

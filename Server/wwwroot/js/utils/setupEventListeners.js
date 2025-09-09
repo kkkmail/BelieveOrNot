@@ -1,3 +1,4 @@
+// js/utils/setupEventListeners.js
 import {setupFormButtons} from "./setupFormButtons.js";
 
 export function setupEventListeners() {
