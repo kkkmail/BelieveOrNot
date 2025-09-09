@@ -5,7 +5,7 @@ import { addToEventHistory } from "../utils/addToEventHistory.js";
 
 export function updateGameActions() {
     console.log("🎯 updateGameActions() CALLED!!!");
-    
+
     // Look for buttons and controls - King buttons should be loaded dynamically
     const startRoundBtn = document.getElementById('startRoundBtn');
     const endRoundBtn = document.getElementById('endRoundBtn');
@@ -40,7 +40,7 @@ export function updateGameActions() {
 
     const currentPlayer = gameState.players?.find(p => p.id === playerId);
     const isCreator = currentPlayer?.isCreator || (gameState.players && gameState.players[0]?.id === playerId);
-    const isMyTurn = gameState.currentPlayerIndex !== undefined && 
+    const isMyTurn = gameState.currentPlayerIndex !== undefined &&
                      gameState.players?.[gameState.currentPlayerIndex]?.id === playerId;
 
     let shouldBlink = false;
@@ -56,11 +56,11 @@ export function updateGameActions() {
     // Game phase handling
     if (gameState.phase === 0) { // WaitingForPlayers
         console.log("=== WAITING FOR PLAYERS PHASE ===");
-        
+
         // Show start round button for creator when all 4 players have joined
         if (isCreator && gameState.players && gameState.players.length >= 4) {
             console.log("CREATOR: All 4 players joined - showing Start Round button");
-            
+
             if (startRoundBtn) {
                 startRoundBtn.classList.remove('hidden');
                 console.log("✅ Start Round button shown successfully");
@@ -68,7 +68,7 @@ export function updateGameActions() {
             } else {
                 console.error("❌ startRoundBtn not found - King game management controls not loaded properly");
                 console.error("Check that loadHtmlContent.js properly replaced the game-management-controls");
-                
+
                 // Debug: Show what buttons actually exist
                 const allButtons = document.querySelectorAll('.game-management-controls button');
                 console.log("Available buttons in game-management-controls:");
@@ -83,12 +83,12 @@ export function updateGameActions() {
                 needs4Players: gameState.players?.length >= 4
             });
         }
-        
+
         // Update table message
         if (tableMessage) {
             const playerCount = gameState.players ? gameState.players.length : 0;
             const playersNeeded = 4 - playerCount;
-            
+
             if (playerCount < 4) {
                 tableMessage.innerHTML = `Waiting for ${playersNeeded} more player${playersNeeded === 1 ? '' : 's'} to join...`;
             } else {
@@ -96,10 +96,10 @@ export function updateGameActions() {
             }
             tableMessage.style.display = 'block';
         }
-    } 
+    }
     else if (gameState.phase === 1) { // InProgress - Round started
         console.log("=== GAME IN PROGRESS PHASE ===");
-        
+
         // Show end round button for creator
         if (isCreator) {
             console.log("CREATOR: Showing End Round button during game");
@@ -107,9 +107,9 @@ export function updateGameActions() {
                 endRoundBtn.classList.remove('hidden');
             }
         }
-        
+
         // Handle player turn logic
-        if (isMyTurn) {
+        if (isMyTurn && !window.trickCompletionInProgress) {
             if (gameState.waitingForTrumpSelection) {
                 if (tableMessage) {
                     tableMessage.innerHTML = "🎯 Your turn - Choose trump suit!";
@@ -150,10 +150,10 @@ export function updateGameActions() {
             }
             shouldBlink = false;
         }
-    } 
+    }
     else if (gameState.phase === 2) { // RoundEnd
         console.log("=== ROUND END PHASE ===");
-        
+
         // Show start round button for creator to start next round
         if (isCreator) {
             console.log("CREATOR: Showing Start Round button for next round");
@@ -161,20 +161,20 @@ export function updateGameActions() {
                 startRoundBtn.classList.remove('hidden');
             }
         }
-        
+
         if (tableMessage) {
             tableMessage.innerHTML = "Round ended - waiting for next round";
             tableMessage.style.display = 'block';
         }
-    } 
+    }
     else if (gameState.phase === 3) { // GameEnd
         console.log("=== GAME END PHASE ===");
-        
+
         if (tableMessage) {
             tableMessage.innerHTML = "Game ended";
             tableMessage.style.display = 'block';
         }
-        
+
         // Show Other Games button for everyone when game ends
         if (otherGamesBtn) {
             otherGamesBtn.classList.remove('hidden');
