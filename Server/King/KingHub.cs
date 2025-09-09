@@ -1,7 +1,7 @@
 // King/KingHub.cs
 namespace BelieveOrNot.Server.King;
 
-public class KingHub : Hub
+public partial class KingHub : Hub
 {
     private readonly IKingGameEngine _gameEngine;
     private readonly IKingMatchManager _matchManager;

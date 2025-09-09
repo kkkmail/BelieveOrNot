@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The King - Game Rules</title>
+    <link rel="stylesheet" href="../styles/help.css">
+</head>
+<body class="help-page">
+    <div class="help-container">
+        <div class="help-header">
+            <h1>👑 The King - Game Rules</h1>
+            <p>Traditional Russian Card Game</p>
+        </div>
+
+        <button class="back-button" onclick="window.close()">← Back to Game</button>
+
+        <div class="rule-section">
+            <h2>🎯 Game Overview</h2>
+            <p><strong>The King</strong> is a traditional Russian trick-taking card game played with 4 players using a standard 52-card deck. Each player plays for themselves, trying to score the least points possible across 8 different rounds.</p>
+        </div>
+
+        <div class="rule-section">
+            <h2>🃏 Basic Setup</h2>
+            <ul>
+                <li><strong>Players:</strong> Exactly 4 players</li>
+                <li><strong>Cards:</strong> Standard 52-card deck (no jokers)</li>
+                <li><strong>Deal:</strong> 13 cards per player each round</li>
+                <li><strong>Objective:</strong> Score the fewest points across all 8 rounds</li>
+            </ul>
+        </div>
+
+        <div class="rule-section">
+            <h2>🔄 The 8 Rounds</h2>
+            <p>Each game consists of exactly 8 rounds, each with different scoring rules:</p>
+            <ol>
+                <li><strong>Round 1:</strong> No Hearts - Avoid taking hearts (each heart = 1 point)</li>
+                <li><strong>Round 2:</strong> No Queens - Avoid taking queens (each queen = 5 points)</li>
+                <li><strong>Round 3:</strong> No Boys - Avoid taking jacks and kings (each = 2 points)</li>
+                <li><strong>Round 4:</strong> No King of Spades - Avoid the King of Spades (= 10 points)</li>
+                <li><strong>Round 5:</strong> No Last Two Tricks - Avoid winning the last 2 tricks (each = 10 points)</li>
+                <li><strong>Round 6:</strong> No Tricks - Avoid taking any tricks (each trick = 2 points)</li>
+                <li><strong>Round 7:</strong> Everything Bad - All previous penalties combined!</li>
+                <li><strong>Round 8:</strong> Choose Your Poison - King chooses which round type to repeat</li>
+            </ol>
+        </div>
+
+        <div class="rule-section">
+            <h2>♠ Trump Selection</h2>
+            <p>At the start of each round, one player becomes the "King" and chooses the trump suit:</p>
+            <ul>
+                <li>The King rotates each round (player 1, then 2, then 3, then 4, repeat)</li>
+                <li>Trump cards beat all non-trump cards</li>
+                <li>Higher trump cards beat lower trump cards</li>
+                <li>Choose wisely - trump selection affects the entire round!</li>
+            </ul>
+        </div>
+
+        <div class="rule-section">
+            <h2>🎮 How to Play</h2>
+            <h3>Playing Tricks:</h3>
+            <ul>
+                <li>The King leads the first trick</li>
+                <li>Players must follow suit if possible</li>
+                <li>If you can't follow suit, you may play any card (including trump)</li>
+                <li>Highest card of the led suit wins (unless trumped)</li>
+                <li>Winner of each trick leads the next trick</li>
+            </ul>
+            
+            <h3>Card Ranking:</h3>
+            <p><strong>High to Low:</strong> Ace, King, Queen, Jack, 10, 9, 8, 7, 6, 5, 4, 3, 2</p>
+        </div>
+
+        <div class="rule-section">
+            <h2>🏆 Scoring & Winning</h2>
+            <ul>
+                <li><strong>Lower scores are better</strong> - you want the fewest points!</li>
+                <li>Points are awarded based on the round type</li>
+                <li>After 8 rounds, the player with the <strong>lowest total score wins</strong></li>
+                <li>If tied, the player who was King fewer times wins</li>
+            </ul>
+        </div>
+
+        <div class="rule-section">
+            <h2>💡 Strategy Tips</h2>
+            <ul>
+                <li><strong>Count cards:</strong> Remember what's been played</li>
+                <li><strong>Trump timing:</strong> Save high trumps for crucial moments</li>
+                <li><strong>Force others:</strong> Lead suits others don't have</li>
+                <li><strong>Plan ahead:</strong> Sometimes taking points early prevents bigger penalties later</li>
+                <li><strong>Watch the King:</strong> In Round 8, anticipate what the King might choose</li>
+            </ul>
+        </div>
+
+        <div class="rule-section">
+            <h2>⚠ Important Rules</h2>
+            <ul>
+                <li>You <strong>must follow suit</strong> if you have cards of the led suit</li>
+                <li>Hearts cannot be led until hearts have been "broken" (played on a trick)</li>
+                <li>The Queen of Spades breaks hearts automatically</li>
+                <li>In Round 7, <strong>all penalties apply</strong> - be extra careful!</li>
+                <li>Only the game creator can end a round early</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
