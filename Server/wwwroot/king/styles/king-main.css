@@ -5,7 +5,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
     min-height: 100vh;
     font-family: 'Segoe UI', Arial, sans-serif;
 }
@@ -454,10 +454,10 @@
 }
 
 @keyframes blink {
-    0%, 50% { 
-        opacity: 1; 
+    0%, 50% {
+        opacity: 1;
     }
-    51%, 100% { 
-        opacity: 0.3; 
+    51%, 100% {
+        opacity: 0.3;
     }
 }
