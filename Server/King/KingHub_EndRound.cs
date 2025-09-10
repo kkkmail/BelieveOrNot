@@ -29,7 +29,7 @@ public partial class KingHub
         match.WaitingForTrumpSelection = false;
         match.SelectedTrumpSuit = null;
         match.CurrentPlayerIndex = 0;
-        
+
         // Advance to next round since this one is cancelled
         match.CurrentRoundIndex++;
 
