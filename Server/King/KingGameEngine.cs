@@ -131,10 +131,10 @@ public class KingGameEngine : IKingGameEngine
     private string GetInvalidMoveReason(KingMatch match, Player player, Card card)
     {
         if (match.Phase != GamePhase.InProgress)
-            return "Game is not in progress";
+            return "Game not in progress";
 
         if (match.CurrentPlayer.Id != player.Id)
-            return "It's not your turn";
+            return "Not your turn";
 
         if (!player.Hand.Contains(card))
             return "You don't have this card";
@@ -168,6 +168,16 @@ public class KingGameEngine : IKingGameEngine
             if (sameSuitCards.Any() && card.GetSuit() != leadSuit)
             {
                 return $"Must follow suit: {leadSuit}";
+            }
+
+            // Check King of Hearts rule when cannot follow suit
+            if (sameSuitCards.Count == 0 && currentRound.MustDiscardKingOfHearts)
+            {
+                var kingOfHearts = player.Hand.FirstOrDefault(c => c.IsKingOfHearts);
+                if (kingOfHearts != null && !card.IsKingOfHearts)
+                {
+                    return "Must discard King of Hearts when you cannot follow suit";
+                }
             }
         }
 

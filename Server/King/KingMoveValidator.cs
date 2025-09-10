@@ -22,7 +22,7 @@ public static class KingMoveValidator
         }
 
         // Following to a trick
-        return IsValidFollow(player, card, currentTrick);
+        return IsValidFollow(player, card, currentTrick, currentRound);
     }
 
     private static bool IsValidLead(KingMatch match, Player player, Card card, GameRound round)
@@ -40,7 +40,7 @@ public static class KingMoveValidator
         return true;
     }
 
-    private static bool IsValidFollow(Player player, Card card, Trick trick)
+    private static bool IsValidFollow(Player player, Card card, Trick trick, GameRound round)
     {
         var leadSuit = trick.LedSuit;
         if (leadSuit == null) return true;
@@ -52,7 +52,18 @@ public static class KingMoveValidator
             return card.GetSuit() == leadSuit.Value;
         }
 
-        // No cards of lead suit - can play any card
+        // No cards of lead suit - check King of Hearts rule
+        if (round.MustDiscardKingOfHearts)
+        {
+            var kingOfHearts = player.Hand.FirstOrDefault(c => c.IsKingOfHearts);
+            if (kingOfHearts != null)
+            {
+                // Must play King of Hearts when cannot follow suit
+                return card.IsKingOfHearts;
+            }
+        }
+
+        // No cards of lead suit and no King of Hearts requirement - can play any card
         return true;
     }
 

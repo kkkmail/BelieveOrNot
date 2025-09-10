@@ -5,7 +5,7 @@ public class KingGameSettings
 {
     public bool IncludeAvoidEverythingRound { get; set; } = false;
     public int CollectingPhaseRounds { get; set; } = 8; // 4 or 8
-    
+
     public List<GameRound> CreateGameRounds()
     {
         var rounds = new List<GameRound>();

@@ -67,7 +67,7 @@ export class KingMoveValidator {
 
         // Following to a trick (subsequent cards)
         console.log("FOLLOWING to a trick - validating follow rules for card:", card);
-        return this.isValidFollow(gameState, card, currentTrick);
+        return this.isValidFollow(gameState, card, currentTrick, currentRound);
     }
 
     static isValidLead(gameState, card, round) {
@@ -92,11 +92,12 @@ export class KingMoveValidator {
         return true;
     }
 
-    static isValidFollow(gameState, card, trick) {
+    static isValidFollow(gameState, card, trick, round) {
         console.log("=== CHECKING FOLLOW VALIDITY ===");
         console.log("Checking if card can follow:", card);
         console.log("Current trick:", trick);
         console.log("Lead suit (raw enum):", trick?.ledSuit);
+        console.log("Round:", round);
         
         // Get the lead suit from the first card played
         const leadSuitEnum = trick.ledSuit;
@@ -132,7 +133,27 @@ export class KingMoveValidator {
             return true;
         }
 
-        // Player has no cards of lead suit - can play any card
+        // Player has no cards of lead suit - check King of Hearts rule
+        if (round?.mustDiscardKingOfHearts) {
+            const kingOfHearts = gameState.yourHand?.find(c => 
+                c.rank === 'K' && c.suit === 'Hearts'
+            );
+            
+            if (kingOfHearts) {
+                const isKingOfHearts = card.rank === 'K' && card.suit === 'Hearts';
+                console.log(`King of Hearts rule active. Player has King of Hearts. Playing King of Hearts: ${isKingOfHearts}`);
+                
+                if (!isKingOfHearts) {
+                    console.log("INVALID FOLLOW: Must discard King of Hearts when cannot follow suit");
+                    return false;
+                }
+                
+                console.log("VALID FOLLOW: Playing required King of Hearts");
+                return true;
+            }
+        }
+
+        // No cards of lead suit and no King of Hearts requirement - can play any card
         console.log("VALID FOLLOW: No cards of lead suit, can play any card");
         return true;
     }
@@ -147,7 +168,7 @@ export class KingMoveValidator {
         }
 
         const kingOfHearts = gameState.yourHand?.find(c => 
-            c.rank === 'King' && c.suit === 'Hearts'
+            c.rank === 'K' && c.suit === 'Hearts'
         );
         if (!kingOfHearts) {
             return false;
