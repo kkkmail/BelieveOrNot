@@ -5,6 +5,9 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Windows service support
+builder.Host.UseWindowsService();
+
 // Add configuration
 builder.Services.Configure<GameSettings>(
     builder.Configuration.GetSection("GameSettings"));
