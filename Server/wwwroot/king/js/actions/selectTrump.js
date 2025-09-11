@@ -3,6 +3,17 @@ import { connection, gameState, playerId } from "../core/variables.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
 import { closeTrumpSelectionModal } from "../utils/showTrumpSelectionModal.js";
 
+// Convert suit name to enum value
+function getSuitEnumValue(suitName) {
+    switch(suitName) {
+        case 'Spades': return 0;
+        case 'Clubs': return 1;
+        case 'Diamonds': return 2;
+        case 'Hearts': return 3;
+        default: throw new Error(`Unknown suit: ${suitName}`);
+    }
+}
+
 export async function selectTrump(trumpSuit) {
     console.log("=== SELECT TRUMP ACTION CALLED ===");
     console.log("trumpSuit parameter:", trumpSuit);
@@ -29,10 +40,14 @@ export async function selectTrump(trumpSuit) {
     console.log("Selecting trump suit:", trumpSuit);
 
     try {
+        // Convert suit string to enum value
+        const trumpSuitEnum = getSuitEnumValue(trumpSuit);
+        console.log("Converted suit to enum value:", trumpSuitEnum);
+
         const trumpRequest = {
             matchId: gameState.matchId,
             playerId: playerId,
-            trumpSuit: trumpSuit
+            trumpSuit: trumpSuitEnum
         };
 
         console.log("Trump selection request:", trumpRequest);
