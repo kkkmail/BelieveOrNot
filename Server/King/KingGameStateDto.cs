@@ -14,5 +14,5 @@ public class KingGameStateDto
     public bool WaitingForTrumpSelection { get; set; }
     public Suit? SelectedTrumpSuit { get; set; }
     public List<Card>? YourHand { get; set; }
-    public List<Card>? TrumSelectionCards { get; set; }
+    public List<Card>? TrumpSelectionCards { get; set; }
 }

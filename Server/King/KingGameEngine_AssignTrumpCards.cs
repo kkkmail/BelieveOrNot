@@ -7,7 +7,7 @@ public partial class KingGameEngine
     {
         foreach (var player in match.Players)
         {
-            player.TrumSelectionCards = player.Hand.Take(trumCards).ToList();
+            player.TrumpSelectionCards = player.Hand.Take(trumCards).ToList();
         }
     }
 }

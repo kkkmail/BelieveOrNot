@@ -9,7 +9,7 @@ public partial class KingGameEngine
         foreach (var player in match.Players)
         {
             player.Hand.Clear();
-            player.TrumSelectionCards?.Clear();
+            player.TrumpSelectionCards?.Clear();
         }
 
         // Build and shuffle deck (32 cards for King game)

@@ -6,6 +6,7 @@ import { updateTrickDisplay } from "./updateTrickDisplay.js";
 import { updateScoresDisplay } from "./updateScoresDisplay.js";
 import { updateRoundDisplay } from "./updateRoundDisplay.js";
 import { updateGameActions } from "./updateGameActions.js";
+import { showTrumpSelectionModal } from "../utils/showTrumpSelectionModal.js";
 
 export function updateGameDisplay() {
     if (!gameState) {
@@ -38,6 +39,9 @@ export function updateGameDisplay() {
     updateTrickDisplay();
     updateScoresDisplay();
     updateGameActions();
+
+    // Check for trump selection requirement
+    checkTrumpSelectionRequirement();
 }
 
 function updateBasicGameInfo() {
@@ -65,7 +69,7 @@ function updateBasicGameInfo() {
     if (currentPlayerElement && gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         currentPlayerElement.textContent = currentPlayer.name;
-        currentPlayerElement.className = gameState.players[gameState.currentPlayerIndex]?.id === playerId ?
+        currentPlayerElement.className = gameState.players[gameState.currentPlayerIndex]?.id === playerId ? 
             'current-player current-player-me' : 'current-player';
     }
 }
@@ -136,4 +140,46 @@ function updateCardAreaVisibility() {
     }
     
     console.log("=== updateCardAreaVisibility() COMPLETE ===");
+}
+
+function checkTrumpSelectionRequirement() {
+    console.log("=== CHECKING TRUMP SELECTION REQUIREMENT ===");
+    console.log("gameState.waitingForTrumpSelection:", gameState.waitingForTrumpSelection);
+    console.log("gameState.phase:", gameState.phase);
+    console.log("gameState.currentPlayerIndex:", gameState.currentPlayerIndex);
+    console.log("playerId:", playerId);
+    
+    if (!gameState || !playerId) {
+        console.log("No game state or player ID - skipping trump selection check");
+        return;
+    }
+
+    // Only check for trump selection in InProgress phase
+    if (gameState.phase !== 1) {
+        console.log("Game not in progress - skipping trump selection check");
+        return;
+    }
+
+    // Check if we're waiting for trump selection
+    if (!gameState.waitingForTrumpSelection) {
+        console.log("Not waiting for trump selection - skipping");
+        return;
+    }
+
+    // Check if it's this player's turn to select trump
+    const currentPlayer = gameState.players?.[gameState.currentPlayerIndex];
+    if (!currentPlayer || currentPlayer.id !== playerId) {
+        console.log("Not this player's turn to select trump - current player:", currentPlayer?.name);
+        return;
+    }
+
+    // Check if modal is already showing
+    if (document.getElementById('trumpSelectionModalOverlay')) {
+        console.log("Trump selection modal already showing - skipping");
+        return;
+    }
+
+    // Show the trump selection modal
+    console.log("✅ SHOWING TRUMP SELECTION MODAL - This player needs to choose trump");
+    showTrumpSelectionModal();
 }

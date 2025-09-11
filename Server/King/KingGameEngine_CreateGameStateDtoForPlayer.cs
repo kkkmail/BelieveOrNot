@@ -11,7 +11,7 @@ public partial class KingGameEngine
         if (player != null)
         {
             state.YourHand = player.Hand.ToList();
-            state.TrumSelectionCards = player.TrumSelectionCards?.ToList();
+            state.TrumpSelectionCards = player.TrumpSelectionCards?.ToList();
         }
 
         return state;
