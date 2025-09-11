@@ -1,4 +1,4 @@
-// King/KingMatch.cs
+// Server/King/KingMatch.cs
 namespace BelieveOrNot.Server.King;
 
 public class KingMatch

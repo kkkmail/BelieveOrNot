@@ -10,4 +10,5 @@ public class Player
     public bool IsConnected { get; set; } = true;
     public string ClientId { get; set; } = string.Empty; // NEW: For reconnection
     public DateTime LastSeen { get; set; } = DateTime.UtcNow; // NEW: Track last activity
+    public List<Card>? TrumSelectionCards { get; set; } = new(); // Cards for trump selection - usually first 3
 }

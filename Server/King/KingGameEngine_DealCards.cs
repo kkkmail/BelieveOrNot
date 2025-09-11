@@ -5,10 +5,11 @@ public partial class KingGameEngine
 {
     private void DealCards(KingMatch match)
     {
-        // Clear all hands
+        // Clear all hands and trump selection cards
         foreach (var player in match.Players)
         {
             player.Hand.Clear();
+            player.TrumSelectionCards?.Clear();
         }
 
         // Build and shuffle deck (32 cards for King game)
@@ -22,20 +23,13 @@ public partial class KingGameEngine
             match.Players[playerIndex].Hand.Add(deck[i]);
         }
 
+        // Store the first 3 cards of each player before sorting.
+        AssignTrumpCards(match, 3);
+
         // Sort each player's hand after dealing
         foreach (var player in match.Players)
         {
             SortPlayerHand(player);
         }
-    }
-
-    private void SortPlayerHand(Player player)
-    {
-        // Sort by suit first (using enum order: Spades, Clubs, Diamonds, Hearts)
-        // Then by rank (7, 8, 9, 10, J, Q, K, A)
-        player.Hand = player.Hand
-            .OrderBy(c => c.GetSuit())
-            .ThenBy(c => c.GetRank())
-            .ToList();
     }
 }

@@ -23,7 +23,7 @@ public partial class KingGameEngine
             CompletedTricks = match.CompletedTricks,
             CurrentTrick = match.CurrentTrick,
             WaitingForTrumpSelection = match.WaitingForTrumpSelection,
-            SelectedTrumpSuit = match.SelectedTrumpSuit
+            SelectedTrumpSuit = match.SelectedTrumpSuit,
         };
     }
 }
