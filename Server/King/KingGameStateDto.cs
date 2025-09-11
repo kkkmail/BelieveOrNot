@@ -1,4 +1,4 @@
-// King/KingGameStateDto.cs
+// Server/King/KingGameStateDto.cs
 namespace BelieveOrNot.Server.King;
 
 public class KingGameStateDto
@@ -14,4 +14,5 @@ public class KingGameStateDto
     public bool WaitingForTrumpSelection { get; set; }
     public Suit? SelectedTrumpSuit { get; set; }
     public List<Card>? YourHand { get; set; }
+    public List<Card>? TrumpSelectionCards { get; set; }
 }

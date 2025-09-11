@@ -124,6 +124,16 @@ function getCardDisabledReason(gameState, card, isMyTurn) {
                 if (hasSameSuit) {
                     return `Must follow suit: ${leadSuit}`;
                 }
+                
+                // Check King of Hearts rule when cannot follow suit
+                if (currentRound.mustDiscardKingOfHearts) {
+                    const kingOfHearts = gameState.yourHand?.find(c => 
+                        c.rank === 'K' && c.suit === 'Hearts'
+                    );
+                    if (kingOfHearts && (card.rank !== 'K' || card.suit !== 'Hearts')) {
+                        return "Must discard King of Hearts when cannot follow suit";
+                    }
+                }
             }
         }
     }

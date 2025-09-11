@@ -60,7 +60,7 @@ export function setupGameButtons() {
         console.log("King copy match ID button listener added");
     }
 
-    // Setup trump selection buttons
+    // Setup trump selection buttons (existing ones in the HTML, keeping as fallback)
     setupTrumpButtons();
 }
 

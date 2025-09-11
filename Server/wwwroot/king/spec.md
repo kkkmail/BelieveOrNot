@@ -91,6 +91,7 @@ Players try to collect tricks for positive points:
 - **Trump order**: Players take turns in rotation (each gets equal opportunities)
 - **Trump power**: Trump cards beat all non-trump cards regardless of rank
 - **Trump vs Trump**: Higher rank wins when both cards are trump
+- **Must place Trump**: Player must place trump if player does not have a leading card suit and has trumps on hand
 
 ## UI Requirements
 

@@ -106,7 +106,8 @@ function loadKingStyles() {
         const kingStyles = [
             '/king/styles/king-main.css',
             '/king/styles/king-table.css',
-            '/king/styles/king-responsive.css'
+            '/king/styles/king-responsive.css',
+            '/king/styles/trump-modal.css'
         ];
 
         let loadedCount = 0;

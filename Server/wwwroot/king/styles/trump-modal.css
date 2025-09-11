@@ -1,0 +1,102 @@
+/* Server/wwwroot/king/styles/trump-modal.css */
+
+/* Trump Selection Modal */
+#trumpSelectionModalOverlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 10000 !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.trump-modal-btn {
+    padding: 25px;
+    font-size: 48px;
+    font-weight: bold;
+    border: 3px solid #ddd;
+    border-radius: 12px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s ease;
+    min-width: 80px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.trump-modal-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.trump-modal-btn.hearts {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.trump-modal-btn.hearts:hover {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.trump-modal-btn.diamonds {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.trump-modal-btn.diamonds:hover {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.trump-modal-btn.clubs {
+    color: #333;
+    border-color: #333;
+}
+
+.trump-modal-btn.clubs:hover {
+    background: #333 !important;
+    color: white !important;
+}
+
+.trump-modal-btn.spades {
+    color: #333;
+    border-color: #333;
+}
+
+.trump-modal-btn.spades:hover {
+    background: #333 !important;
+    color: white !important;
+}
+
+.trump-modal-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .trump-modal-buttons {
+        gap: 15px;
+    }
+    
+    .trump-modal-btn {
+        min-width: 80px;
+        min-height: 80px;
+        font-size: 48px;
+        padding: 20px;
+    }
+}

@@ -22,7 +22,7 @@ public static class KingMoveValidator
         }
 
         // Following to a trick
-        return IsValidFollow(player, card, currentTrick);
+        return IsValidFollow(match, player, card, currentTrick, currentRound);
     }
 
     private static bool IsValidLead(KingMatch match, Player player, Card card, GameRound round)
@@ -40,7 +40,7 @@ public static class KingMoveValidator
         return true;
     }
 
-    private static bool IsValidFollow(Player player, Card card, Trick trick)
+    private static bool IsValidFollow(KingMatch match, Player player, Card card, Trick trick, GameRound round)
     {
         var leadSuit = trick.LedSuit;
         if (leadSuit == null) return true;
@@ -52,23 +52,32 @@ public static class KingMoveValidator
             return card.GetSuit() == leadSuit.Value;
         }
 
-        // No cards of lead suit - can play any card
+        // No cards of lead suit - check King of Hearts rule
+        if (round.MustDiscardKingOfHearts)
+        {
+            var kingOfHearts = player.Hand.FirstOrDefault(c => c.IsKingOfHearts);
+            if (kingOfHearts != null)
+            {
+                // Must play King of Hearts when cannot follow suit
+                return card.IsKingOfHearts;
+            }
+        }
+
+        // Collecting Phase Trump Rules: Must place trump if player does not have leading card suit and has trumps on hand
+        if (round.IsCollectingPhase && match.SelectedTrumpSuit.HasValue)
+        {
+            var trumpSuit = match.SelectedTrumpSuit.Value;
+            var trumpCards = player.Hand.Where(c => c.GetSuit() == trumpSuit).ToList();
+
+            if (trumpCards.Any())
+            {
+                // Player has trump cards and cannot follow suit, must play trump
+                return card.GetSuit() == trumpSuit;
+            }
+        }
+
+        // No cards of lead suit and no King of Hearts requirement - can play any card
         return true;
-    }
-
-    public static bool MustDiscardKingOfHearts(Player player, Trick trick, GameRound round)
-    {
-        if (!round.MustDiscardKingOfHearts) return false;
-        if (trick.Cards.Count == 0) return false; // Leading, not discarding
-
-        var kingOfHearts = player.Hand.FirstOrDefault(c => c.IsKingOfHearts);
-        if (kingOfHearts == null) return false;
-
-        var leadSuit = trick.LedSuit!.Value;
-        var sameSuitCards = player.Hand.Where(c => c.GetSuit() == leadSuit).ToList();
-
-        // Must discard King of Hearts if cannot follow suit
-        return !sameSuitCards.Any();
     }
 
     public static bool IsValidTrumpSelection(KingMatch match, Player player, Suit trumpSuit)
