@@ -88,149 +88,79 @@ export function showTrumpSelectionModal() {
                         const suitClass = getSuitClass(card.suit);
                         const suitSymbol = getSuitSymbol(card.suit);
                         return `
-                            <div class="card hand-card trump-selection-card ${getSuitClass(card.suit)}" style="
-                                width: 80px;
-                                height: 112px;
-                                border: 2px solid #333;
-                                border-radius: 8px;
-                                background: white;
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: space-between;
-                                padding: 12px;
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                cursor: default;
-                                margin: 5px;
-                            ">
-                                <div class="rank ${getSuitClass(card.suit)}" style="font-size: 24px; font-weight: bold; text-align: left; line-height: 1;">${card.rank}</div>
-                                <div class="suit ${getSuitClass(card.suit)}" style="font-size: 36px; text-align: center; align-self: center; line-height: 1;">${suitSymbol}</div>
+                            <div class="card">
+                                <div class="rank ${suitClass}">${card.rank}</div>
+                                <div class="suit ${suitClass}">${suitSymbol}</div>
                             </div>
                         `;
                     }).join('')}
                 </div>
             </div>
         `;
-    } else {
-        console.log("No trump selection cards found or empty array");
-        trumpCardsHtml = `
-            <div style="margin-bottom: 20px;">
-                <p style="color: #666; font-style: italic;">No trump selection cards available</p>
-            </div>
-        `;
     }
 
-    // Create modal content
+    // Set modal content
     modal.innerHTML = `
-        <h2 style="margin: 0 0 20px 0; color: #333; font-size: 1.8em;">
-            🎯 Choose Trump Suit
-        </h2>
+        <h2 style="margin: 0 0 20px 0; color: #333; font-size: 1.5em;">Choose Trump Suit</h2>
         ${trumpCardsHtml}
-        <p style="margin: 0 0 30px 0; color: #666; font-size: 1.1em;">
-            Select a trump suit for this collecting round:
-        </p>
-        <div class="trump-modal-buttons" style="display: flex; gap: 20px; justify-content: center; align-items: center;">
-            <button class="trump-modal-btn spades" data-suit="Spades" style="
-                padding: 25px;
-                font-size: 48px;
-                font-weight: bold;
-                border: 3px solid #333;
-                border-radius: 12px;
-                cursor: pointer;
-                background: white;
-                color: #333;
-                transition: all 0.3s ease;
-                min-width: 80px;
-                min-height: 80px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">♠</button>
-            <button class="trump-modal-btn hearts" data-suit="Hearts" style="
-                padding: 25px;
-                font-size: 48px;
-                font-weight: bold;
-                border: 3px solid #dc3545;
-                border-radius: 12px;
-                cursor: pointer;
-                background: white;
-                color: #dc3545;
-                transition: all 0.3s ease;
-                min-width: 80px;
-                min-height: 80px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">♥</button>
-            <button class="trump-modal-btn diamonds" data-suit="Diamonds" style="
-                padding: 25px;
-                font-size: 48px;
-                font-weight: bold;
-                border: 3px solid #dc3545;
-                border-radius: 12px;
-                cursor: pointer;
-                background: white;
-                color: #dc3545;
-                transition: all 0.3s ease;
-                min-width: 80px;
-                min-height: 80px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">♦</button>
-            <button class="trump-modal-btn clubs" data-suit="Clubs" style="
-                padding: 25px;
-                font-size: 48px;
-                font-weight: bold;
-                border: 3px solid #333;
-                border-radius: 12px;
-                cursor: pointer;
-                background: white;
-                color: #333;
-                transition: all 0.3s ease;
-                min-width: 80px;
-                min-height: 80px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">♣</button>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <button class="trump-btn spades" data-suit="Spades">♠ Spades</button>
+            <button class="trump-btn clubs" data-suit="Clubs">♣ Clubs</button>
+            <button class="trump-btn diamonds" data-suit="Diamonds">♦ Diamonds</button>
+            <button class="trump-btn hearts" data-suit="Hearts">♥ Hearts</button>
         </div>
     `;
 
-    // Add event listeners to trump buttons
-    const trumpButtons = modal.querySelectorAll('.trump-modal-btn');
-    trumpButtons.forEach(button => {
-        button.addEventListener('click', async function(event) {
-            event.preventDefault();
-            event.stopPropagation();
+    // Add click handlers for trump buttons
+    modal.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('trump-btn')) {
+            const selectedSuit = e.target.dataset.suit;
+            console.log("Trump suit selected:", selectedSuit);
             
-            const suit = this.getAttribute('data-suit');
-            console.log("Trump modal button clicked:", suit);
+            // Visual feedback
+            e.target.style.background = '#e3f2fd';
+            e.target.style.borderColor = '#2196f3';
+            e.target.disabled = true;
             
-            // Hide the modal immediately
-            closeTrumpSelectionModal();
-            
-            // Select the trump
-            await selectTrump(suit);
-        });
+            try {
+                await selectTrump(selectedSuit);
+                closeTrumpSelectionModal();
+            } catch (error) {
+                console.error("Error selecting trump:", error);
+                // Reset button state
+                e.target.style.background = '';
+                e.target.style.borderColor = '';
+                e.target.disabled = false;
+            }
+        }
     });
 
-    // Append to body
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
+    // Add close handler for overlay clicks
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            // Don't allow closing by clicking outside - player must choose trump
+            console.log("Cannot close trump selection - must choose trump");
+        }
+    });
 
-    // Animate in
+    // Add to document and animate in
+    document.body.appendChild(overlay);
+    overlay.appendChild(modal);
+    
+    // Trigger animations
     requestAnimationFrame(() => {
         overlay.style.opacity = '1';
         modal.style.transform = 'scale(1)';
     });
-
-    console.log("Trump selection modal shown with cards:", trumpCards);
+    
+    console.log("Trump selection modal created and shown");
 }
 
 export function closeTrumpSelectionModal() {
     const overlay = document.getElementById('trumpSelectionModalOverlay');
     if (overlay) {
         overlay.style.opacity = '0';
+        overlay.querySelector('div').style.transform = 'scale(0.9)';
         setTimeout(() => {
             if (overlay.parentNode) {
                 overlay.parentNode.removeChild(overlay);
@@ -238,8 +168,4 @@ export function closeTrumpSelectionModal() {
         }, 300);
         console.log("Trump selection modal closed");
     }
-}
-
-export function hideTrumpSelectionModal() {
-    closeTrumpSelectionModal();
 }
