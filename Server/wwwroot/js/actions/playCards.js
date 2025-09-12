@@ -16,18 +16,18 @@ export async function playCards() {
     if (gameState && gameState.players) {
         const activePlayers = gameState.players.filter(p => p.handCount > 0);
         const playersWithNoCards = gameState.players.filter(p => p.handCount === 0);
-        
+
         if (activePlayers.length === 1 && playersWithNoCards.length > 0) {
             // Format player names with HTML styling
             const finishedPlayerNames = playersWithNoCards
                 .map(p => `<span style="font-weight: bold; font-style: italic;">${p.name}</span>`)
                 .join(', ');
-            
+
             await customAlert(
                 `You cannot play more cards! ${finishedPlayerNames} finished the round. You can only challenge now.`,
                 'Cannot Play Cards'
             );
-            
+
             // Clear selected cards and update display
             setSelectedCards([]);
             updateHandDisplay();
@@ -50,7 +50,7 @@ export async function playCards() {
             return aRankIndex - bRankIndex;
         }
 
-        const suitOrder = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+        const suitOrder = ['Spades', 'Clubs', 'Diamonds', 'Hearts'];
         return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
     });
 
