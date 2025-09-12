@@ -41,7 +41,6 @@ public partial class KingGameEngine
             Console.WriteLine($"Match phase: {match.Phase}");
             Console.WriteLine($"Current round name: {match.CurrentRound?.Name}");
             Console.WriteLine($"Is collecting phase: {match.CurrentRound?.IsCollectingPhase}");
-            // Console.WriteLine($"Trump chooser: {match.CurrentRound?.TrumpChooser}");
             Console.WriteLine($"Current player: {match.Players[match.CurrentPlayerIndex].Id}");
             throw new InvalidOperationException("Invalid trump selection");
         }

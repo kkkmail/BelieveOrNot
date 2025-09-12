@@ -11,7 +11,6 @@ public class GameRound
     public bool RequiresAllTricks { get; set; }
     public bool IsCollectingPhase { get; set; }
     public Suit? TrumpSuit { get; set; }
-    // public Guid? TrumpChooser { get; set; }
 
     // Scoring configuration
     public int PointsPerTrick { get; set; }
@@ -157,7 +156,6 @@ public class GameRound
             RequiresAllTricks = true,
             IsCollectingPhase = true,
             PointsPerTrick = 3,
-            // TrumpChooser = trumpChooser
         };
     }
 }

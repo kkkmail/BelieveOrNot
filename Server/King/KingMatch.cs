@@ -30,13 +30,5 @@ public class KingMatch
     public void InitializeGameRounds()
     {
         GameRounds = Settings.CreateGameRounds();
-
-        // // Assign trump choosers for collecting rounds
-        // var collectingRounds = GameRounds.Where(r => r.IsCollectingPhase).ToList();
-        // for (int i = 0; i < collectingRounds.Count; i++)
-        // {
-        //     var playerIndex = i % Players.Count;
-        //     collectingRounds[i].TrumpChooser = Players[playerIndex].Id;
-        // }
     }
 }
