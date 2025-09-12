@@ -248,7 +248,7 @@ function getCardPlayPreview() {
             return aRankIndex - bRankIndex;
         }
 
-        const suitOrder = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+        const suitOrder = ['Spades', 'Clubs', 'Diamonds', 'Hearts'];
         return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
     });
 
