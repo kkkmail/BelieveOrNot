@@ -6,7 +6,7 @@ import { getSuitClass } from "../../../js/cards/getSuitClass.js";
 
 export function showTrumpSelectionModal() {
     console.log("=== SHOWING TRUMP SELECTION MODAL ===");
-    
+
     if (!gameState || !playerId) {
         console.error("Cannot show trump selection modal: missing game state or player ID");
         return;
@@ -77,7 +77,7 @@ export function showTrumpSelectionModal() {
 
     // Create trump selection cards HTML
     let trumpCardsHtml = '';
-    
+
     if (trumpCards && trumpCards.length > 0) {
         console.log("Creating HTML for trump selection cards:", trumpCards);
         trumpCardsHtml = `
@@ -102,35 +102,44 @@ export function showTrumpSelectionModal() {
     // Set modal content
     modal.innerHTML = `
         <h2 style="margin: 0 0 20px 0; color: #333; font-size: 1.5em;">Choose Trump Suit</h2>
-        ${trumpCardsHtml}
-        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            <button class="trump-btn spades" data-suit="Spades">♠ Spades</button>
-            <button class="trump-btn clubs" data-suit="Clubs">♣ Clubs</button>
-            <button class="trump-btn diamonds" data-suit="Diamonds">♦ Diamonds</button>
-            <button class="trump-btn hearts" data-suit="Hearts">♥ Hearts</button>
-        </div>
+        ${trumpCardsHtml}        
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <div class="card trump-btn" data-suit="Spades" style="cursor: pointer; user-select: none;">
+                <div class="suit spades" style="pointer-events: none;">${getSuitSymbol('Spades')}</div>
+            </div>
+            <div class="card trump-btn" data-suit="Clubs" style="cursor: pointer; user-select: none;">
+                <div class="suit clubs" style="pointer-events: none;">${getSuitSymbol('Clubs')}</div>
+            </div>
+            <div class="card trump-btn" data-suit="Diamonds" style="cursor: pointer; user-select: none;">
+                <div class="suit diamonds" style="pointer-events: none;">${getSuitSymbol('Diamonds')}</div>
+            </div>
+            <div class="card trump-btn" data-suit="Hearts" style="cursor: pointer; user-select: none;">
+                <div class="suit hearts" style="pointer-events: none;">${getSuitSymbol('Hearts')}</div>
+            </div>
+        </div>        
     `;
 
     // Add click handlers for trump buttons
     modal.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('trump-btn')) {
-            const selectedSuit = e.target.dataset.suit;
+        const trumpBtn = e.target.closest('.trump-btn');
+        if (trumpBtn) {
+            const selectedSuit = trumpBtn.dataset.suit;
             console.log("Trump suit selected:", selectedSuit);
-            
+
             // Visual feedback
-            e.target.style.background = '#e3f2fd';
-            e.target.style.borderColor = '#2196f3';
-            e.target.disabled = true;
-            
+            trumpBtn.style.background = '#e3f2fd';
+            trumpBtn.style.borderColor = '#2196f3';
+            trumpBtn.style.pointerEvents = 'none';
+
             try {
                 await selectTrump(selectedSuit);
                 closeTrumpSelectionModal();
             } catch (error) {
                 console.error("Error selecting trump:", error);
                 // Reset button state
-                e.target.style.background = '';
-                e.target.style.borderColor = '';
-                e.target.disabled = false;
+                trumpBtn.style.background = '';
+                trumpBtn.style.borderColor = '';
+                trumpBtn.style.pointerEvents = '';
             }
         }
     });
@@ -146,13 +155,13 @@ export function showTrumpSelectionModal() {
     // Add to document and animate in
     document.body.appendChild(overlay);
     overlay.appendChild(modal);
-    
+
     // Trigger animations
     requestAnimationFrame(() => {
         overlay.style.opacity = '1';
         modal.style.transform = 'scale(1)';
     });
-    
+
     console.log("Trump selection modal created and shown");
 }
 
