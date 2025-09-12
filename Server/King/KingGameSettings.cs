@@ -28,7 +28,7 @@ public class KingGameSettings
         for (int i = 0; i < CollectingPhaseRounds; i++)
         {
             // We'll set the trump chooser when the match starts and we know player order
-            rounds.Add(GameRound.CreateCollectTricks(roundNumber++, Guid.Empty));
+            rounds.Add(GameRound.CreateCollectTricks(roundNumber++));
         }
 
         return rounds;

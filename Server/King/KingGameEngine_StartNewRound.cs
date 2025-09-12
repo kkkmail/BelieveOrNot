@@ -38,12 +38,12 @@ public partial class KingGameEngine
         if (currentRound.IsCollectingPhase)
         {
             match.WaitingForTrumpSelection = true;
-            // Current player should be the trump chooser
-            var trumpChooser = match.Players.FirstOrDefault(p => p.Id == currentRound.TrumpChooser);
-            if (trumpChooser != null)
-            {
-                match.CurrentPlayerIndex = match.Players.IndexOf(trumpChooser);
-            }
+            // // Current player should be the trump chooser
+            // var trumpChooser = match.Players.FirstOrDefault(p => p.Id == currentRound.TrumpChooser);
+            // if (trumpChooser != null)
+            // {
+            //     match.CurrentPlayerIndex = match.Players.IndexOf(trumpChooser);
+            // }
         }
         else
         {

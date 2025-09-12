@@ -83,7 +83,7 @@ public static class KingMoveValidator
     public static bool IsValidTrumpSelection(KingMatch match, Player player, Suit trumpSuit)
     {
         if (!match.WaitingForTrumpSelection) return false;
-        if (match.CurrentRound?.TrumpChooser != player.Id) return false;
+        // if (match.CurrentRound?.TrumpChooser != player.Id) return false;
 
         return true;
     }
