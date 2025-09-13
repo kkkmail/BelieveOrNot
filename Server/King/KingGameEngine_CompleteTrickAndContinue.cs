@@ -3,15 +3,15 @@ namespace BelieveOrNot.Server.King;
 
 public partial class KingGameEngine
 {
-    public KingGameStateDto CompleteTrickAndContinue(KingMatch match)
+    public (KingGameStateDto gameState, TrickCompletionResult trickResult) CompleteTrickAndContinue(KingMatch match)
     {
         if (match.CurrentTrick?.IsComplete != true)
         {
-            return CreateGameStateDto(match);
+            return (CreateGameStateDto(match), null);
         }
 
-        // Complete the trick
-        CompleteTrick(match);
+        // Complete the trick and get results
+        var trickResult = CompleteTrick(match);
 
         // Check for round end conditions
         if (ShouldEndRound(match))
@@ -23,6 +23,6 @@ public partial class KingGameEngine
             StartNewTrick(match);
         }
 
-        return CreateGameStateDto(match);
+        return (CreateGameStateDto(match), trickResult);
     }
 }

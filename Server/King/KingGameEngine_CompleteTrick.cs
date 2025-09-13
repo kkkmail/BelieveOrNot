@@ -3,7 +3,7 @@ namespace BelieveOrNot.Server.King;
 
 public partial class KingGameEngine
 {
-    private void CompleteTrick(KingMatch match)
+    private TrickCompletionResult CompleteTrick(KingMatch match)
     {
         var trick = match.CurrentTrick!;
         var winningCard = trick.GetWinningCard(match.SelectedTrumpSuit);
@@ -18,6 +18,20 @@ public partial class KingGameEngine
         }
 
         match.CompletedTricks.Add(trick);
+
+        // Capture trick details for broadcasting
+        var trickResult = new TrickCompletionResult
+        {
+            WinningCard = winningCard,
+            WinnerName = winningCard != null
+                ? match.Players.FirstOrDefault(p => p.Id == winningCard.PlayerId)?.Name
+                : null,
+            TrickCards = trick.Cards.ToList(),
+            TrickNumber = match.CompletedTricks.Count
+        };
+
         match.CurrentTrick = null;
+
+        return trickResult;
     }
 }

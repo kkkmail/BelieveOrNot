@@ -21,16 +21,12 @@ public static class MessageFormatter
         {
             return "<span style=\"font-size: 1.2em; font-weight: bold;\">🃏</span>";
         }
+
         return FormatCard(card.Rank, card.Suit);
     }
 
-    public static string FormatCard(string rank, string suit)
+    public static string FormatSuit(string suit)
     {
-        if (rank == "Joker")
-        {
-            return "<span style=\"font-size: 1.2em; font-weight: bold;\">🃏</span>";
-        }
-
         // Get suit symbol and color
         string suitSymbol;
         string color;
@@ -59,8 +55,28 @@ public static class MessageFormatter
                 break;
         }
 
-        // Bold rank + space + suit symbol
-        return $"<span style=\"color: {color}; font-weight: bold; font-size: 1.3em;\">{rank}</span> <span style=\"color: {color}; font-size: 1.1em;\">{suitSymbol}</span>";
+        return $"<span style=\"color: {color}; font-size: 1.1em;\">{suitSymbol}</span>";
+    }
+
+    public static string FormatCard(string rank, string suit)
+    {
+        if (rank == "Joker")
+        {
+            return "<span style=\"font-size: 1.2em; font-weight: bold;\">🃏</span>";
+        }
+
+        // Get suit color for the rank (same as suit)
+        string rankColor = suit switch
+        {
+            "Hearts" => "#dc3545",
+            "Diamonds" => "#dc3545",
+            "Clubs" => "#333",
+            "Spades" => "#333",
+            _ => "#333"
+        };
+
+        // Bold rank + non-breaking space + formatted suit
+        return $"<span style=\"color: {rankColor}; font-weight: bold; font-size: 1.3em;\">{rank}</span>&nbsp;{FormatSuit(suit)}";
     }
 
     public static string FormatCount(int count)
@@ -88,10 +104,12 @@ public static class MessageFormatter
 
     public static string Challenge(string challenger, string challenged, int cardIndex, int totalCards)
     {
-        return $"{FormatPlayer(challenger)} challenges {FormatPlayer(challenged)} (card {FormatCount(cardIndex + 1)} of {FormatCount(totalCards)}).";
+        return
+            $"{FormatPlayer(challenger)} challenges {FormatPlayer(challenged)} (card {FormatCount(cardIndex + 1)} of {FormatCount(totalCards)}).";
     }
 
-    public static string ChallengeResult(Card revealedCard, string announcedRank, string challenger, string challenged, bool cardMatches)
+    public static string ChallengeResult(Card revealedCard, string announcedRank, string challenger, string challenged,
+        bool cardMatches)
     {
         var cardText = FormatCard(revealedCard);
         var rankText = FormatRank(announcedRank);
@@ -99,15 +117,15 @@ public static class MessageFormatter
         if (cardMatches)
         {
             // Card matches the announced rank - challenger was WRONG
-            var matchText = revealedCard.IsJoker ?
-                $"(Joker matches {rankText})" :
-                $"(matches {rankText})";
-            return $"Challenged card was {cardText} {matchText}. {FormatPlayer(challenger)} was wrong and collects all cards.";
+            var matchText = revealedCard.IsJoker ? $"(Joker matches {rankText})" : $"(matches {rankText})";
+            return
+                $"Challenged card was {cardText} {matchText}. {FormatPlayer(challenger)} was wrong and collects all cards.";
         }
         else
         {
             // Card does NOT match - challenger was RIGHT
-            return $"Challenged card was {cardText} (does not match {rankText}). {FormatPlayer(challenger)} was right, {FormatPlayer(challenged)} collects all cards.";
+            return
+                $"Challenged card was {cardText} (does not match {rankText}). {FormatPlayer(challenger)} was right, {FormatPlayer(challenged)} collects all cards.";
         }
     }
 
@@ -133,11 +151,13 @@ public static class MessageFormatter
         }
     }
 
-    public static string ScoreResult(string playerName, int points, bool isWinner, int bonusPoints, int regularCards, int jokerCards, int regularPenalty, int jokerPenalty)
+    public static string ScoreResult(string playerName, int points, bool isWinner, int bonusPoints, int regularCards,
+        int jokerCards, int regularPenalty, int jokerPenalty)
     {
         if (isWinner)
         {
-            return $"{FormatPlayer(playerName)}: {FormatPoints(points)} points (Winner bonus: {FormatPoints(bonusPoints)}, {FormatCount(0)} cards)";
+            return
+                $"{FormatPlayer(playerName)}: {FormatPoints(points)} points (Winner bonus: {FormatPoints(bonusPoints)}, {FormatCount(0)} cards)";
         }
         else
         {
@@ -146,10 +166,12 @@ public static class MessageFormatter
             {
                 penalties.Add($"{FormatCount(regularCards)} cards: {FormatPoints(regularPenalty)}");
             }
+
             if (jokerCards > 0)
             {
                 penalties.Add($"{FormatCount(jokerCards)} jokers: {FormatPoints(jokerPenalty)}");
             }
+
             return $"{FormatPlayer(playerName)}: {FormatPoints(points)} points ({string.Join(", ", penalties)})";
         }
     }
