@@ -7,13 +7,14 @@ import { updateScoresDisplay } from "./updateScoresDisplay.js";
 import { updateRoundDisplay } from "./updateRoundDisplay.js";
 import { updateGameActions } from "./updateGameActions.js";
 import { showTrumpSelectionModal } from "../utils/showTrumpSelectionModal.js";
+import { updateTrumpDisplay } from "./updateTrumpDisplay.js";
 
 export function updateGameDisplay() {
     if (!gameState) {
         // On home page (no game state), show basic setup
         document.getElementById('gameSetup').style.display = 'block';
         document.getElementById('gameBoard').style.display = 'none';
-        
+
         // Show Other Games button
         const otherGamesBtn = document.getElementById('otherGamesBtn');
         if (otherGamesBtn) {
@@ -39,6 +40,11 @@ export function updateGameDisplay() {
     updateTrickDisplay();
     updateScoresDisplay();
     updateGameActions();
+
+    // Update trump display
+    const trumpSuit = gameState.selectedTrumpSuit;
+    console.log("Calling updateTrumpDisplay with:", trumpSuit);
+    updateTrumpDisplay(trumpSuit);
 
     // Check for trump selection requirement
     checkTrumpSelectionRequirement();
@@ -69,27 +75,27 @@ function updateBasicGameInfo() {
     if (currentPlayerElement && gameState.players && gameState.players.length > gameState.currentPlayerIndex) {
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         currentPlayerElement.textContent = currentPlayer.name;
-        currentPlayerElement.className = gameState.players[gameState.currentPlayerIndex]?.id === playerId ? 
+        currentPlayerElement.className = gameState.players[gameState.currentPlayerIndex]?.id === playerId ?
             'current-player current-player-me' : 'current-player';
     }
 }
 
 function updateCardAreaVisibility() {
     console.log("=== updateCardAreaVisibility() CALLED ===");
-    
+
     const handArea = document.querySelector('.hand-area');
     const trumpSelectionArea = document.getElementById('trumpSelectionArea');
     const roundInfoArea = document.getElementById('roundInfoArea');
-    
+
     console.log("Elements found:");
     console.log("- handArea:", handArea);
     console.log("- trumpSelectionArea:", trumpSelectionArea);
     console.log("- roundInfoArea:", roundInfoArea);
-    
+
     // Show card area only when the round has started (phase 1)
     // The Start Round button is in game-management-controls, not in hand area
-    const shouldShowCardArea = gameState.players && 
-                               gameState.players.length === 4 && 
+    const shouldShowCardArea = gameState.players &&
+                               gameState.players.length === 4 &&
                                gameState.phase === 1; // InProgress phase
 
     console.log("=== CARD AREA VISIBILITY DEBUG ===");
@@ -102,7 +108,7 @@ function updateCardAreaVisibility() {
     if (handArea) {
         console.log("Hand area current display style:", handArea.style.display);
         console.log("Hand area computed display:", window.getComputedStyle(handArea).display);
-        
+
         if (shouldShowCardArea) {
             handArea.style.display = 'block';
             console.log("✅ SHOWING hand area - Round started with 4 players");
@@ -138,7 +144,7 @@ function updateCardAreaVisibility() {
             console.log("Round info area - hiding");
         }
     }
-    
+
     console.log("=== updateCardAreaVisibility() COMPLETE ===");
 }
 
@@ -148,7 +154,7 @@ function checkTrumpSelectionRequirement() {
     console.log("gameState.phase:", gameState.phase);
     console.log("gameState.currentPlayerIndex:", gameState.currentPlayerIndex);
     console.log("playerId:", playerId);
-    
+
     if (!gameState || !playerId) {
         console.log("No game state or player ID - skipping trump selection check");
         return;
