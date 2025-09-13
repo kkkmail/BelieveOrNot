@@ -2,6 +2,7 @@
 import { connection, gameState, playerId } from "../core/variables.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
 import { closeTrumpSelectionModal } from "../utils/showTrumpSelectionModal.js";
+import { updateTrumpDisplay } from "../display/updateTrumpDisplay.js";
 
 // Convert suit name to enum value
 function getSuitEnumValue(suitName) {
@@ -17,7 +18,7 @@ function getSuitEnumValue(suitName) {
 export async function selectTrump(trumpSuit) {
     console.log("=== SELECT TRUMP ACTION CALLED ===");
     console.log("trumpSuit parameter:", trumpSuit);
-    
+
     if (!gameState || !playerId) {
         await customAlert('Cannot select trump: game or player not found');
         return;
@@ -59,12 +60,13 @@ export async function selectTrump(trumpSuit) {
         console.log("About to invoke SelectTrump with request:", JSON.stringify(trumpRequest, null, 2));
 
         await connection.invoke("SelectTrump", trumpRequest);
-        
+
         console.log("Trump selected successfully:", trumpSuit);
-        
+        updateTrumpDisplay(trumpSuit);
+
         // Close the modal if it's open
         closeTrumpSelectionModal();
-        
+
     } catch (err) {
         console.error("=== TRUMP SELECTION ERROR ===");
         console.error("Error object:", err);

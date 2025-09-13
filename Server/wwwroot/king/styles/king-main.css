@@ -29,6 +29,71 @@
     opacity: 0.9;
 }
 
+/* Trump Card Display */
+.trump-card-display {
+    position: absolute;
+    top: 200px;
+    left: 50px;
+    z-index: 10;
+    text-align: center;
+    width: 60px;
+}
+
+.trump-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    margin-bottom: 5px;
+    width: 60px;
+    line-height: 1;
+}
+
+.trump-card-slot {
+    width: 80px;   /* Match hand card width */
+    height: 115px; /* Match hand card height */
+    margin: 0;
+}
+
+.trump-card-slot .card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.trump-card-slot .card.blank {
+    background: #f8f9fa;
+    border-color: #e9ecef;
+}
+
+.trump-card-slot .card .rank {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.trump-card-slot .card.hearts .rank {
+    color: #dc3545;
+}
+
+.trump-card-slot .card.diamonds .rank {
+    color: #dc3545;
+}
+
+.trump-card-slot .card.clubs .rank {
+    color: #333;
+}
+
+.trump-card-slot .card.spades .rank {
+    color: #333;
+}
+
 /* Game board */
 .game-board {
     background: rgba(255, 255, 255, 0.95);

@@ -84,6 +84,11 @@
         right: -35px;
         left: auto;
     }
+
+    .trump-card-display {
+        top: 15px;
+        left: 15px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -241,6 +246,12 @@
     .player-stats {
         font-size: 9px;
     }
+
+    .trump-card-display {
+        top: 8px;
+        left: 8px;
+        transform: scale(0.8);
+    }
 }
 
 /* Landscape mobile adjustments */
@@ -303,5 +314,9 @@
     .card-slot {
         border: 1px solid #000;
         background: white;
+    }
+
+    .trump-card-display {
+        display: none !important;
     }
 }
