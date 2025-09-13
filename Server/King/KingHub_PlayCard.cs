@@ -23,11 +23,12 @@ public partial class KingHub
                 var cardPlayedEvent = new GameEventDto
                 {
                     Type = "CardPlayed",
-                    DisplayMessage = $"🃏 {playingPlayer.Name} played {request.Card.Rank} of {request.Card.Suit}",
-                    Data = new {
+                    DisplayMessage = $"🃏 {MessageFormatter.FormatPlayer(playingPlayer.Name)} played {MessageFormatter.FormatCard(request.Card)}",
+                    Data = new
+                    {
                         PlayerName = playingPlayer.Name,
                         Card = request.Card,
-                        PlayerId = request.PlayerId,
+                        PlayerId = request.PlayerId
                     }
                 };
                 await Clients.Group($"kingmatch:{match.Id}").SendAsync("GameEvent", cardPlayedEvent);
@@ -43,15 +44,16 @@ public partial class KingHub
                 // Broadcast trick completion event if we have results
                 if (trickResult != null && trickResult.WinnerName != null)
                 {
-                    var trickCards = string.Join(", ", trickResult.TrickCards.Select(pc => $"{pc.Card.Rank} of {pc.Card.Suit}"));
+                    var trickCardsText = string.Join(", ",
+                        trickResult.TrickCards.Select(pc => MessageFormatter.FormatCard(pc.Card)));
                     var trickWonEvent = new GameEventDto
                     {
                         Type = "TrickWon",
-                        DisplayMessage = $"🏆 {trickResult.WinnerName} won trick #{trickResult.TrickNumber} with {trickResult.WinningCard.Card.Rank} of {trickResult.WinningCard.Card.Suit}",
-                        Data = new {
+                        DisplayMessage = $"🏆 {MessageFormatter.FormatPlayer(trickResult.WinnerName)} won trick #{trickResult.TrickNumber} with {MessageFormatter.FormatCard(trickResult.WinningCard.Card)} (Trick: {trickCardsText})",
+                        Data = new
+                        {
                             WinnerName = trickResult.WinnerName,
                             WinningCard = trickResult.WinningCard.Card,
-                            TrickCards = trickCards,
                             TrickNumber = trickResult.TrickNumber
                         }
                     };

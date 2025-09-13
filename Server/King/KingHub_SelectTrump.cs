@@ -23,8 +23,9 @@ public partial class KingHub
                 var trumpSelectedEvent = new GameEventDto
                 {
                     Type = "TrumpSelected",
-                    DisplayMessage = $"👑 {trumpPlayer.Name} selected {request.TrumpSuit} as trump suit",
-                    Data = new {
+                    DisplayMessage = $"👑 {MessageFormatter.FormatPlayer(trumpPlayer.Name)} selected {MessageFormatter.FormatSuit(request.TrumpSuit.ToString())} {request.TrumpSuit} as trump suit",
+                    Data = new
+                    {
                         PlayerName = trumpPlayer.Name,
                         TrumpSuit = request.TrumpSuit,
                         PlayerId = request.PlayerId

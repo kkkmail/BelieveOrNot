@@ -44,11 +44,10 @@ export async function playCard() {
 
         console.log("Card played successfully");
 
-        // Add test messages to verify messaging system
-        const playerName = gameState.players?.find(p => p.id === playerId)?.name || "You";
-        const cardText = `<span style="font-weight: bold; color: #007bff;">${card.rank} of ${card.suit}</span>`;
-
-        await addToEventHistory(`🃏 <span style="font-weight: bold; font-style: italic;">${playerName}</span> played ${cardText}`);
+        // // Add test messages to verify messaging system
+        // const playerName = gameState.players?.find(p => p.id === playerId)?.name || "You";
+        // const cardText = `<span style="font-weight: bold; color: #007bff;">${card.rank} of ${card.suit}</span>`;
+        // await addToEventHistory(`🃏 <span style="font-weight: bold; font-style: italic;">${playerName}</span> played ${cardText}`);
 
         // Clear selection after successful play
         setSelectedCard(null);
