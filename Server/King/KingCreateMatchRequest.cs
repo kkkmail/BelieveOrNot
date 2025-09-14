@@ -1,7 +1,7 @@
 // King/KingCreateMatchRequest.cs
 namespace BelieveOrNot.Server.King;
 
-public class KingCreateMatchRequest
+public record KingCreateMatchRequest
 {
     public string PlayerName { get; set; } = string.Empty;
     public KingGameSettings? Settings { get; set; }

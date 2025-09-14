@@ -1,7 +1,7 @@
 // Server/King/KingGameStateDto.cs
 namespace BelieveOrNot.Server.King;
 
-public class KingGameStateDto
+public record KingGameStateDto
 {
     public Guid MatchId { get; set; }
     public GamePhase Phase { get; set; }

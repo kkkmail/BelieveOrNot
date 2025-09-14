@@ -1,7 +1,7 @@
 // Server/King/KingMatch.cs
 namespace BelieveOrNot.Server.King;
 
-public class KingMatch
+public record KingMatch
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public KingGameSettings Settings { get; set; } = new();

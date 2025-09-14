@@ -3,26 +3,26 @@ namespace BelieveOrNot.Server.King;
 
 public partial class KingGameEngine
 {
-    public (KingGameStateDto gameState, TrickCompletionResult trickResult) CompleteTrickAndContinue(KingMatch match)
+    public async Task<KingGameStateDto> CompleteTrickAndContinue(KingMatch match)
     {
         if (match.CurrentTrick?.IsComplete != true)
         {
-            return (CreateGameStateDto(match), null);
+            return CreateGameStateDto(match);
         }
 
-        // Complete the trick and get results
-        var trickResult = CompleteTrick(match);
+        // Complete the trick (this will broadcast trick won event)
+        await CompleteTrick(match);
 
         // Check for round end conditions
         if (ShouldEndRound(match))
         {
-            EndRound(match);
+            await EndRound(match);  // This will broadcast round ended event
         }
         else if (!match.IsRoundComplete)
         {
             StartNewTrick(match);
         }
 
-        return (CreateGameStateDto(match), trickResult);
+        return CreateGameStateDto(match);
     }
 }

@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IGameEngine, GameEngine>();
 // Add services for King
 builder.Services.AddSingleton<IKingMatchManager, KingMatchManager>();
 builder.Services.AddSingleton<IKingGameEngine, KingGameEngine>();
+builder.Services.AddSingleton<IKingEventBroadcaster, KingEventBroadcaster>();
 
 builder.Services.AddCors(options =>
 {

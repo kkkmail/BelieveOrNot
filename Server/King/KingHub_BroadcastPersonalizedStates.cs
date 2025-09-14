@@ -5,6 +5,15 @@ public partial class KingHub
 {
     private async Task BroadcastPersonalizedStates(KingMatch match)
     {
+        // Console.WriteLine($"{nameof(KingHub)}.{nameof(BroadcastPersonalizedStates)} - match: {match}");
+
+        // var allConnections = _connectionToPlayer.ToArray();
+        //
+        // foreach (var connection in allConnections)
+        // {
+        //     Console.WriteLine($"{nameof(KingHub)}.{nameof(BroadcastPersonalizedStates)} - match.Id: {match.Id}, connection.Key: {connection.Key}, connection.Value: (MatchId: {connection.Value.MatchId}, PlayerId: {connection.Value.PlayerId})");
+        // }
+
         var tasks = _connectionToPlayer
             .Where(kvp => kvp.Value.MatchId == match.Id)
             .Select(async kvp =>
@@ -13,6 +22,7 @@ public partial class KingHub
                 var playerId = kvp.Value.PlayerId;
 
                 var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, playerId);
+                // Console.WriteLine($"{nameof(KingHub)}.{nameof(BroadcastPersonalizedStates)} - playerId: {playerId}, playerState: {playerState}");
                 await Clients.Client(connectionId).SendAsync("StateUpdate", playerState);
             });
 

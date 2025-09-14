@@ -5,7 +5,7 @@ public partial class KingHub
 {
     public override async Task OnConnectedAsync()
     {
-        Console.WriteLine($"King client connected: {Context.ConnectionId}");
+        // Console.WriteLine($"{nameof(KingHub)}.{nameof(OnConnectedAsync)} - Context.ConnectionId: {Context.ConnectionId}");
         await base.OnConnectedAsync();
     }
 }

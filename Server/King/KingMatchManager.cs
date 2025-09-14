@@ -13,6 +13,8 @@ public class KingMatchManager : IKingMatchManager
 
     public KingMatch CreateMatch(string playerName, KingGameSettings? settings = null, string clientId = "")
     {
+        // Console.WriteLine($"{nameof(KingMatchManager)}.{nameof(CreateMatch)} - playerName: {playerName}, clientId: {clientId}");
+
         var match = new KingMatch
         {
             Settings = settings ?? new KingGameSettings(),
@@ -33,6 +35,8 @@ public class KingMatchManager : IKingMatchManager
 
     public KingMatch JoinMatch(Guid matchId, string playerName, string clientId = "")
     {
+        // Console.WriteLine($"{nameof(KingMatchManager)}.{nameof(JoinMatch)} - matchId: {matchId}, playerName: {playerName}, clientId: {clientId}");
+
         var match = GetMatch(matchId) ?? throw new InvalidOperationException("Match not found");
 
         if (match.Phase != GamePhase.WaitingForPlayers)
@@ -53,6 +57,11 @@ public class KingMatchManager : IKingMatchManager
             ClientId = clientId,
             LastSeen = DateTime.UtcNow
         });
+
+        // foreach (var player in match.Players)
+        // {
+        //     Console.WriteLine($"{nameof(KingMatchManager)}.{nameof(JoinMatch)} - player: {player}");
+        // }
 
         return match;
     }

@@ -14,6 +14,7 @@ public partial class KingGameEngine
             state.TrumpSelectionCards = player.TrumpSelectionCards?.ToList();
         }
 
+        // Console.WriteLine($"{nameof(KingGameStateDto)}.{nameof(CreateGameStateDtoForPlayer)} - playerId: {playerId}, state: {state}");
         return state;
     }
 }
