@@ -14,26 +14,20 @@ public partial class KingHub
         try
         {
             var state = _gameEngine.SelectTrump(match, request.PlayerId, request.TrumpSuit);
-            await BroadcastPersonalizedStates(match);
 
-            // Broadcast trump selection event to all players
+            // Broadcast trump selection event
             var trumpPlayer = match.Players.FirstOrDefault(p => p.Id == request.PlayerId);
             if (trumpPlayer != null)
             {
-                var trumpSelectedEvent = new GameEventDto
+                var trumpSelectedEvent = new TrumpSelectedEvent
                 {
-                    Type = "TrumpSelected",
-                    DisplayMessage = $"👑 {MessageFormatter.FormatPlayer(trumpPlayer.Name)} selected {MessageFormatter.FormatSuit(request.TrumpSuit.ToString())} {request.TrumpSuit} as trump suit",
-                    Data = new
-                    {
-                        PlayerName = trumpPlayer.Name,
-                        TrumpSuit = request.TrumpSuit,
-                        PlayerId = request.PlayerId
-                    }
+                    PlayerName = trumpPlayer.Name,
+                    TrumpSuit = request.TrumpSuit.ToString()
                 };
-                await Clients.Group($"kingmatch:{match.Id}").SendAsync("GameEvent", trumpSelectedEvent);
+                await _eventBroadcaster.BroadcastTrumpSelected(match, trumpSelectedEvent);
             }
 
+            await BroadcastPersonalizedStates(match);
             return state;
         }
         catch (Exception ex)

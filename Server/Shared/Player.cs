@@ -1,7 +1,7 @@
 // Shared/Player.cs
 namespace BelieveOrNot.Server.Shared;
 
-public class Player
+public record Player
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;

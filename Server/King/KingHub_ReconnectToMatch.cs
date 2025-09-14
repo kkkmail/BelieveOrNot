@@ -5,6 +5,8 @@ public partial class KingHub
 {
     public async Task<KingReconnectionResponse> ReconnectToMatch(string matchIdString, string clientId)
     {
+        // Console.WriteLine($"{nameof(KingHub)}.{nameof(ReconnectToMatch)} - matchIdString: {matchIdString}, clientId: {clientId}");
+
         if (!Guid.TryParse(matchIdString, out var matchId))
         {
             return new KingReconnectionResponse
@@ -48,6 +50,12 @@ public partial class KingHub
 
         await Groups.AddToGroupAsync(Context.ConnectionId, $"kingmatch:{matchId}");
         _connectionToPlayer[Context.ConnectionId] = (matchId, player.Id);
+        // var allConnections = _connectionToPlayer.ToArray();
+        //
+        // foreach (var connection in allConnections)
+        // {
+        //     Console.WriteLine($"{nameof(KingHub)}.{nameof(ReconnectToMatch)} - connection.Key: {connection.Key}, connection.Value: (MatchId: {connection.Value.MatchId}, PlayerId: {connection.Value.PlayerId})");
+        // }
 
         await BroadcastPersonalizedStates(match);
 

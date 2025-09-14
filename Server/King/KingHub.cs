@@ -3,15 +3,15 @@ namespace BelieveOrNot.Server.King;
 
 public partial class KingHub : Hub
 {
-    private readonly IKingGameEngine _gameEngine;
     private readonly IKingMatchManager _matchManager;
-
-    // Track connection to player mapping
+    private readonly IKingGameEngine _gameEngine;
+    private readonly IKingEventBroadcaster _eventBroadcaster;
     private static readonly ConcurrentDictionary<string, (Guid MatchId, Guid PlayerId)> _connectionToPlayer = new();
 
-    public KingHub(IKingGameEngine gameEngine, IKingMatchManager matchManager)
+    public KingHub(IKingMatchManager matchManager, IKingGameEngine gameEngine, IKingEventBroadcaster eventBroadcaster)
     {
-        _gameEngine = gameEngine;
         _matchManager = matchManager;
+        _gameEngine = gameEngine;
+        _eventBroadcaster = eventBroadcaster;
     }
 }

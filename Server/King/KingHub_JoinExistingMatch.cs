@@ -5,6 +5,8 @@ public partial class KingHub
 {
     public async Task<KingJoinMatchResponse> JoinExistingMatch(string matchIdString, string playerName, string clientId = "")
     {
+        // Console.WriteLine($"{nameof(KingHub)}.{nameof(JoinExistingMatch)} - matchIdString: {matchIdString}, playerName: {playerName}, clientId: {clientId}, Context.ConnectionId: {Context.ConnectionId}");
+
         if (!Guid.TryParse(matchIdString, out var matchId))
         {
             throw new HubException("Invalid match ID format.");
@@ -33,6 +35,12 @@ public partial class KingHub
 
             var joiningPlayer = match.Players.Last();
             _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
+            // var allConnections = _connectionToPlayer.ToArray();
+            //
+            // foreach (var connection in allConnections)
+            // {
+            //     Console.WriteLine($"{nameof(KingHub)}.{nameof(JoinExistingMatch)} - match.Id: {match.Id}, connection.Key: {connection.Key}, connection.Value: (MatchId: {connection.Value.MatchId}, PlayerId: {connection.Value.PlayerId})");
+            // }
 
             await BroadcastPersonalizedStates(match);
 

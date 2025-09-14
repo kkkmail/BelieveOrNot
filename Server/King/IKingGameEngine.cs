@@ -8,5 +8,5 @@ public interface IKingGameEngine
     KingGameStateDto SelectTrump(KingMatch match, Guid playerId, Suit trumpSuit);
     KingGameStateDto CreateGameStateDto(KingMatch match);
     KingGameStateDto CreateGameStateDtoForPlayer(KingMatch match, Guid playerId);
-    (KingGameStateDto gameState, TrickCompletionResult trickResult) CompleteTrickAndContinue(KingMatch match);
+    Task<KingGameStateDto> CompleteTrickAndContinue(KingMatch match);
 }
