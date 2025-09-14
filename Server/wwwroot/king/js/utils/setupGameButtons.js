@@ -4,6 +4,7 @@ import { endRound } from "../actions/endRound.js";
 import { playCard } from "../actions/playCard.js";
 import { selectTrump } from "../actions/selectTrump.js";
 import { copyMatchId } from "./copyMatchId.js";
+import { showOtherGamesModal } from "../../../js/utils/showOtherGamesModal.js";
 
 export function setupGameButtons() {
     console.log("Setting up King game buttons...");
@@ -60,26 +61,39 @@ export function setupGameButtons() {
         console.log("King copy match ID button listener added");
     }
 
+    // Other Games button
+    const otherGamesBtn = document.getElementById('otherGamesBtn');
+    if (otherGamesBtn && !otherGamesBtn.hasAttribute('data-listener')) {
+        otherGamesBtn.setAttribute('data-listener', 'true');
+        otherGamesBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("King other games button clicked");
+            showOtherGamesModal();
+        });
+        console.log("King other games button listener added");
+    }
+
     // Setup trump selection buttons (existing ones in the HTML, keeping as fallback)
     setupTrumpButtons();
 }
 
 function setupTrumpButtons() {
     const trumpButtons = document.querySelectorAll('.trump-btn');
-    
+
     trumpButtons.forEach(button => {
         if (!button.hasAttribute('data-listener')) {
             button.setAttribute('data-listener', 'true');
             button.addEventListener('click', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                
+
                 const suit = this.getAttribute('data-suit');
                 console.log("Trump button clicked:", suit);
                 selectTrump(suit);
             });
         }
     });
-    
+
     console.log("Trump selection buttons set up");
 }
