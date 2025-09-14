@@ -36,7 +36,7 @@ public class GameRound
             RequiresAllTricks = false,
             IsCollectingPhase = false,
             PointsPerTrick = -2,
-            MustDiscardKingOfHearts = true
+            MustDiscardKingOfHearts = false
         };
     }
 
@@ -53,7 +53,7 @@ public class GameRound
             IsCollectingPhase = false,
             PointsPerHeart = -2,
             CannotLeadHearts = true,
-            MustDiscardKingOfHearts = true
+            MustDiscardKingOfHearts = false
         };
     }
 
@@ -69,7 +69,7 @@ public class GameRound
             RequiresAllTricks = false,
             IsCollectingPhase = false,
             PointsPerBoy = -2,
-            MustDiscardKingOfHearts = true
+            MustDiscardKingOfHearts = false
         };
     }
 
@@ -85,7 +85,7 @@ public class GameRound
             RequiresAllTricks = false,
             IsCollectingPhase = false,
             PointsPerQueen = -4,
-            MustDiscardKingOfHearts = true
+            MustDiscardKingOfHearts = false
         };
     }
 
@@ -101,7 +101,7 @@ public class GameRound
             RequiresAllTricks = true,
             IsCollectingPhase = false,
             PointsPerLastTrick = -8,
-            MustDiscardKingOfHearts = true
+            MustDiscardKingOfHearts = false
         };
     }
 
