@@ -19,9 +19,94 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="appsettings.json">
+      <None Include="..\..\Softellect\Scripts\Get-BinaryPathName.ps1" Link="Get-BinaryPathName.ps1">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Include="..\..\Softellect\Scripts\Get-Description.ps1" Link="Get-Description.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Get-ServiceName.ps1" Link="Get-ServiceName.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Install-DistributedService.ps1" Link="Install-DistributedService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Install-Service.ps1" Link="Install-Service.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Reinstall-Service.ps1" Link="Reinstall-Service.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Reinstall-WindowsService.ps1" Link="Reinstall-WindowsService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Start-DistributedService.ps1" Link="Start-DistributedService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Start-WindowsService.ps1" Link="Start-WindowsService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Stop-DistributedService.ps1" Link="Stop-DistributedService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Stop-WindowsService.ps1" Link="Stop-WindowsService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Uninstall-DistributedService.ps1" Link="Uninstall-DistributedService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Uninstall-Service.ps1" Link="Uninstall-Service.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Uninstall-ServiceWithDotNet.ps1" Link="Uninstall-ServiceWithDotNet.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Uninstall-ServiceWithScExe.ps1" Link="Uninstall-ServiceWithScExe.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Uninstall-ServiceWithWMI.ps1" Link="Uninstall-ServiceWithWMI.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Uninstall-WindowsService.ps1" Link="Uninstall-WindowsService.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="..\..\Softellect\Scripts\Write-ServiceLog.ps1" Link="Write-ServiceLog.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="appsettings.Production.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <DependentUpon>appsettings.json</DependentUpon>
+        </None>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BelieveOrNotFunctions.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BelieveOrNotServiceName.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="BuildInfo.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Install-BelieveOrNotService.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessagingVersionInfo.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Start-BelieveOrNotService.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Stop-BelieveOrNotService.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Uninstall-BelieveOrNotService.ps1">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
