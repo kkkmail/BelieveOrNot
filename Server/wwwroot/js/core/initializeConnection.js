@@ -8,7 +8,6 @@ import { attemptReconnection, handleDisconnection, handleReconnection } from "..
 import { showFinalResults } from "../utils/showFinalResults.js";
 
 export async function initializeConnection() {
-    // Get or create persistent player ID
     const persistentPlayerId = getOrCreatePlayerId();
     setPlayerId(persistentPlayerId);
     console.log("Using player ID:", persistentPlayerId);
