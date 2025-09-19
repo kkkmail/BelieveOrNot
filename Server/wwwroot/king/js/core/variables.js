@@ -5,7 +5,6 @@ export let connection = null;
 export let gameState = null;
 export let currentMatch = null;
 export let playerId = null;
-export let clientId = null;
 export let selectedCard = null; // Single card selection for King game
 export let selectedTrumpSuit = null;
 
@@ -25,10 +24,6 @@ export function setCurrentMatch(newMatch) {
 
 export function setPlayerId(newPlayerId) {
     playerId = newPlayerId;
-}
-
-export function setClientId(newClientId) {
-    clientId = newClientId;
 }
 
 export function setSelectedCard(cardIndex) {

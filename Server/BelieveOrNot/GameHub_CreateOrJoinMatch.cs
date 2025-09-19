@@ -10,7 +10,7 @@ public partial class GameHub
         try
         {
             // Try to create new match
-            match = _matchManager.CreateMatch(request.PlayerName, request.Settings, request.ClientId ?? string.Empty);
+            match = _matchManager.CreateMatch(request.PlayerName, request.PlayerId, request.Settings);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{match.Id}");
 
             // Map this connection to the creator player

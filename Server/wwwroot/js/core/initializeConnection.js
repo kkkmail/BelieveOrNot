@@ -1,17 +1,17 @@
 // js/core/initializeConnection.js
-import { setConnection, setGameState, setClientId } from "./variables.js";
+import { setConnection, setGameState, setPlayerId } from "./variables.js";
 import { updateConnectionStatus } from "./updateConnectionStatus.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { addToEventHistory } from "../utils/addToEventHistory.js";
-import { getOrCreateClientId } from "../utils/clientIdUtils.js";
+import { getOrCreatePlayerId } from "../utils/playerIdUtils.js";
 import { attemptReconnection, handleDisconnection, handleReconnection } from "../utils/reconnectionHandler.js";
 import { showFinalResults } from "../utils/showFinalResults.js";
 
 export async function initializeConnection() {
-    // Get or create persistent client ID
-    const persistentClientId = getOrCreateClientId();
-    setClientId(persistentClientId);
-    console.log("Using client ID:", persistentClientId);
+    // Get or create persistent player ID
+    const persistentPlayerId = getOrCreatePlayerId();
+    setPlayerId(persistentPlayerId);
+    console.log("Using player ID:", persistentPlayerId);
 
     const s = globalThis.signalR || window.signalR;
     if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }

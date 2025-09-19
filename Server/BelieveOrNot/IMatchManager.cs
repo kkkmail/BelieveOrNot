@@ -4,9 +4,9 @@ namespace BelieveOrNot.Server.BelieveOrNot;
 public interface IMatchManager
 {
     Match? GetMatch(Guid matchId);
-    Match CreateMatch(string playerName, GameSettings? settings = null, string clientId = "");
-    Match JoinMatch(Guid matchId, string playerName, string clientId = "");
+    Match CreateMatch(string playerName, Guid playerId, GameSettings? settings = null);
+    Match JoinMatch(Guid matchId, string playerName, Guid playerId);
     void RemoveMatch(Guid matchId);
     List<Match> GetActiveMatches();
-    void ShufflePlayersForNewRound(Match match); // Expose shuffle method
+    void ShufflePlayersForNewRound(Match match);
 }

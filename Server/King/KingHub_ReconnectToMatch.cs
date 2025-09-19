@@ -3,7 +3,7 @@ namespace BelieveOrNot.Server.King;
 
 public partial class KingHub
 {
-    public async Task<KingReconnectionResponse> ReconnectToMatch(string matchIdString, string clientId)
+    public async Task<KingReconnectionResponse> ReconnectToMatch(string matchIdString, string playerIdString)
     {
         // Console.WriteLine($"{nameof(KingHub)}.{nameof(ReconnectToMatch)} - matchIdString: {matchIdString}, clientId: {clientId}");
 
@@ -13,6 +13,15 @@ public partial class KingHub
             {
                 Success = false,
                 Message = "Invalid match ID format."
+            };
+        }
+
+        if (!Guid.TryParse(playerIdString, out var playerId))
+        {
+            return new KingReconnectionResponse
+            {
+                Success = false,
+                Message = "Invalid player ID format."
             };
         }
 
@@ -26,7 +35,7 @@ public partial class KingHub
             };
         }
 
-        var player = match.Players.FirstOrDefault(p => p.ClientId == clientId);
+        var player = match.Players.FirstOrDefault(p => p.Id == playerId);
         if (player == null)
         {
             if (match.Phase != GamePhase.WaitingForPlayers)

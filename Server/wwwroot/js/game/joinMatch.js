@@ -1,10 +1,10 @@
 // js/game/joinMatch.js
-import {playerId, connection, setCurrentMatch, setPlayerId, clientId} from "../core/variables.js";
+import {playerId, connection, setCurrentMatch, setPlayerId} from "../core/variables.js";
 import {showMessage} from "../utils/showMessage.js";
 import {showGameBoard} from "./showGameBoard.js";
 import {setMatchIdInUrl} from "../utils/urlManager.js";
 import {customAlert} from "../utils/customAlert.js";
-import {storePlayerName} from "../utils/clientIdUtils.js";
+import {storePlayerName} from "../utils/playerIdUtils.js";
 import {routeToCorrectGame} from "../utils/gameRouter.js";
 
 export async function joinMatch() {
@@ -32,7 +32,7 @@ export async function joinMatch() {
     storePlayerName(playerName);
 
     try {
-        const result = await connection.invoke("JoinExistingMatch", matchId, playerName, clientId);
+        const result = await connection.invoke("JoinExistingMatch", matchId, playerName, playerId);
 
         if (result.success) {
             setCurrentMatch(result.match);

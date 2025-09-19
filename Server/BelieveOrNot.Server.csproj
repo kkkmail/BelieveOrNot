@@ -77,7 +77,7 @@
 
     <ItemGroup>
         <None Update="appsettings.Production.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory Condition="'$(Configuration)'!='Debug'">PreserveNewest</CopyToOutputDirectory>
             <DependentUpon>appsettings.json</DependentUpon>
         </None>
         <None Update="appsettings.json">
