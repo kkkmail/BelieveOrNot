@@ -14,7 +14,7 @@ public partial class GameHub
             await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{match.Id}");
 
             // Map this connection to the creator player
-            _connectionToPlayer[Context.ConnectionId] = (match.Id, match.Players[0].Id);
+            PlayerToConnection[match.Players[0].Id] = (match.Id, Context.ConnectionId);
         }
         catch
         {

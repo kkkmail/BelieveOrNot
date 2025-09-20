@@ -6,12 +6,12 @@ public partial class GameHub
     private async Task BroadcastPersonalizedStates(Match match)
     {
         // Send personalized state to each connection based on their mapped player
-        var tasks = _connectionToPlayer
+        var tasks = PlayerToConnection
             .Where(kvp => kvp.Value.MatchId == match.Id)
             .Select(async kvp =>
             {
-                var connectionId = kvp.Key;
-                var playerId = kvp.Value.PlayerId;
+                var playerId = kvp.Key;
+                var connectionId = kvp.Value.ConnectionId;
 
                 var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, playerId);
                 playerState.CreatorPlayerId = match.Players[0].Id;

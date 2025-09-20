@@ -39,8 +39,8 @@ public partial class KingHub
             await Groups.AddToGroupAsync(Context.ConnectionId, $"kingmatch:{matchId}");
 
             var joiningPlayer = match.Players.Last();
-            _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
-            // var allConnections = _connectionToPlayer.ToArray();
+            PlayerToConnection[joiningPlayer.Id] = (matchId, Context.ConnectionId);
+            // var allConnections = PlayerToConnection.ToArray();
             //
             // foreach (var connection in allConnections)
             // {

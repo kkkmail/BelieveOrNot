@@ -33,7 +33,7 @@ public partial class GameHub
 
             // Map this connection to the joining player
             var joiningPlayer = match.Players.Last();
-            _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
+            PlayerToConnection[joiningPlayer.Id] = (matchId, Context.ConnectionId);
 
             // Broadcast join event to all players
             var joinEvent = GameEventFactory.CreateJoinEvent(joiningPlayer.Name, false);

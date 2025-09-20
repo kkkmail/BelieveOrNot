@@ -7,19 +7,19 @@ public partial class KingHub
     {
         // Console.WriteLine($"{nameof(KingHub)}.{nameof(BroadcastPersonalizedStates)} - match: {match}");
 
-        // var allConnections = _connectionToPlayer.ToArray();
+        // var allConnections = PlayerToConnection.ToArray();
         //
         // foreach (var connection in allConnections)
         // {
         //     Console.WriteLine($"{nameof(KingHub)}.{nameof(BroadcastPersonalizedStates)} - match.Id: {match.Id}, connection.Key: {connection.Key}, connection.Value: (MatchId: {connection.Value.MatchId}, PlayerId: {connection.Value.PlayerId})");
         // }
 
-        var tasks = _connectionToPlayer
+        var tasks = PlayerToConnection
             .Where(kvp => kvp.Value.MatchId == match.Id)
             .Select(async kvp =>
             {
-                var connectionId = kvp.Key;
-                var playerId = kvp.Value.PlayerId;
+                var playerId = kvp.Key;
+                var connectionId = kvp.Value.ConnectionId;
 
                 var playerState = _gameEngine.CreateGameStateDtoForPlayer(match, playerId);
                 // Console.WriteLine($"{nameof(KingHub)}.{nameof(BroadcastPersonalizedStates)} - playerId: {playerId}, playerState: {playerState}");

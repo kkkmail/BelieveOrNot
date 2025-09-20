@@ -7,20 +7,17 @@ public partial class KingHub
     {
         // Console.WriteLine($"{nameof(KingHub)}.{nameof(OnDisconnectedAsync)} - Context.ConnectionId: {Context.ConnectionId}");
 
-        if (_connectionToPlayer.TryRemove(Context.ConnectionId, out var connectionInfo))
+        var playerEntry = PlayerToConnection.FirstOrDefault(kvp => kvp.Value.ConnectionId == Context.ConnectionId);
+        if (playerEntry.Key != Guid.Empty)
         {
-            // Console.WriteLine($"{nameof(KingHub)}.{nameof(OnDisconnectedAsync)} - Removed connection mapping for {Context.ConnectionId}, connectionInfo: {connectionInfo}");
-            // var allConnections = _connectionToPlayer.ToArray();
-            //
-            // foreach (var connection in allConnections)
-            // {
-            //     Console.WriteLine($"{nameof(KingHub)}.{nameof(OnDisconnectedAsync)} - connection.Key: {connection.Key}, connection.Value: (MatchId: {connection.Value.MatchId}, PlayerId: {connection.Value.PlayerId})");
-            // }
+            PlayerToConnection.TryRemove(playerEntry.Key, out _);
+            var playerId = playerEntry.Key;
+            var matchId = playerEntry.Value.MatchId;
 
-            var match = _matchManager.GetMatch(connectionInfo.MatchId);
+            var match = _matchManager.GetMatch(matchId);
             if (match != null)
             {
-                var player = match.Players.FirstOrDefault(p => p.Id == connectionInfo.PlayerId);
+                var player = match.Players.FirstOrDefault(p => p.Id == playerId);
                 if (player != null)
                 {
                     player.IsConnected = false;

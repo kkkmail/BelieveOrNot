@@ -9,7 +9,7 @@ public partial class GameHub : Hub
     private readonly ConcurrentDictionary<Guid, Guid> _processedCommands = new();
 
     // Track connection to player mapping
-    private static readonly ConcurrentDictionary<string, (Guid MatchId, Guid PlayerId)> _connectionToPlayer = new();
+    private static ConcurrentDictionary<Guid, (Guid MatchId, string ConnectionId)> PlayerToConnection { get; } = new();
 
     public GameHub(IGameEngine gameEngine, IMatchManager matchManager)
     {
@@ -28,12 +28,17 @@ public partial class GameHub : Hub
         Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
 
         // Find the player associated with this connection
-        if (_connectionToPlayer.TryRemove(Context.ConnectionId, out var connectionInfo))
+        var playerEntry = PlayerToConnection.FirstOrDefault(kvp => kvp.Value.ConnectionId == Context.ConnectionId);
+        if (playerEntry.Key != Guid.Empty)
         {
-            var match = _matchManager.GetMatch(connectionInfo.MatchId);
+            PlayerToConnection.TryRemove(playerEntry.Key, out _);
+            var playerId = playerEntry.Key;
+            var matchId = playerEntry.Value.MatchId;
+
+            var match = _matchManager.GetMatch(matchId);
             if (match != null)
             {
-                var player = match.Players.FirstOrDefault(p => p.Id == connectionInfo.PlayerId);
+                var player = match.Players.FirstOrDefault(p => p.Id == playerId);
                 if (player != null)
                 {
                     player.IsConnected = false;

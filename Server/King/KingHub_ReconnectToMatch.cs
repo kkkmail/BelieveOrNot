@@ -58,8 +58,8 @@ public partial class KingHub
         player.LastSeen = DateTime.UtcNow;
 
         await Groups.AddToGroupAsync(Context.ConnectionId, $"kingmatch:{matchId}");
-        _connectionToPlayer[Context.ConnectionId] = (matchId, player.Id);
-        // var allConnections = _connectionToPlayer.ToArray();
+        PlayerToConnection[player.Id] = (matchId, Context.ConnectionId);
+        // var allConnections = PlayerToConnection.ToArray();
         //
         // foreach (var connection in allConnections)
         // {

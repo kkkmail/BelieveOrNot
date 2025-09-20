@@ -12,9 +12,9 @@ public partial class KingHub
             var match = _matchManager.CreateMatch(request.PlayerName, request.PlayerId, request.Settings);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"kingmatch:{match.Id}");
 
-            _connectionToPlayer[Context.ConnectionId] = (match.Id, match.Players[0].Id);
+            PlayerToConnection[match.Players[0].Id] = (match.Id, Context.ConnectionId);
             // Console.WriteLine($"{nameof(KingHub)}.{nameof(CreateOrJoinKingMatch)} - Added connection mapping: {Context.ConnectionId} -> {match.Players[0].Id}");
-            // var allConnections = _connectionToPlayer.ToArray();
+            // var allConnections = PlayerToConnection.ToArray();
             //
             // foreach (var connection in allConnections)
             // {

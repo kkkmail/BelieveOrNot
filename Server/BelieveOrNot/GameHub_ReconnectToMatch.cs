@@ -62,7 +62,7 @@ public partial class GameHub
         await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
 
         // Map connection to player
-        _connectionToPlayer[Context.ConnectionId] = (matchId, player.Id);
+        PlayerToConnection[player.Id] = (matchId, Context.ConnectionId);
 
         // Broadcast reconnection event
         var reconnectionEvent = GameEventFactory.CreateConnectionEvent(player.Name, true);
