@@ -21,7 +21,7 @@
     background: linear-gradient(135deg, #2d5016, #4a7c59);
     border-radius: 200px;
     border: 8px solid #8b4513;
-    box-shadow: 
+    box-shadow:
         inset 0 0 50px rgba(0,0,0,0.3),
         0 10px 30px rgba(0,0,0,0.2);
 }
@@ -92,10 +92,10 @@
     background: rgba(255, 255, 255, 0.95);
 }
 
-.player-position.creator .player-name::after {
-    content: " ⭐";
-    color: #ffd700;
-}
+/*.player-position.creator .player-name::after {*/
+/*    content: " ⭐";*/
+/*    color: #ffd700;*/
+/*}*/
 
 /* You (current player) styling - SAME BACKGROUND AS OTHERS */
 .player-position.you {
