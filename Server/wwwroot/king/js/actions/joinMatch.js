@@ -1,9 +1,8 @@
 // Server/wwwroot/king/js/actions/joinMatch.js
-import { connection, setCurrentMatch, setPlayerId, setGameState, clientId } from "../core/variables.js";
+import { connection, setCurrentMatch, setPlayerId, setGameState, playerId } from "../core/variables.js";
 import { showGameBoard } from "../utils/showGameBoard.js";
-import { setMatchIdInUrl } from "../../../js/utils/urlManager.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
-import { storePlayerName } from "../../../js/utils/clientIdUtils.js";
+import { storePlayerName } from "../../../js/utils/playerIdUtils.js";
 import { routeToCorrectGame } from "../../../js/utils/gameRouter.js";
 
 export async function joinMatch() {
@@ -25,7 +24,7 @@ export async function joinMatch() {
     storePlayerName(playerName);
 
     try {
-        const result = await connection.invoke("JoinExistingMatch", matchId, playerName, clientId);
+        const result = await connection.invoke("JoinExistingMatch", matchId, playerName, playerId);
 
         if (result.success) {
             setCurrentMatch(result.match);

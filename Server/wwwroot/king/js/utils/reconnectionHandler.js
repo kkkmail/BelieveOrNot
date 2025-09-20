@@ -1,29 +1,29 @@
 // Server/wwwroot/king/js/utils/reconnectionHandler.js
-import { connection, setGameState, setPlayerId, clientId } from "../core/variables.js";
+import { connection, setGameState, setPlayerId, playerId } from "../core/variables.js";
 import { showGameBoard } from "./showGameBoard.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
 
 export async function attemptReconnection(matchId) {
-    if (!connection || !clientId) {
-        console.log("King connection or clientId not available for reconnection");
+    if (!connection || !playerId) {
+        console.log("King connection or playerId not available for reconnection");
         return false;
     }
 
     try {
         console.log("King attempting reconnection to match:", matchId);
-        
-        const result = await connection.invoke("ReconnectToMatch", matchId, clientId);
-        
+
+        const result = await connection.invoke("ReconnectToMatch", matchId, playerId);
+
         if (result.success) {
             console.log("King reconnection successful:", result.message);
-            
+
             setGameState(result.gameState);
             setPlayerId(result.playerId);
-            
+
             showGameBoard();
             updateGameDisplay();
-            
+
             return true;
         } else {
             console.log("King reconnection failed:", result.message);
@@ -32,7 +32,7 @@ export async function attemptReconnection(matchId) {
         }
     } catch (err) {
         console.error("King reconnection error:", err);
-        
+
         let errorMessage = "Failed to reconnect to King game";
         if (err.message) {
             if (err.message.includes("no longer exists")) {
@@ -43,18 +43,8 @@ export async function attemptReconnection(matchId) {
                 errorMessage = "Failed to reconnect: " + err.message;
             }
         }
-        
+
         await customAlert(errorMessage);
         return false;
     }
-}
-
-export function handleDisconnection() {
-    console.log("King connection lost");
-    // Could add UI indicators here
-}
-
-export function handleReconnection() {
-    console.log("King connection restored");
-    // Could add UI indicators here
 }

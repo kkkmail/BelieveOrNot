@@ -3,8 +3,14 @@ import { setConnection, setGameState } from "./variables.js";
 import { updateConnectionStatus } from "../../../js/core/updateConnectionStatus.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { addToEventHistory } from "../utils/addToEventHistory.js";
+import { getOrCreatePlayerId } from "../../../js/utils/playerIdUtils.js";
+import { setPlayerId } from "./variables.js";
 
 export async function initializeConnection() {
+    const persistentPlayerId = getOrCreatePlayerId();
+    setPlayerId(persistentPlayerId);
+    console.log("King: Using player ID:", persistentPlayerId);
+
     const s = globalThis.signalR || window.signalR;
     if (!s) { throw new Error("SignalR script not loaded (include it as a classic <script> before modules)."); }
 

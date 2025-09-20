@@ -4,7 +4,7 @@ namespace BelieveOrNot.Server.BelieveOrNot;
 public partial class GameHub
 {
     // Reconnection method
-    public async Task<ReconnectionResponse> ReconnectToMatch(string matchIdString, string clientId)
+    public async Task<ReconnectionResponse> ReconnectToMatch(string matchIdString, string playerIdString)
     {
         if (!Guid.TryParse(matchIdString, out var matchId))
         {
@@ -12,6 +12,15 @@ public partial class GameHub
             {
                 Success = false,
                 Message = "Invalid match ID format."
+            };
+        }
+
+        if (!Guid.TryParse(playerIdString, out var playerId))
+        {
+            return new ReconnectionResponse
+            {
+                Success = false,
+                Message = "Invalid player ID format."
             };
         }
 
@@ -25,8 +34,7 @@ public partial class GameHub
             };
         }
 
-        // Find player by client ID
-        var player = match.Players.FirstOrDefault(p => p.ClientId == clientId);
+        var player = match.Players.FirstOrDefault(p => p.Id == playerId);
         if (player == null)
         {
             // Check if game has started and new players can't join
@@ -54,7 +62,7 @@ public partial class GameHub
         await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
 
         // Map connection to player
-        _connectionToPlayer[Context.ConnectionId] = (matchId, player.Id);
+        PlayerToConnection[player.Id] = (matchId, Context.ConnectionId);
 
         // Broadcast reconnection event
         var reconnectionEvent = GameEventFactory.CreateConnectionEvent(player.Name, true);

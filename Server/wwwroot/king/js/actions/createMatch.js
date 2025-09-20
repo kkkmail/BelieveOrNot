@@ -1,7 +1,7 @@
 // Server/wwwroot/king/js/actions/createMatch.js
-import { connection, playerId, currentMatch, setCurrentMatch, setPlayerId, clientId, setGameState } from "../core/variables.js";
+import { connection, playerId, setCurrentMatch, setPlayerId, setGameState } from "../core/variables.js";
 import { showGameBoard } from "../utils/showGameBoard.js";
-import { storePlayerName } from "../../../js/utils/clientIdUtils.js";
+import { storePlayerName } from "../../../js/utils/playerIdUtils.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { customAlert } from "../../../js/utils/customAlert.js";
 
@@ -21,10 +21,10 @@ export async function createMatch() {
     };
 
     try {
-        const result = await connection.invoke("CreateOrJoinMatch", {
+        const result = await connection.invoke("CreateOrJoinKingMatch", {
             playerName: playerName,
             settings: settings,
-            clientId: clientId
+            playerId: playerId
         });
 
         setCurrentMatch(result);

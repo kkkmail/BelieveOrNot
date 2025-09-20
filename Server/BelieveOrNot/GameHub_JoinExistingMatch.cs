@@ -3,11 +3,16 @@ namespace BelieveOrNot.Server.BelieveOrNot;
 
 public partial class GameHub
 {
-    public async Task<JoinMatchResponse> JoinExistingMatch(string matchIdString, string playerName, string clientId = "")
+    public async Task<JoinMatchResponse> JoinExistingMatch(string matchIdString, string playerName, string playerIdString)
     {
         if (!Guid.TryParse(matchIdString, out var matchId))
         {
             throw new HubException("Invalid match ID format.");
+        }
+
+        if (!Guid.TryParse(playerIdString, out var playerId))
+        {
+            throw new HubException("Invalid player ID format.");
         }
 
         var match = _matchManager.GetMatch(matchId);
@@ -23,12 +28,12 @@ public partial class GameHub
 
         try
         {
-            match = _matchManager.JoinMatch(matchId, playerName, clientId);
+            match = _matchManager.JoinMatch(matchId, playerName, playerId);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
 
             // Map this connection to the joining player
             var joiningPlayer = match.Players.Last();
-            _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
+            PlayerToConnection[joiningPlayer.Id] = (matchId, Context.ConnectionId);
 
             // Broadcast join event to all players
             var joinEvent = GameEventFactory.CreateJoinEvent(joiningPlayer.Name, false);

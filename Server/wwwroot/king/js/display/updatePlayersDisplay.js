@@ -6,10 +6,10 @@ export function updatePlayersDisplay() {
 
     // Position mapping: creator always on left (position 0), then clockwise
     const positionMapping = [0, 1, 2, 3]; // top, right, bottom, left
-    
+
     // Find current player's position and arrange others accordingly
     const myPlayerIndex = gameState.players.findIndex(p => p.id === playerId);
-    
+
     for (let i = 0; i < 4; i++) {
         const playerPosition = document.getElementById(`playerPosition${i}`);
         if (!playerPosition) continue;
@@ -22,7 +22,7 @@ export function updatePlayersDisplay() {
 
             // Update player position classes
             playerPosition.className = `player-position ${getPositionClass(i)}`;
-            
+
             if (isCurrentTurn) playerPosition.classList.add('current-turn');
             if (isCreator) playerPosition.classList.add('creator');
             if (isMe) playerPosition.classList.add('you');
@@ -66,7 +66,7 @@ export function updatePlayersDisplay() {
         } else {
             // Empty position
             playerPosition.className = `player-position ${getPositionClass(i)} empty`;
-            
+
             const nameElement = playerPosition.querySelector('.player-name');
             const cardCountElement = playerPosition.querySelector('.card-count');
             const scoreElement = playerPosition.querySelector('.score');

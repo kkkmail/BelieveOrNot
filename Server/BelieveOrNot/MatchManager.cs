@@ -13,7 +13,7 @@ public class MatchManager : IMatchManager
         return match;
     }
 
-    public Match CreateMatch(string playerName, GameSettings? settings = null, string clientId = "")
+    public Match CreateMatch(string playerName, Guid playerId, GameSettings? settings = null)
     {
         var match = new Match
         {
@@ -22,7 +22,7 @@ public class MatchManager : IMatchManager
             {
                 new Player {
                     Name = playerName,
-                    ClientId = clientId,
+                    Id = playerId,
                     LastSeen = DateTime.UtcNow
                 } // Creator is always first, never shuffled
             }
@@ -32,7 +32,7 @@ public class MatchManager : IMatchManager
         return match;
     }
 
-    public Match JoinMatch(Guid matchId, string playerName, string clientId = "")
+    public Match JoinMatch(Guid matchId, string playerName, Guid playerId)
     {
         var match = GetMatch(matchId) ?? throw new InvalidOperationException("Match not found");
 
@@ -46,7 +46,7 @@ public class MatchManager : IMatchManager
 
         match.Players.Add(new Player {
             Name = uniqueName,
-            ClientId = clientId,
+            Id = playerId,
             LastSeen = DateTime.UtcNow
         });
 

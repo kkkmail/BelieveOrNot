@@ -1,6 +1,6 @@
 // js/utils/reconnectionHandler.js
-import { getOrCreateClientId } from "./clientIdUtils.js";
-import { getMatchIdFromUrl, setMatchIdInUrl } from "./urlManager.js";
+import { getOrCreatePlayerId } from "./playerIdUtils.js";
+import { getMatchIdFromUrl } from "./urlManager.js";
 import { connection, setGameState, setCurrentMatch, setPlayerId } from "../core/variables.js";
 import { updateGameDisplay } from "../display/updateGameDisplay.js";
 import { showGameBoard } from "../game/showGameBoard.js";
@@ -9,30 +9,30 @@ import { customAlert } from "./customAlert.js";
 
 export async function attemptReconnection() {
     const matchId = getMatchIdFromUrl();
-    const clientId = getOrCreateClientId();
-    
+    const playerId = getOrCreatePlayerId();
+
     if (!matchId) {
         console.log('No match ID in URL, showing setup form');
         return false;
     }
 
-    console.log('Attempting reconnection to match:', matchId, 'with client ID:', clientId);
+    console.log('Attempting reconnection to match:', matchId, 'with player ID:', playerId);
 
     try {
-        const result = await connection.invoke("ReconnectToMatch", matchId, clientId);
-        
+        const result = await connection.invoke("ReconnectToMatch", matchId, playerId);
+
         if (result.success) {
             console.log('Reconnection successful:', result);
-            
+
             setCurrentMatch(result.match);
             setGameState(result.gameState);
             setPlayerId(result.playerId);
-            
+
             showGameBoard();
             updateGameDisplay();
-            
-            addToEventHistory(`🔄 Reconnected to game successfully!`);
-            
+
+            await addToEventHistory(`🔄 Reconnected to game successfully!`);
+
             return true;
         } else {
             console.log('Reconnection failed:', result.message);
@@ -41,7 +41,7 @@ export async function attemptReconnection() {
         }
     } catch (err) {
         console.error('Reconnection error:', err);
-        
+
         if (err.message.includes('Match not found')) {
             await customAlert('The game you were trying to rejoin no longer exists or has ended.', 'Game Not Found');
         } else if (err.message.includes('Game already started')) {
@@ -49,7 +49,7 @@ export async function attemptReconnection() {
         } else {
             await customAlert('Could not reconnect to the game. You can create a new game or join a different one.', 'Reconnection Failed');
         }
-        
+
         return false;
     }
 }
@@ -62,7 +62,7 @@ export function handleDisconnection() {
 export function handleReconnection() {
     console.log('Connection restored');
     addToEventHistory('✅ Connection restored!');
-    
+
     // Attempt to rejoin the match if we have one
     const matchId = getMatchIdFromUrl();
     if (matchId) {

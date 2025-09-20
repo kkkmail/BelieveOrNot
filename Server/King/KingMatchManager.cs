@@ -11,7 +11,7 @@ public class KingMatchManager : IKingMatchManager
         return match;
     }
 
-    public KingMatch CreateMatch(string playerName, KingGameSettings? settings = null, string clientId = "")
+    public KingMatch CreateMatch(string playerName, Guid playerId, KingGameSettings? settings = null)
     {
         // Console.WriteLine($"{nameof(KingMatchManager)}.{nameof(CreateMatch)} - playerName: {playerName}, clientId: {clientId}");
 
@@ -22,7 +22,7 @@ public class KingMatchManager : IKingMatchManager
             {
                 new Player {
                     Name = playerName,
-                    ClientId = clientId,
+                    Id = playerId,
                     LastSeen = DateTime.UtcNow
                 }
             }
@@ -33,7 +33,7 @@ public class KingMatchManager : IKingMatchManager
         return match;
     }
 
-    public KingMatch JoinMatch(Guid matchId, string playerName, string clientId = "")
+    public KingMatch JoinMatch(Guid matchId, string playerName, Guid playerId)
     {
         // Console.WriteLine($"{nameof(KingMatchManager)}.{nameof(JoinMatch)} - matchId: {matchId}, playerName: {playerName}, clientId: {clientId}");
 
@@ -54,7 +54,7 @@ public class KingMatchManager : IKingMatchManager
 
         match.Players.Add(new Player {
             Name = uniqueName,
-            ClientId = clientId,
+            Id = playerId,
             LastSeen = DateTime.UtcNow
         });
 

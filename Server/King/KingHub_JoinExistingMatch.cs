@@ -3,13 +3,18 @@ namespace BelieveOrNot.Server.King;
 
 public partial class KingHub
 {
-    public async Task<KingJoinMatchResponse> JoinExistingMatch(string matchIdString, string playerName, string clientId = "")
+    public async Task<KingJoinMatchResponse> JoinExistingMatch(string matchIdString, string playerName, string playerIdString)
     {
         // Console.WriteLine($"{nameof(KingHub)}.{nameof(JoinExistingMatch)} - matchIdString: {matchIdString}, playerName: {playerName}, clientId: {clientId}, Context.ConnectionId: {Context.ConnectionId}");
 
         if (!Guid.TryParse(matchIdString, out var matchId))
         {
             throw new HubException("Invalid match ID format.");
+        }
+
+        if (!Guid.TryParse(playerIdString, out var playerId))
+        {
+            throw new HubException("Invalid player ID format.");
         }
 
         var match = _matchManager.GetMatch(matchId);
@@ -30,12 +35,12 @@ public partial class KingHub
 
         try
         {
-            match = _matchManager.JoinMatch(matchId, playerName, clientId);
+            match = _matchManager.JoinMatch(matchId, playerName, playerId);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"kingmatch:{matchId}");
 
             var joiningPlayer = match.Players.Last();
-            _connectionToPlayer[Context.ConnectionId] = (matchId, joiningPlayer.Id);
-            // var allConnections = _connectionToPlayer.ToArray();
+            PlayerToConnection[joiningPlayer.Id] = (matchId, Context.ConnectionId);
+            // var allConnections = PlayerToConnection.ToArray();
             //
             // foreach (var connection in allConnections)
             // {

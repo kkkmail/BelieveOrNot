@@ -10,10 +10,10 @@ public partial class GameHub
         if (match == null) throw new HubException("Match not found");
 
         // Find the requesting player
-        var connectionInfo = _connectionToPlayer.FirstOrDefault(kvp => kvp.Key == Context.ConnectionId);
-        if (connectionInfo.Key == null) throw new HubException("Player not found");
+        var connectionInfo = PlayerToConnection.FirstOrDefault(kvp => kvp.Value.ConnectionId == Context.ConnectionId);
+        if (connectionInfo.Value.ConnectionId == null) throw new HubException("Player not found");
 
-        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == connectionInfo.Value.PlayerId);
+        var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == connectionInfo.Key);
         if (requestingPlayer == null) throw new HubException("Player not in match");
 
         // Create simple message event
