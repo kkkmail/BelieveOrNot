@@ -69,12 +69,12 @@
 .rank-button .rank-display {
     font-size: 24px;
     line-height: 1;
+    color: #2a7f7e; /* Teal - clearly not red or black */
 }
 
 /* Small decorative symbols */
 .rank-button::before,
 .rank-button::after {
-    content: "♦";
     position: absolute;
     font-size: 10px;
     color: #9b8a9b;
