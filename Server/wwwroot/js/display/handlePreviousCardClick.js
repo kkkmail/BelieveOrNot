@@ -3,6 +3,7 @@ import {showMessage} from "../utils/showMessage.js";
 import {gameState, playerId, setSelectedChallengeIndex, selectedChallengeIndex, setSelectedCards} from "../core/variables.js";
 import {updatePreviousPlayDisplay} from "./updatePreviousPlayDisplay.js";
 import {updateActionsDisplay} from "./updateActionsDisplay.js";
+import {clearRankSelection} from "../utils/updateRankButtons.js";
 
 export function handlePreviousCardClick(cardIndex) {
     console.log('Previous play card ' + (cardIndex + 1) + ' clicked');
@@ -52,6 +53,7 @@ export function handlePreviousCardClick(cardIndex) {
 
     // Clear any selected cards since we're switching to challenge mode
     setSelectedCards([]);
+    clearRankSelection();
 
     // Set interaction state and clear stored message when starting challenge
     window.playerInteractionState = true;

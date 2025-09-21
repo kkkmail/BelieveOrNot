@@ -8,7 +8,7 @@
         <div>Announced Rank: <span id="announcedRank">-</span></div>
         <div>Table Cards: <span id="tablePileCount">0</span></div>
         <div class="match-id-section">
-            Match ID: 
+            Match ID:
             <input type="text" id="displayMatchId" readonly style="border: none; background: transparent; width: 200px; text-align: center; font-family: monospace; font-size: 14px;">
             <button class="btn-copy" id="copyMatchIdBtn" title="Copy Match ID">📋</button>
         </div>
@@ -23,7 +23,7 @@
 <!-- Table Area -->
 <div class="table-area">
     <h3>Table</h3>
-    
+
     <div class="table-display">
         <!-- Last Play section - LEFT, space for 3 cards -->
         <div class="previous-play-section" id="previousPlaySection">
@@ -33,7 +33,7 @@
             </div>
             <div class="play-info" id="playInfoDisplay">No previous play</div>
         </div>
-        
+
         <!-- Card Pile section - RIGHT, uses remaining space -->
         <div class="table-pile-section">
             <div class="pile-label">Card Pile</div>
@@ -43,23 +43,23 @@
             <div class="pile-count" id="pileCountDisplay">0 cards</div>
         </div>
     </div>
-    
+
     <!-- Table Controls - includes card play preview in the message area -->
     <div class="table-controls" id="tableControls">
         <div class="table-message" id="tableMessage">Wait your turn</div>
         <div class="table-actions" id="tableActions">
             <!-- Opening turn rank selection -->
             <div class="rank-selector hidden" id="rankSelector">
-                <label for="declaredRank">Declare Rank:</label>
-                <select id="declaredRank">
-                    <!-- Options will be populated dynamically by updateRankDropdown() -->
-                </select>
+                <label>Declare Rank:</label>
+                <div class="rank-buttons-container" id="rankButtonsContainer">
+                    <!-- Rank buttons will be populated dynamically -->
+                </div>
             </div>
             <button class="btn btn-primary hidden" id="playBtn">Play Selected Cards</button>
             <button class="btn btn-warning hidden" id="confirmChallengeBtn">Flip Selected Card</button>
         </div>
     </div>
-    
+
     <!-- Game Management Buttons -->
     <div class="game-management">
         <button class="btn btn-success hidden" id="startRoundBtn">Start Round</button>

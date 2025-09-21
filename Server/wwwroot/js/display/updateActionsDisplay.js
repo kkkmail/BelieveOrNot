@@ -2,6 +2,7 @@
 import {gameState, playerId, selectedCards, selectedChallengeIndex, setSelectedCards} from "../core/variables.js";
 import {getSuitSymbol} from "../cards/getSuitSymbol.js";
 import {CONFIG} from "../utils/config.js";
+import {clearRankSelection} from "../utils/updateRankButtons.js";
 
 export function updateActionsDisplay() {
     console.log("=== updateActionsDisplay called ===");
@@ -21,7 +22,13 @@ export function updateActionsDisplay() {
     // Hide ALL buttons by default
     if (playBtn) playBtn.classList.add('hidden');
     if (confirmChallengeBtn) confirmChallengeBtn.classList.add('hidden');
-    if (rankSelector) rankSelector.classList.add('hidden');
+
+    // if (rankSelector) rankSelector.classList.add('hidden');
+    if (rankSelector) {
+        rankSelector.classList.add('hidden');
+        clearRankSelection();
+    }
+
     if (startRoundBtn) startRoundBtn.classList.add('hidden');
     if (endRoundBtn) endRoundBtn.classList.add('hidden');
     if (endGameBtn) endGameBtn.classList.add('hidden');

@@ -5,6 +5,7 @@ import {updateHandDisplay} from "../display/updateHandDisplay.js";
 import {generateGuid} from "../utils/generateGuid.js";
 import {customAlert} from "../utils/customAlert.js";
 import {getSuitSymbol} from "../cards/getSuitSymbol.js";
+import {getSelectedRank, clearRankSelection} from "../utils/updateRankButtons.js";
 
 export async function playCards() {
     if (selectedCards.length === 0) {
@@ -30,6 +31,7 @@ export async function playCards() {
 
             // Clear selected cards and update display
             setSelectedCards([]);
+            clearRankSelection();
             updateHandDisplay();
             updateActionsDisplay();
             return;
@@ -59,10 +61,10 @@ export async function playCards() {
 
     // If opening turn, get declared rank and validate
     if (!gameState.announcedRank) {
-        declaredRank = document.getElementById('declaredRank').value;
+        declaredRank = getSelectedRank();
 
-        if (!declaredRank || declaredRank === '') {
-            await customAlert('Please choose a rank from the dropdown before playing cards.');
+        if (!declaredRank) {
+            await customAlert('Please select a rank before playing cards.');
             return;
         }
     }
@@ -93,6 +95,7 @@ export async function playCards() {
 
         // Clear selected cards and interaction state after successful play
         setSelectedCards([]);
+        clearRankSelection();
         window.playerInteractionState = false;
 
         console.log("Selected cards cleared after play, interaction state cleared");
