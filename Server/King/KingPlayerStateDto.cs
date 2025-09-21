@@ -8,4 +8,5 @@ public class KingPlayerStateDto
     public int HandCount { get; set; }
     public int Score { get; set; }
     public bool IsConnected { get; set; }
+    public int TricksWon { get; set; }
 }

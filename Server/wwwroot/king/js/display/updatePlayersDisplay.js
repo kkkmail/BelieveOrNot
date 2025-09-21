@@ -31,6 +31,7 @@ export function updatePlayersDisplay() {
             // Update player info
             const nameElement = playerPosition.querySelector('.player-name');
             const cardCountElement = playerPosition.querySelector('.card-count');
+            const tricksCountElement = playerPosition.querySelector('.tricks-count');
             const scoreElement = playerPosition.querySelector('.score');
             const cardsContainer = playerPosition.querySelector('.player-cards');
 
@@ -44,6 +45,10 @@ export function updatePlayersDisplay() {
 
             if (cardCountElement) {
                 cardCountElement.textContent = player.handCount;
+            }
+
+            if (tricksCountElement) {
+                tricksCountElement.textContent = player.tricksWon || 0;
             }
 
             if (scoreElement) {
@@ -69,11 +74,13 @@ export function updatePlayersDisplay() {
 
             const nameElement = playerPosition.querySelector('.player-name');
             const cardCountElement = playerPosition.querySelector('.card-count');
+            const tricksCountElement = playerPosition.querySelector('.tricks-count');
             const scoreElement = playerPosition.querySelector('.score');
             const cardsContainer = playerPosition.querySelector('.player-cards');
 
             if (nameElement) nameElement.textContent = 'Waiting...';
             if (cardCountElement) cardCountElement.textContent = '0';
+            if (tricksCountElement) tricksCountElement.textContent = '0';
             if (scoreElement) {
                 scoreElement.textContent = '0';
                 scoreElement.className = 'score zero';

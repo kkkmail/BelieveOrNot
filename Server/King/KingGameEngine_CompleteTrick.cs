@@ -16,6 +16,9 @@ public partial class KingGameEngine
             var winnerIndex = match.Players.FindIndex(p => p.Id == winningCard.PlayerId);
             match.CurrentPlayerIndex = winnerIndex;
 
+            // After: var winnerIndex = match.Players.FindIndex(p => p.Id == winningCard.PlayerId);
+            match.Players[winnerIndex].TricksWon++;
+
             // Broadcast trick won event
             var winnerName = match.Players.FirstOrDefault(p => p.Id == winningCard.PlayerId)?.Name;
             if (winnerName != null)

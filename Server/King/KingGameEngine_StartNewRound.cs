@@ -34,6 +34,11 @@ public partial class KingGameEngine
         match.RoundLeaderIndex = (match.RoundLeaderIndex + 1) % match.Players.Count;
         match.CurrentPlayerIndex = match.RoundLeaderIndex;
 
+        foreach (var player in match.Players)
+        {
+            player.TricksWon = 0;
+        }
+
         // Check if we need trump selection for collecting phase
         if (currentRound.IsCollectingPhase)
         {

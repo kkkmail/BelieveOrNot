@@ -15,7 +15,8 @@ public partial class KingGameEngine
                 Name = p.Name,
                 HandCount = p.Hand.Count,
                 Score = p.Score,
-                IsConnected = p.IsConnected
+                IsConnected = p.IsConnected,
+                TricksWon = p.TricksWon,
             }).ToList(),
             CurrentPlayerIndex = match.CurrentPlayerIndex,
             CurrentRoundIndex = match.CurrentRoundIndex,
