@@ -44,7 +44,7 @@
 
 /* Position players around the table */
 .player-position.top {
-    top: -70px;
+    top: -85px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -56,7 +56,7 @@
 }
 
 .player-position.bottom {
-    bottom: -70px;
+    bottom: -85px;
     left: 50%;
     transform: translateX(-50%);
 }

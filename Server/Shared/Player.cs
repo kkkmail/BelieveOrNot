@@ -11,4 +11,5 @@ public record Player
     // public string ClientId { get; set; } = string.Empty; // NEW: For reconnection
     public DateTime LastSeen { get; set; } = DateTime.UtcNow; // NEW: Track last activity
     public List<Card>? TrumpSelectionCards { get; set; } = new(); // Cards for trump selection - usually first 3
+    public int TricksWon { get; set; }
 }
