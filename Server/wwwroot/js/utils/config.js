@@ -24,4 +24,7 @@ export const CONFIG = {
 
     // UI message formatting
     MESSAGE_SEPARATOR: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', // 6 non-breaking spaces for message part separation
+
+    // Challenge confirmation settings
+    ENABLE_CHALLENGE_CONFIRMATION: false, // Default is false (no extra confirmation)
 };
