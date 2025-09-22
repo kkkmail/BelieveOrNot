@@ -11,3 +11,111 @@
     border: 2px solid #ddd;
     border-radius: 5px;
 }
+
+/* Rank button cards */
+.rank-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    max-width: 100%;
+}
+
+.rank-button {
+    width: 45px;
+    height: 60px;
+    border: 2px solid #8b7d8b; /* Muted purple-gray color */
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f5f3f5 0%, #e8e5e8 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: bold;
+    font-size: 20px;
+    color: #4a454a; /* Dark gray-purple text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.rank-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #fdfbfd 0%, #ede9ed 100%);
+}
+
+.rank-button.selected {
+    border-color: #6b4c7a; /* Deeper purple for selection */
+    background: linear-gradient(135deg, #d4c5db 0%, #baa6c2 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(107, 76, 122, 0.3);
+}
+
+.rank-button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #e0e0e0;
+    border-color: #ccc;
+}
+
+.rank-button.disabled:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Rank display inside button */
+.rank-button .rank-display {
+    font-size: 24px;
+    line-height: 1;
+    color: #2a7f7e; /* Teal - clearly not red or black */
+}
+
+/* Small decorative symbols */
+.rank-button::before,
+.rank-button::after {
+    position: absolute;
+    font-size: 10px;
+    color: #9b8a9b;
+    opacity: 0.5;
+}
+
+.rank-button::before {
+    top: 4px;
+    left: 4px;
+}
+
+.rank-button::after {
+    bottom: 4px;
+    right: 4px;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .rank-button {
+        width: 40px;
+        height: 54px;
+        font-size: 18px;
+    }
+
+    .rank-button .rank-display {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .rank-button {
+        width: 36px;
+        height: 48px;
+        font-size: 16px;
+    }
+
+    .rank-button .rank-display {
+        font-size: 18px;
+    }
+
+    .rank-buttons-container {
+        gap: 6px;
+    }
+}

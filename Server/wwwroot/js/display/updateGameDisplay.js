@@ -4,7 +4,7 @@ import {updateScoresDisplay} from "./updateScoresDisplay.js";
 import {updateActionsDisplay} from "./updateActionsDisplay.js";
 import {updateHandDisplay} from "./updateHandDisplay.js";
 import {updatePlayersDisplay} from "./updatePlayersDisplay.js";
-import {updateRankDropdown} from "../utils/updateRankDropdown.js";
+import {updateRankButtons, clearRankSelection} from "../utils/updateRankButtons.js";
 import {updateTablePileDisplay} from "./updateTablePileDisplay.js";
 
 export function updateGameDisplay() {
@@ -52,8 +52,8 @@ export function updateGameDisplay() {
     };
     document.getElementById('gamePhase').textContent = phaseText[gameState.phase] || 'Unknown';
 
-    // Update rank dropdown based on game settings
-    updateRankDropdown();
+    // Update rank buttons based on game settings
+    updateRankButtons();
 
     // Update players display
     updatePlayersDisplay();
@@ -71,6 +71,7 @@ export function updateGameDisplay() {
     // Only clear if game phase changed to non-active
     if (gameState.phase !== 1) {
         setSelectedCards([]);
+        clearRankSelection();
         // Clear preview when round/game ends
         window.cardsJustPlayed = false;
     }
