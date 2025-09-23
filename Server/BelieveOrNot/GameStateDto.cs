@@ -1,7 +1,7 @@
 // BelieveOrNot/GameStateDto.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
-public class GameStateDto
+public record GameStateDto
 {
     public Guid MatchId { get; set; }
     public GamePhase Phase { get; set; }
@@ -23,4 +23,5 @@ public class GameStateDto
 
     // NEW: Structured event data instead of LastAction string
     public GameEventDto? Event { get; set; }
+    public int? LastActualPlayerIndex { get; set; }
 }

@@ -122,7 +122,11 @@ export function updateActionsDisplay() {
             }
 
             if (gameState.tablePileCount > 0) {
-                const lastPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+                // const lastPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+                const lastPlayerIndex = gameState.lastActualPlayerIndex !== undefined && gameState.lastActualPlayerIndex !== null
+                    ? gameState.lastActualPlayerIndex
+                    : (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+
                 const lastPlayer = gameState.players[lastPlayerIndex];
 
                 if (selectedChallengeIndex !== -1) {
@@ -165,7 +169,11 @@ export function updateActionsDisplay() {
 
             if (selectedChallengeIndex !== -1) {
                 // In challenge mode
-                const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+                // const previousPlayerIndex = (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+                const previousPlayerIndex = gameState.lastActualPlayerIndex !== undefined && gameState.lastActualPlayerIndex !== null
+                    ? gameState.lastActualPlayerIndex
+                    : (gameState.currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+
                 const previousPlayer = gameState.players[previousPlayerIndex];
 
                 if (tableMessage) tableMessage.innerHTML = `🎯 Challenge ${previousPlayer.name} - card ${selectedChallengeIndex + 1} selected`;

@@ -25,7 +25,8 @@ public partial class GameEngine
             DeckSize = (int)match.Settings.DeckSize,
             JokerCount = match.Settings.JokerCount,
             DisposedRanks = match.DisposedRanks.ToList(), // Include disposed ranks
-            CreatorPlayerId = match.Players[0].Id
+            CreatorPlayerId = match.Players[0].Id,
+            LastActualPlayerIndex = match.LastActualPlayerIndex,
         };
 
         var requestingPlayer = match.Players.FirstOrDefault(p => p.Id == requestingPlayerId);

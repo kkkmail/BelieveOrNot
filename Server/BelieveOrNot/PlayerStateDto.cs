@@ -1,7 +1,7 @@
 // BelieveOrNot/PlayerStateDto.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
-public class PlayerStateDto
+public record PlayerStateDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
