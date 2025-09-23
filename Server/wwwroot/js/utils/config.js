@@ -4,10 +4,10 @@
 export const CONFIG = {
     // Challenge card animation timings
     CHALLENGE_CARD_FLIP_DURATION: 600, // milliseconds for flip animation
-    CHALLENGE_CARD_DISPLAY_DURATION: 5000, // 5 seconds to show result (for challenger)
-    CHALLENGE_CARD_DISPLAY_DURATION_NON_CHALLENGER: 3000, // 3 seconds for non-challenger (shorter)
-    CHALLENGE_CARD_EXTRA_TIME: 2000, // 2 additional seconds for visibility (for challenger)
-    CHALLENGE_CARD_EXTRA_TIME_NON_CHALLENGER: 1000, // 1 seconds for non-challenger (much shorter)
+    CHALLENGE_CARD_DISPLAY_DURATION: 3000, // time to show result for challenger
+    CHALLENGE_CARD_DISPLAY_DURATION_NON_CHALLENGER: 3000, // time to show result for non-challenger
+    CHALLENGE_CARD_EXTRA_TIME: 2000, // additional seconds for visibility for challenger
+    CHALLENGE_CARD_EXTRA_TIME_NON_CHALLENGER: 1000, // additional seconds for non-challenger
     CHALLENGE_CARD_REVEAL_DELAY: 800, // delay before showing success/fail symbol
     CHALLENGE_RESULT_FADE_DURATION: 300, // milliseconds for fade out
 
@@ -24,4 +24,7 @@ export const CONFIG = {
 
     // UI message formatting
     MESSAGE_SEPARATOR: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', // 6 non-breaking spaces for message part separation
+
+    // Challenge confirmation settings
+    ENABLE_CHALLENGE_CONFIRMATION: false, // Default is false (no extra confirmation)
 };

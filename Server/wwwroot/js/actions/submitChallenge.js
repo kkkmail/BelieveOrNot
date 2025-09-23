@@ -6,6 +6,7 @@ import {setPendingChallengeAnimation} from "./setPendingChallengeAnimation.js";
 import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.js";
 import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
+import {CONFIG} from "../utils/config.js";
 
 export async function submitChallenge() {
     console.log("submitChallenge called, selectedChallengeIndex:", selectedChallengeIndex);
@@ -29,21 +30,41 @@ export async function submitChallenge() {
         announcedRank: gameState.announcedRank
     });
 
-    // Format player name and rank with proper HTML styling for confirmation dialog
-    const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${targetPlayer?.name || 'the previous player'}</span>`;
-    const formattedRank = `<span style="font-weight: bold; font-size: 1.3em;">${gameState.announcedRank}</span>`;
-    const formattedCardNumber = `<span style="font-weight: bold;">${selectedChallengeIndex + 1}</span>`;
+    // // Format player name and rank with proper HTML styling for confirmation dialog
+    // const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${targetPlayer?.name || 'the previous player'}</span>`;
+    // const formattedRank = `<span style="font-weight: bold; font-size: 1.3em;">${gameState.announcedRank}</span>`;
+    // const formattedCardNumber = `<span style="font-weight: bold;">${selectedChallengeIndex + 1}</span>`;
+    //
+    // // Show confirmation dialog with HTML formatting
+    // const confirmed = await customConfirm(
+    //     `Are you sure you want to challenge ${formattedPlayerName}?\n\n` +
+    //     `You are challenging that card ${formattedCardNumber} is NOT a ${formattedRank}.`,
+    //     'Challenge Player'
+    // );
+    //
+    // if (!confirmed) {
+    //     console.log("Challenge cancelled by user");
+    //     return; // User cancelled, don't send challenge
+    // }
 
-    // Show confirmation dialog with HTML formatting
-    const confirmed = await customConfirm(
-        `Are you sure you want to challenge ${formattedPlayerName}?\n\n` +
-        `You are challenging that card ${formattedCardNumber} is NOT a ${formattedRank}.`,
-        'Challenge Player'
-    );
+    // Check if challenge confirmation is enabled in config
+    if (CONFIG.ENABLE_CHALLENGE_CONFIRMATION) {
+        // Format player name and rank with proper HTML styling for confirmation dialog
+        const formattedPlayerName = `<span style="font-weight: bold; font-style: italic;">${targetPlayer?.name || 'the previous player'}</span>`;
+        const formattedRank = `<span style="font-weight: bold; font-size: 1.3em;">${gameState.announcedRank}</span>`;
+        const formattedCardNumber = `<span style="font-weight: bold;">${selectedChallengeIndex + 1}</span>`;
 
-    if (!confirmed) {
-        console.log("Challenge cancelled by user");
-        return; // User cancelled, don't send challenge
+        // Show confirmation dialog with HTML formatting
+        const confirmed = await customConfirm(
+            `Are you sure you want to challenge ${formattedPlayerName}?\n\n` +
+            `You are challenging that card ${formattedCardNumber} is NOT a ${formattedRank}.`,
+            'Challenge Player'
+        );
+
+        if (!confirmed) {
+            console.log("Challenge cancelled by user");
+            return; // User cancelled, don't send challenge
+        }
     }
 
     console.log("User confirmed challenge, sending to server...");
@@ -61,12 +82,12 @@ export async function submitChallenge() {
 
         // Store pending animation info to trigger when we get the result
         const tableCardElement = document.querySelector(`#previousPlayCards .card:nth-child(${selectedChallengeIndex + 1})`);
-        
+
         console.log("Looking for animation element:", {
             tableSelector: `#previousPlayCards .card:nth-child(${selectedChallengeIndex + 1})`,
             tableCardElement: !!tableCardElement
         });
-        
+
         if (tableCardElement) {
             setPendingChallengeAnimation({
                 tableCardElement,
