@@ -8,8 +8,14 @@ public partial class GameEngine
         var cardIndex = match.TablePile.Count - match.LastPlayCardCount + request.ChallengePickIndex!.Value;
         var revealedCard = match.TablePile[cardIndex];
 
-        var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
-        var challengedPlayer = match.Players[prevPlayerIndex];
+        // var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
+        // var challengedPlayer = match.Players[prevPlayerIndex];
+
+        var challengedPlayerIndex =
+            match.LastActualPlayerIndex
+            ?? ((match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count);
+
+        var challengedPlayer = match.Players[challengedPlayerIndex];
 
         var isMatch = revealedCard.Rank == match.AnnouncedRank || revealedCard.IsJoker;
         var challengerWasRight = !isMatch;
@@ -28,6 +34,7 @@ public partial class GameEngine
         match.TablePile.Clear();
         match.AnnouncedRank = null;
         match.LastPlayCardCount = 0;
+        match.LastActualPlayerIndex = null;
 
         // Handle automatic disposal
         var disposalEvents = AutoDisposeFourOfAKind(collector, match);

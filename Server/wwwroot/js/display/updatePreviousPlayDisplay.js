@@ -33,7 +33,11 @@ export function updatePreviousPlayDisplay() {
 
     // Get the previous player info
     const currentPlayerIndex = gameState.currentPlayerIndex;
-    const previousPlayerIndex = (currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+    // const previousPlayerIndex = (currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+    const previousPlayerIndex = gameState.lastActualPlayerIndex !== undefined && gameState.lastActualPlayerIndex !== null
+        ? gameState.lastActualPlayerIndex
+        : (currentPlayerIndex - 1 + gameState.players.length) % gameState.players.length;
+
     const previousPlayer = gameState.players[previousPlayerIndex];
     const announcedRank = gameState.announcedRank || 'Unknown';
 

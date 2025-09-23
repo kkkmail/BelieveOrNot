@@ -50,6 +50,9 @@ public partial class GameEngine
             cardPlayEvent.DisplayMessage += " " + string.Join(" ", disposalMessages);
         }
 
+        // Store who actually played these cards
+        match.LastActualPlayerIndex = match.Players.IndexOf(player);
+
         AdvanceToNextActivePlayer(match);
         return cardPlayEvent;
     }

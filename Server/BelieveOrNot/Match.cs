@@ -14,7 +14,8 @@ public class Match
     public GamePhase Phase { get; set; } = GamePhase.WaitingForPlayers;
     public int RoundNumber { get; set; } = 0;
     public string? LastRoundEndMessage { get; set; } // Added for round end event broadcasting
-    
+
     // NEW: Track disposed ranks for this round
     public HashSet<string> DisposedRanks { get; set; } = new();
+    public int? LastActualPlayerIndex { get; set; } // Track who actually played last
 }
