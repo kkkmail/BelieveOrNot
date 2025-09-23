@@ -1,0 +1,60 @@
+﻿/* styles/components/collected-cards.css */
+.collected-cards-dialog {
+    min-width: 500px;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.collected-cards-content {
+    padding: 20px 10px;
+}
+
+.collected-cards-section {
+    margin-bottom: 25px;
+}
+
+.collected-cards-section:last-child {
+    margin-bottom: 10px;
+}
+
+.collected-cards-label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.collected-cards-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.collected-card {
+    cursor: default !important;
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+.collected-card:hover {
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+@media (max-width: 768px) {
+    .collected-cards-dialog {
+        min-width: 350px;
+        max-width: 90vw;
+    }
+
+    .collected-cards-content {
+        padding: 15px 5px;
+    }
+
+    .collected-cards-row {
+        gap: 6px;
+    }
+}

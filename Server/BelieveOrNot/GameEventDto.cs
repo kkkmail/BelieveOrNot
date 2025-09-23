@@ -1,7 +1,7 @@
 // BelieveOrNot/GameEventDto.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
-public class GameEventDto
+public record GameEventDto
 {
     public string Type { get; set; } = string.Empty;
     public string DisplayMessage { get; set; } = string.Empty;

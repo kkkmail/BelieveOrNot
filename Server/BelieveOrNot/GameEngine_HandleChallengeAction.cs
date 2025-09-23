@@ -11,11 +11,11 @@ public partial class GameEngine
         var prevPlayerIndex = (match.CurrentPlayerIndex - 1 + match.Players.Count) % match.Players.Count;
         var challengedPlayer = match.Players[prevPlayerIndex];
 
-        bool isMatch = revealedCard.Rank == match.AnnouncedRank || revealedCard.IsJoker;
-        bool challengerWasRight = !isMatch;
+        var isMatch = revealedCard.Rank == match.AnnouncedRank || revealedCard.IsJoker;
+        var challengerWasRight = !isMatch;
 
         // Determine who collects the cards
-        Player collector = challengerWasRight ? challengedPlayer : challenger;
+        var collector = challengerWasRight ? challengedPlayer : challenger;
 
         var collectedCount = match.TablePile.Count;
 
@@ -37,8 +37,8 @@ public partial class GameEngine
         match.CurrentPlayerIndex = collectorIndex;
 
         // FIXED: Calculate remaining cards and their match status for animation
-        List<Card>? remainingCards = null;
-        List<bool>? remainingCardsMatch = null;
+        List<Card> remainingCards = new();
+        List<bool> remainingCardsMatch = new();
 
         if (isMatch && collector == challenger) // Challenger collects when challenged card matches
         {
@@ -62,7 +62,6 @@ public partial class GameEngine
             }
         }
 
-        // FIXED: Pass remaining cards with their match status
         var challengeEvent = GameEventFactory.CreateChallengeEvent(
             challenger.Name,
             challengedPlayer.Name,

@@ -6,6 +6,7 @@ import {clearPendingChallengeAnimation} from "./clearPendingChallengeAnimation.j
 import {updatePreviousPlayDisplay} from "../display/updatePreviousPlayDisplay.js";
 import {updateActionsDisplay} from "../display/updateActionsDisplay.js";
 import {CONFIG} from "../utils/config.js";
+import {showCollectedCardsDialog} from "../utils/showCollectedCardsDialog.js";
 
 // Function to be called when challenge event is received from server
 export async function handleChallengeEvent(challengeEventData) {
@@ -116,4 +117,25 @@ export async function handleChallengeEvent(challengeEventData) {
         updatePreviousPlayDisplay();
         updateActionsDisplay();
     }, cleanupDelay);
+
+    // Show collected cards dialog if we have card data
+    console.log("challengeEventData:", challengeEventData);
+    const allTableCards = challengeEventData.allTableCards || challengeEventData.AllTableCards;
+    const totalCards = challengeEventData.totalCards || challengeEventData.TotalCards || 0;
+    const collectorName = challengeEventData.collectorName || challengeEventData.CollectorName;
+    const isCollector = currentPlayer?.name === collectorName;
+    console.log("allTableCards:", allTableCards);
+
+    if (isCollector && allTableCards && allTableCards.length > 0 && collectorName && totalCards > 0) {
+        // Get last play cards (the ones that were just played)
+        const lastPlayCards = allTableCards.slice(-totalCards);
+
+        // Get other cards (everything except last play)
+        const otherCards = allTableCards.slice(0, -totalCards);
+
+        // Show dialog after a brief delay to let animations settle
+        setTimeout(() => {
+            showCollectedCardsDialog(collectorName, lastPlayCards, otherCards);
+        }, 500);
+    }
 }

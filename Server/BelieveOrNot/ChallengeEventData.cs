@@ -1,7 +1,7 @@
 // BelieveOrNot/ChallengeEventData.cs
 namespace BelieveOrNot.Server.BelieveOrNot;
 
-public class ChallengeEventData
+public record ChallengeEventData
 {
     public string ChallengerName { get; set; } = string.Empty;
     public string ChallengedPlayerName { get; set; } = string.Empty;
@@ -12,6 +12,7 @@ public class ChallengeEventData
     public bool IsMatch { get; set; }
     public string CollectorName { get; set; } = string.Empty;
     public int CardsCollected { get; set; }
-    public List<Card>? RemainingCards { get; set; } // For challenger animation
-    public List<bool>? RemainingCardsMatch { get; set; } // NEW: Match status for each remaining card
+    public List<Card> RemainingCards { get; set; } = new(); // For challenger animation
+    public List<bool> RemainingCardsMatch { get; set; } = new(); // NEW: Match status for each remaining card
+    public List<Card> AllTableCards { get; set; } = new();
 }
