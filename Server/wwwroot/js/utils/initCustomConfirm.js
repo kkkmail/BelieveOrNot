@@ -38,6 +38,10 @@ export function initCustomConfirm() {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
 
+            .custom-confirm.collected-cards-dialog {
+                max-width: 1050px;
+            }
+            
             .custom-confirm-overlay.show .custom-confirm {
                 transform: scale(1);
             }
@@ -117,7 +121,7 @@ export function initCustomConfirm() {
         `;
         document.head.appendChild(style);
     }
-    
+
     // Override the global confirm function
     window.confirm = customConfirm;
 }
