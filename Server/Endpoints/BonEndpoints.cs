@@ -130,9 +130,10 @@ public static class BonEndpoints
             var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
 
             // Append initial events to HTTP response (player has no SSE yet)
-            html += await viewRenderer.RenderEventLogEntryAsync(shareEvent);
-            html += await viewRenderer.RenderEventLogEntryAsync(createEvent);
+            // Order: oldest first because afterbegin prepends each, so last appended = top
             html += await viewRenderer.RenderEventLogEntryAsync(welcomeEvent);
+            html += await viewRenderer.RenderEventLogEntryAsync(createEvent);
+            html += await viewRenderer.RenderEventLogEntryAsync(shareEvent);
 
             return Results.Content(html, "text/html");
         }

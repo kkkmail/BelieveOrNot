@@ -57,8 +57,8 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 /* === Page Container === */
 
-.container {
-    max-width: 1200px;
+.page-container {
+    max-width: 800px;
     margin: 0 auto;
     position: relative;
 }
@@ -66,9 +66,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 /* === Top Controls === */
 
 .top-controls {
-    position: fixed;
-    top: 20px;
-    right: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -215,8 +215,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-width: 500px;
-    margin: 0 auto 30px;
+    margin: 0 0 30px;
 }
 
 .setup-form {
@@ -348,8 +347,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     padding: 20px 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-width: 800px;
-    margin: 0 auto 30px;
+    margin: 0 0 30px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -392,12 +390,17 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 }
 
 .match-id-section code {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     background: #fff;
     padding: 2px 6px;
     border-radius: 4px;
-    word-break: break-all;
     user-select: all;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .btn-copy {
@@ -927,9 +930,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 @media (max-width: 768px) {
     .top-controls {
-        top: 10px;
-        right: 10px;
-        gap: 8px;
+        gap: 6px;
     }
 
     .connection-badge {

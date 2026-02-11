@@ -3,17 +3,6 @@
     ViewData["Title"] = "Believe Or Not";
 }
 
-<!-- Top Controls -->
-<div class="top-controls">
-    <div class="top-controls-row">
-        <div id="connection-status" class="connection-badge connected">Connected</div>
-        <button class="help-button" title="Game Rules &amp; Help"
-                onclick="document.getElementById('help-modal').showModal()">?</button>
-    </div>
-    <a href="/" class="btn btn-other-games">OTHER GAMES</a>
-    <div id="management-controls"></div>
-</div>
-
 <!-- Help Modal -->
 <dialog id="help-modal" class="help-modal">
     <div class="help-modal-content">
@@ -34,83 +23,98 @@
     </div>
 </dialog>
 
-<!-- Game Header -->
-<header class="game-header">
-    <h1>🎴 Believe Or Not</h1>
-    <p>The Ultimate Bluffing Card Game</p>
-</header>
-
-<!-- Game Setup Section (replaced via OOB after create/join) -->
-<div id="game-setup">
-    <section class="game-setup-panel">
-        <h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
-        <div class="setup-form">
-            <div class="form-group">
-                <label for="playerName">Your Name:</label>
-                <input type="text" id="playerName" name="playerName" placeholder="Enter your name" required />
-            </div>
-
-            <div class="form-group">
-                <label for="deckSize">Deck Size:</label>
-                <select id="deckSize" name="deckSize">
-                    <option value="Small">32 cards (7-A)</option>
-                    <option value="Medium">36 cards (6-A)</option>
-                    <option value="Full" selected>52 cards (2-A)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="jokerCount">Number of Jokers:</label>
-                <select id="jokerCount" name="jokerCount">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                </select>
-            </div>
-
-            <button class="btn btn-primary"
-                    hx-post="/bon/create"
-                    hx-include="#playerName, #deckSize, #jokerCount"
-                    hx-swap="none">CREATE NEW GAME</button>
-
-            <div class="or-divider">
-                <hr /><span>Or</span><hr />
-            </div>
-
-            <div class="form-group">
-                <label for="matchIdJoin">Match ID to Join:</label>
-                <input type="text" id="matchIdJoin" name="matchId" placeholder="Enter match ID or share URL" />
-            </div>
-
-            <button class="btn btn-secondary"
-                    hx-post="/bon/join"
-                    hx-include="#playerName, #matchIdJoin"
-                    hx-swap="none">JOIN EXISTING GAME</button>
+<div class="page-container">
+    <!-- Top Controls (positioned within container) -->
+    <div class="top-controls">
+        <div class="top-controls-row">
+            <div id="connection-status" class="connection-badge connected">Connected</div>
+            <button class="help-button" title="Game Rules &amp; Help"
+                    onclick="document.getElementById('help-modal').showModal()">?</button>
         </div>
-    </section>
-</div>
-
-<!-- Game Board (white panel, shown after create/join) -->
-<section class="game-board-panel">
-    <div id="sse-container"></div>
-    <div id="game-status"></div>
-    <div id="players-area"></div>
-
-    <div class="table-area">
-        <h3>Table</h3>
-        <div class="table-display">
-            <div id="previous-play"></div>
-            <div id="card-pile"></div>
-        </div>
-        <div id="table-actions"></div>
-        <div id="game-management"></div>
+        <div id="management-controls"></div>
     </div>
 
-    <div id="hand-area"></div>
-    <div id="score-table"></div>
-    <div id="event-log"></div>
-    <div id="final-results"></div>
-    <div id="help-content"></div>
-</section>
+    <!-- Game Header -->
+    <header class="game-header">
+        <h1>🎴 Believe Or Not</h1>
+        <p>The Ultimate Bluffing Card Game</p>
+    </header>
+
+    <!-- Game Setup Section (replaced via OOB after create/join) -->
+    <div id="game-setup">
+        <section class="game-setup-panel">
+            <h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" name="playerName" placeholder="Enter your name" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="deckSize">Deck Size:</label>
+                    <select id="deckSize" name="deckSize">
+                        <option value="Small">32 cards (7-A)</option>
+                        <option value="Medium">36 cards (6-A)</option>
+                        <option value="Full" selected>52 cards (2-A)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jokerCount">Number of Jokers:</label>
+                    <select id="jokerCount" name="jokerCount">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary"
+                        hx-post="/bon/create"
+                        hx-include="#playerName, #deckSize, #jokerCount"
+                        hx-swap="none">CREATE NEW GAME</button>
+
+                <div class="or-divider">
+                    <hr /><span>Or</span><hr />
+                </div>
+
+                <div class="form-group">
+                    <label for="matchIdJoin">Match ID to Join:</label>
+                    <input type="text" id="matchIdJoin" name="matchId" placeholder="Enter match ID or share URL" />
+                </div>
+
+                <button class="btn btn-secondary"
+                        hx-post="/bon/join"
+                        hx-include="#playerName, #matchIdJoin"
+                        hx-swap="none">JOIN EXISTING GAME</button>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/" class="btn btn-other-games">OTHER GAMES</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Game Board (white panel, shown after create/join) -->
+    <section class="game-board-panel">
+        <div id="sse-container"></div>
+        <div id="game-status"></div>
+        <div id="players-area"></div>
+
+        <div class="table-area">
+            <h3>Table</h3>
+            <div class="table-display">
+                <div id="previous-play"></div>
+                <div id="card-pile"></div>
+            </div>
+            <div id="table-actions"></div>
+            <div id="game-management"></div>
+        </div>
+
+        <div id="hand-area"></div>
+        <div id="score-table"></div>
+        <div id="event-log"></div>
+        <div id="final-results"></div>
+        <div id="help-content"></div>
+    </section>
+</div>
