@@ -13,21 +13,21 @@
 /* === Base Typography === */
 
 html {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    color: #1a1a1a;
-    background-color: #f5f5f5;
+    color: #333;
 }
 
 body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100dvh;
-    padding: 1rem;
+    padding: 20px;
 }
 
 h1, h2, h3 { margin-bottom: 0.25rem; }
 
-hr { border: none; border-top: 1px solid #ddd; margin: 1rem 0; }
+hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 /* === Layout Primitives === */
 
@@ -55,96 +55,217 @@ hr { border: none; border-top: 1px solid #ddd; margin: 1rem 0; }
     gap: 0.5rem;
 }
 
-/* === Base Controls === */
+/* === Page Container === */
 
-button, input, select {
-    font: inherit;
-    color: inherit;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
 }
 
-button {
+/* === Top Controls === */
+
+.top-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.btn-other-games {
+    background: #28a745;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
     cursor: pointer;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
+    transition: background 0.3s;
 }
 
-button:hover { background: #e8e8e8; }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-other-games:hover { background: #218838; }
 
-input[type="text"], select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+/* === Connection Badge (pill) === */
+
+.connection-badge {
+    padding: 8px 15px;
+    border-radius: 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.connection-badge.connected {
+    background: #28a745;
+}
+
+.connection-badge:not(.connected) {
+    display: none;
+}
+
+/* === Game Header === */
+
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+    padding-top: 20px;
+}
+
+.game-header h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.game-header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+/* === Setup Panel === */
+
+.game-setup-panel {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 500px;
+    margin: 0 auto 30px;
+}
+
+.setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #555;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    transition: border-color 0.3s;
     width: 100%;
 }
 
-label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-weight: 500;
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
 }
 
-label:has(input[type="checkbox"]) {
-    flex-direction: row;
+.or-divider {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 10px;
+    margin: 5px 0;
+    color: #666;
+}
+
+.or-divider hr {
+    flex: 1;
+    border-top: 1px solid #ddd;
 }
 
 /* === Buttons === */
 
-.btn { font-weight: 600; }
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Game-board specific button variants */
 
 .btn--play {
     background: #2563eb;
     color: #fff;
-    border-color: #1d4ed8;
+    border: 1px solid #1d4ed8;
 }
 .btn--play:hover { background: #1d4ed8; }
 
 .btn--challenge {
     background: #dc2626;
     color: #fff;
-    border-color: #b91c1c;
+    border: 1px solid #b91c1c;
 }
 .btn--challenge:hover { background: #b91c1c; }
 
 .btn--start {
-    background: #16a34a;
+    background: #28a745;
     color: #fff;
-    border-color: #15803d;
+    border: none;
 }
-.btn--start:hover { background: #15803d; }
+.btn--start:hover { background: #218838; }
 
 .btn--danger {
-    background: #ef4444;
+    background: #dc3545;
     color: #fff;
-    border-color: #dc2626;
+    border: none;
 }
-.btn--danger:hover { background: #dc2626; }
+.btn--danger:hover { background: #c82333; }
 
-/* === Connection Status === */
-
-.connection-status {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.85rem;
-    color: #666;
+.btn--warning {
+    background: #ffc107;
+    color: #212529;
+    border: none;
 }
+.btn--warning:hover { background: #e0a800; }
 
-.connection-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ccc;
-}
-
-.connection-dot--on { background: #22c55e; }
-
-/* === Match Info === */
+/* === Match Info (after create/join) === */
 
 .match-info {
     background: #e0f2fe;
@@ -462,13 +583,34 @@ details summary {
     margin-bottom: 0.3rem;
 }
 
-/* === Page Layout === */
+/* === Responsive === */
 
-#page-content {
-    max-width: 900px;
-    margin: 0 auto;
-}
+@media (max-width: 768px) {
+    .top-controls {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+    }
 
-#game-setup {
-    margin-bottom: 1rem;
+    .connection-badge {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .btn-other-games {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    .game-header {
+        padding-top: 50px;
+    }
+
+    .game-header h1 {
+        font-size: 2em;
+    }
+
+    .game-setup-panel {
+        padding: 20px;
+    }
 }

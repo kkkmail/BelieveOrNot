@@ -1,8 +1,8 @@
 @model BonViewModel
-<div id="connection-status" hx-swap-oob="true" class="connection-status">
+<div id="connection-status" hx-swap-oob="true"
+     class="connection-badge @(Model.State.MatchId != Guid.Empty ? "connected" : "")">
     @if (Model.State.MatchId != Guid.Empty)
     {
-        <span class="connection-dot connection-dot--on"></span>
-        <span>Connected</span>
+        @:Connected
     }
 </div>
