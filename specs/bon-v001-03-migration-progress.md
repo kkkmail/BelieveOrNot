@@ -18,18 +18,24 @@
 - [x] Scaffold test page at /bon
 - [x] Build succeeds (0 warnings, 0 errors)
 
-## Phase 2 — BelieveOrNot Endpoints
-- [ ] POST /bon/create
-- [ ] POST /bon/join
-- [ ] POST /bon/reconnect
-- [ ] POST /bon/start-round
-- [ ] POST /bon/play
-- [ ] POST /bon/challenge
-- [ ] POST /bon/end-round
-- [ ] POST /bon/end-game
-- [ ] POST /bon/message
-- [ ] BonViewRenderer service
-- [ ] Connection tracking via SseConnectionManager
+## Phase 2 — BelieveOrNot Endpoints (COMPLETE)
+- [x] POST /bon/create
+- [x] POST /bon/join
+- [x] POST /bon/reconnect
+- [x] POST /bon/start-round
+- [x] POST /bon/play
+- [x] POST /bon/challenge
+- [x] POST /bon/end-round
+- [x] POST /bon/end-game
+- [x] POST /bon/message
+- [x] POST /bon/check-match
+- [x] BonViewRenderer service (placeholder HTML, Phase 3 renders actual Razor)
+- [x] RazorPartialRenderer service (generic partial-to-string renderer)
+- [x] Connection tracking via SseConnectionManager
+- [x] SSE disconnect handling (marks player disconnected, notifies others)
+- [x] Idempotency for play/challenge via ProcessedCommands
+- [x] PlayerId from HttpOnly cookie (not form data)
+- [x] Build succeeds (0 errors)
 
 ## Phase 3 — BelieveOrNot UI
 - [ ] _SetupForm partial

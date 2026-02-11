@@ -1,6 +1,8 @@
 // Program.cs
 using BelieveOrNot.Server.BelieveOrNot;
+using BelieveOrNot.Server.Endpoints;
 using BelieveOrNot.Server.King;
+using BelieveOrNot.Server.Services;
 using BelieveOrNot.Server.Sse;
 using Microsoft.Extensions.FileProviders;
 
@@ -29,6 +31,10 @@ builder.Services.AddSingleton<IKingEventBroadcaster, KingEventBroadcaster>();
 // Add SSE infrastructure
 builder.Services.AddSingleton<ISseConnectionManager, SseConnectionManager>();
 builder.Services.AddSingleton<ISseBroadcaster, SseBroadcaster>();
+
+// Add Razor rendering services for BelieveOrNot endpoints
+builder.Services.AddScoped<IRazorPartialRenderer, RazorPartialRenderer>();
+builder.Services.AddScoped<IBonViewRenderer, BonViewRenderer>();
 
 builder.Services.AddCors(options =>
 {
@@ -108,8 +114,12 @@ app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager m
     return Results.Ok(new { exists = match != null });
 });
 
+// Map BelieveOrNot HTTP POST endpoints
+app.MapBonEndpoints();
+
 // SSE endpoint for BelieveOrNot real-time updates
-app.MapGet("/bon/sse", async (HttpContext context, ISseConnectionManager sseManager) =>
+app.MapGet("/bon/sse", async (HttpContext context, ISseConnectionManager sseManager,
+    IMatchManager matchManager, ISseBroadcaster broadcaster, IBonViewRenderer viewRenderer) =>
 {
     if (!Guid.TryParse(context.Request.Query["matchId"], out var matchId) ||
         !Guid.TryParse(context.Request.Query["playerId"], out var playerId))
@@ -141,6 +151,32 @@ app.MapGet("/bon/sse", async (HttpContext context, ISseConnectionManager sseMana
     finally
     {
         sseManager.RemoveConnection(playerId);
+
+        // Handle disconnect: mark player as disconnected and notify others
+        var match = matchManager.GetMatch(matchId);
+        if (match != null)
+        {
+            var player = match.Players.FirstOrDefault(p => p.Id == playerId);
+            if (player != null)
+            {
+                player.IsConnected = false;
+                player.LastSeen = DateTime.UtcNow;
+
+                var disconnectEvent = GameEventFactory.CreateConnectionEvent(player.Name, false);
+                var eventHtml = await viewRenderer.RenderEventLogEntryAsync(disconnectEvent);
+                await broadcaster.SendToMatchAsync(matchId, "game-event", _ => eventHtml);
+
+                // Send updated state to remaining players
+                var connections = sseManager.GetConnectionsForMatch(matchId).ToList();
+                var rendered = new Dictionary<Guid, string>();
+                foreach (var conn in connections)
+                {
+                    rendered[conn.PlayerId] = await viewRenderer.RenderAllRegionsAsync(match, conn.PlayerId);
+                }
+                await broadcaster.SendToMatchAsync(matchId, "state-update",
+                    pid => rendered.GetValueOrDefault(pid, ""));
+            }
+        }
     }
 });
 
