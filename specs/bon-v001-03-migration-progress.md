@@ -2,7 +2,7 @@
 
 **Spec**: `bon-v001-02-migration.md`
 **Started**: 2026-02-10
-**Last updated**: 2026-02-10
+**Last updated**: 2026-02-11
 
 ---
 
@@ -37,21 +37,31 @@
 - [x] PlayerId from HttpOnly cookie (not form data)
 - [x] Build succeeds (0 errors)
 
-## Phase 3 — BelieveOrNot UI
-- [ ] _SetupForm partial
-- [ ] _GameStatus partial
-- [ ] _Players partial
-- [ ] _Hand partial (with checkbox card selection)
-- [ ] _Actions partial (play button, rank selector, challenge confirm)
-- [ ] _PreviousPlay partial
-- [ ] _CardPile partial
-- [ ] _Scores partial
-- [ ] _EventLog partial
-- [ ] _GameManagement partial
-- [ ] _FinalResults partial
-- [ ] _ConnectionStatus partial
-- [ ] _Help partial
-- [ ] Full game playable at /bon
+## Phase 3 — BelieveOrNot UI (COMPLETE)
+- [x] BonViewModel wrapper with computed properties (IsCreator, IsYourTurn, CanPlay, CanChallenge)
+- [x] _ViewImports updated with game namespaces
+- [x] Index.cshtml page with setup forms and all region placeholders
+- [x] _SseContainer partial (SSE connection setup via OOB swap)
+- [x] _SetupForm partial (match ID display after joining)
+- [x] _ConnectionStatus partial
+- [x] _GameStatus partial (phase, round, turn, rank, pile)
+- [x] _Players partial (player cards with stats, turn indicator, badges)
+- [x] _Hand partial (checkbox card selection with data-* constraints)
+- [x] _Actions partial (play button, rank selector, challenge button, hx-include wiring)
+- [x] _PreviousPlay partial (face-down cards with radio selection for challenge)
+- [x] _CardPile partial
+- [x] _Scores partial (sorted score table)
+- [x] _EventLog partial (SSE prepends via afterbegin OOB)
+- [x] _GameManagement partial (start/end round/game, creator-only, hx-confirm)
+- [x] _FinalResults partial (game over overlay with final scores)
+- [x] _Help partial (collapsible game rules)
+- [x] BonViewRenderer renders all Razor partials (with fallback logging)
+- [x] site.css updated with full game styles (cards, players, actions, scores, events)
+- [x] Build succeeds (0 warnings, 0 errors)
+- [x] All endpoints return correct HTML (curl-tested: create, join, start-round, play, challenge, end-round, end-game, message, check-match)
+- [x] Error cases verified (missing cookie, bad IDs, non-creator, etc.)
+- [x] Old frontend at / still works
+- [ ] Full browser testing with htmx (SSE push, OOB swaps, interaction.js)
 
 ## Phase 4 — King Endpoints
 - [ ] POST /king/create

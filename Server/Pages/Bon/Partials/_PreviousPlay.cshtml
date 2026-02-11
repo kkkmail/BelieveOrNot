@@ -1,0 +1,24 @@
+@model BonViewModel
+<div id="previous-play" hx-swap-oob="true">
+    @if (Model.State.Phase == GamePhase.InProgress && Model.State.LastPlayCardCount > 0)
+    {
+        var lastPlayerName = Model.State.LastActualPlayerIndex.HasValue
+            && Model.State.LastActualPlayerIndex.Value < Model.State.Players.Count
+            ? Model.State.Players[Model.State.LastActualPlayerIndex.Value].Name
+            : "Unknown";
+
+        <div class="previous-play-area">
+            <p>@lastPlayerName played @Model.State.LastPlayCardCount card(s) face down:</p>
+            <div class="face-down-cards">
+                @for (int i = 0; i < Model.State.LastPlayCardCount; i++)
+                {
+                    <label class="card card--facedown">
+                        <input type="radio" name="challengePickIndex" value="@i"
+                               @(Model.CanChallenge ? "" : "disabled") />
+                        <span class="card-face">?</span>
+                    </label>
+                }
+            </div>
+        </div>
+    }
+</div>

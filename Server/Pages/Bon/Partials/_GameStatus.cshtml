@@ -1,0 +1,22 @@
+@model BonViewModel
+<div id="game-status" hx-swap-oob="true">
+    @if (Model.State.MatchId != Guid.Empty)
+    {
+        <div class="game-status-bar">
+            <span><strong>Phase:</strong> @Model.State.Phase</span>
+            @if (Model.State.RoundNumber > 0)
+            {
+                <span><strong>Round:</strong> @Model.State.RoundNumber</span>
+            }
+            @if (Model.State.Phase == GamePhase.InProgress)
+            {
+                <span><strong>Turn:</strong> @(Model.CurrentPlayerName ?? "—")</span>
+                @if (!string.IsNullOrEmpty(Model.State.AnnouncedRank))
+                {
+                    <span><strong>Rank:</strong> @Model.State.AnnouncedRank</span>
+                }
+                <span><strong>Pile:</strong> @Model.State.TablePileCount cards</span>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,11 @@
+@model BonViewModel
+<div id="game-setup" hx-swap-oob="true">
+    @if (Model.State.Phase == GamePhase.WaitingForPlayers)
+    {
+        <div class="stack match-info">
+            <p><strong>Match ID:</strong></p>
+            <code class="match-id">@Model.State.MatchId</code>
+            <p>Share this ID with other players so they can join.</p>
+        </div>
+    }
+</div>

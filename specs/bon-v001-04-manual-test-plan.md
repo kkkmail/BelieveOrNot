@@ -30,7 +30,7 @@ All tests use curl from the command line. The PlayerId cookie must be set. Repla
 
 | # | Test | Command | Expected Result |
 |---|---|---|---|
-| 1 | Create match | `curl -v -X POST http://127.0.0.1:44999/bon/create -d "playerName=Alice&deckSize=Full&jokerCount=0" -b "PlayerId={your-guid}"` | 200 OK with HTML comment containing `state-update for player {guid}` |
+| 1 | Create match | `curl -v -X POST http://127.0.0.1:44999/bon/create -d "playerName=Alice&deckSize=Full&jokerCount=0" -b "PlayerId={your-guid}"` | 200 OK with HTML containing `sse-container`, `game-setup`, `players-area` with Alice |
 | 2 | Create rejects missing name | `curl -v -X POST http://127.0.0.1:44999/bon/create -d "" -b "PlayerId={guid}"` | 400 Bad Request |
 | 3 | Create rejects missing cookie | `curl -v -X POST http://127.0.0.1:44999/bon/create -d "playerName=Alice"` | 400 "Missing PlayerId cookie" |
 | 4 | Join match | `curl -v -X POST http://127.0.0.1:44999/bon/join -d "matchId={matchId}&playerName=Bob" -b "PlayerId={different-guid}"` | 200 OK with HTML comment |
@@ -50,7 +50,23 @@ All tests use curl from the command line. The PlayerId cookie must be set. Repla
 
 ## Phase 3 — BelieveOrNot UI
 
-_(To be written when Phase 3 is implemented)_
+**Browser testing**: Open `/bon` in two browsers (or one regular + one incognito). Each gets a unique PlayerId cookie.
+
+| # | Test | Steps | Expected Result |
+|---|---|---|---|
+| 1 | Page loads | Visit `/bon` | Shows "Believe Or Not" heading, Create/Join/Reconnect forms |
+| 2 | Create game | Fill name + settings, click "Create Game" | Setup form replaced with Match ID display; game status shows "WaitingForPlayers"; player list shows creator with (you) and host badges; "Start Round" button visible |
+| 3 | Join game (2nd browser) | Copy Match ID, fill name, click "Join Game" | Both browsers show updated player list with 2 players; SSE pushes update the creator's browser |
+| 4 | SSE connection | After create/join, check browser Network tab | SSE connection open at `/bon/sse`; `event: connected` received |
+| 5 | Start round | Creator clicks "Start Round" | Phase changes to InProgress; cards dealt; hand shows clickable cards; turn indicator on current player; pile count shows; rank/play controls visible for active player |
+| 6 | Card selection | Click cards in hand | Cards visually raise/highlight; selection counter updates; max selection enforced by interaction.js |
+| 7 | Play cards | Select cards, choose rank (if opening), click "Play Cards" | Hand updated (played cards removed); pile count increases; turn moves to next player; event log shows play event |
+| 8 | Challenge | On your turn when previous play exists, select a face-down card, click "Challenge" | Challenge result shown in event log; cards collected by loser; pile resets |
+| 9 | End round | Creator clicks "End Round" | Phase returns to WaitingForPlayers; hands cleared; "Start Round" button reappears |
+| 10 | End game | Creator clicks "End Game" | Game Over overlay shows with final scores |
+| 11 | Scores update | Play multiple rounds | Score table reflects accumulated scores |
+| 12 | Reconnect | Refresh page, paste Match ID, click "Reconnect" | Player rejoins; game state restored; hand visible if round in progress |
+| 13 | Build succeeds | `dotnet build -c Release` | 0 errors |
 
 ---
 

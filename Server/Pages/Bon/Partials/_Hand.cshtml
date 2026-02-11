@@ -1,0 +1,40 @@
+@model BonViewModel
+@{
+    var hand = Model.State.YourHand ?? new List<Card>();
+    var maxSelect = Model.MaxCardsPerPlay;
+    var minSelect = Model.MinCardsPerPlay;
+}
+<div id="hand-area" hx-swap-oob="true"
+     data-max-select="@maxSelect"
+     data-min-select="@minSelect">
+    @if (hand.Count > 0)
+    {
+        <h3>Your Hand (@hand.Count cards)</h3>
+        <div class="hand">
+            @for (int i = 0; i < hand.Count; i++)
+            {
+                var card = hand[i];
+                var suitClass = card.IsJoker ? "joker" : card.Suit.ToLower();
+                var suitSymbol = card.Suit switch
+                {
+                    "Hearts" => "♥",
+                    "Diamonds" => "♦",
+                    "Clubs" => "♣",
+                    "Spades" => "♠",
+                    _ => ""
+                };
+                var displayText = card.IsJoker ? "🃏" : $"{card.Rank}{suitSymbol}";
+                <label class="card card--@suitClass">
+                    <input type="checkbox" name="cardIndices" value="@i"
+                           @(Model.CanPlay ? "" : "disabled") />
+                    <span class="card-face">@displayText</span>
+                </label>
+            }
+        </div>
+        <span class="selection-counter"></span>
+    }
+    else if (Model.State.Phase == GamePhase.InProgress)
+    {
+        <p class="hand-empty">You have no cards.</p>
+    }
+</div>

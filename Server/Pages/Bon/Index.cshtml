@@ -1,10 +1,83 @@
 @page "/bon"
 @{
     ViewData["Title"] = "Believe Or Not";
+    var playerId = Request.Cookies["PlayerId"] ?? "";
 }
 
-<div class="stack stack--center" style="margin-top: 2rem;">
+<div id="page-content" class="stack">
     <h1>Believe Or Not</h1>
-    <p>New htmx + Razor frontend — Phase 1 foundation complete.</p>
-    <p>Player ID (cookie): @Request.Cookies["PlayerId"]</p>
+
+    <div id="connection-status"></div>
+
+    <div id="game-setup">
+        <div class="stack" style="max-width: 480px; margin: 0 auto;">
+            <h2>Create a Game</h2>
+            <form hx-post="/bon/create" hx-swap="none">
+                <div class="stack" style="gap: 0.5rem;">
+                    <label>Your Name
+                        <input type="text" name="playerName" required placeholder="Enter your name" />
+                    </label>
+                    <label>Deck Size
+                        <select name="deckSize">
+                            <option value="Full" selected>Full (52 cards)</option>
+                            <option value="Medium">Medium (36 cards)</option>
+                            <option value="Small">Small (32 cards)</option>
+                        </select>
+                    </label>
+                    <label>Joker Count
+                        <select name="jokerCount">
+                            <option value="0" selected>0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="jokerDisposalEnabled" value="true" />
+                        Enable Joker Disposal
+                    </label>
+                    <button type="submit">Create Game</button>
+                </div>
+            </form>
+
+            <hr />
+
+            <h2>Join a Game</h2>
+            <form hx-post="/bon/join" hx-swap="none">
+                <div class="stack" style="gap: 0.5rem;">
+                    <label>Match ID
+                        <input type="text" name="matchId" required placeholder="Paste match ID here" />
+                    </label>
+                    <label>Your Name
+                        <input type="text" name="playerName" required placeholder="Enter your name" />
+                    </label>
+                    <button type="submit">Join Game</button>
+                </div>
+            </form>
+
+            <hr />
+
+            <h2>Reconnect</h2>
+            <form hx-post="/bon/reconnect" hx-swap="none">
+                <div class="stack" style="gap: 0.5rem;">
+                    <label>Match ID
+                        <input type="text" name="matchId" required placeholder="Paste match ID here" />
+                    </label>
+                    <button type="submit">Reconnect</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="sse-container"></div>
+    <div id="game-status"></div>
+    <div id="players-area"></div>
+    <div id="hand-area"></div>
+    <div id="previous-play"></div>
+    <div id="card-pile"></div>
+    <div id="table-actions"></div>
+    <div id="score-table"></div>
+    <div id="event-log"></div>
+    <div id="game-management"></div>
+    <div id="final-results"></div>
+    <div id="help-content"></div>
 </div>

@@ -171,7 +171,7 @@ app.MapGet("/bon/sse", async (HttpContext context, ISseConnectionManager sseMana
                 var rendered = new Dictionary<Guid, string>();
                 foreach (var conn in connections)
                 {
-                    rendered[conn.PlayerId] = await viewRenderer.RenderAllRegionsAsync(match, conn.PlayerId);
+                    rendered[conn.PlayerId] = await viewRenderer.RenderStateUpdateAsync(match, conn.PlayerId);
                 }
                 await broadcaster.SendToMatchAsync(matchId, "state-update",
                     pid => rendered.GetValueOrDefault(pid, ""));

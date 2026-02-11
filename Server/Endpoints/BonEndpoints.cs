@@ -40,7 +40,9 @@ public static class BonEndpoints
 
         foreach (var conn in connections)
         {
-            rendered[conn.PlayerId] = await viewRenderer.RenderAllRegionsAsync(match, conn.PlayerId);
+            // Use RenderStateUpdateAsync (excludes _SseContainer) to avoid
+            // OOB-replacing the live SSE connection element on each broadcast.
+            rendered[conn.PlayerId] = await viewRenderer.RenderStateUpdateAsync(match, conn.PlayerId);
         }
 
         await broadcaster.SendToMatchAsync(match.Id, "state-update",
@@ -233,7 +235,7 @@ public static class BonEndpoints
 
         await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
-        var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+        var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
         return Results.Content(html, "text/html");
     }
 
@@ -266,7 +268,7 @@ public static class BonEndpoints
         // Idempotency check
         if (ProcessedCommands.ContainsKey(clientCmdId))
         {
-            var dupHtml = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+            var dupHtml = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
             return Results.Content(dupHtml, "text/html");
         }
 
@@ -301,7 +303,7 @@ public static class BonEndpoints
             await BroadcastMoveEventAsync(match, state, viewRenderer, broadcaster);
             await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
-            var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+            var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
             return Results.Content(html, "text/html");
         }
         catch (Exception ex)
@@ -339,7 +341,7 @@ public static class BonEndpoints
 
         if (ProcessedCommands.ContainsKey(clientCmdId))
         {
-            var dupHtml = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+            var dupHtml = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
             return Results.Content(dupHtml, "text/html");
         }
 
@@ -360,7 +362,7 @@ public static class BonEndpoints
             await BroadcastMoveEventAsync(match, state, viewRenderer, broadcaster);
             await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
-            var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+            var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
             return Results.Content(html, "text/html");
         }
         catch (Exception ex)
@@ -413,7 +415,7 @@ public static class BonEndpoints
         await BroadcastEventAsync(match, endEvent, viewRenderer, broadcaster);
         await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
-        var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+        var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
         return Results.Content(html, "text/html");
     }
 
@@ -481,7 +483,7 @@ public static class BonEndpoints
         match.Phase = GamePhase.GameEnd;
         await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
-        var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+        var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
         return Results.Content(html, "text/html");
     }
 

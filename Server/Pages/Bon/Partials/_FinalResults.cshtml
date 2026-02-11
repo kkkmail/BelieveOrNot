@@ -1,0 +1,32 @@
+@model BonViewModel
+<div id="final-results" hx-swap-oob="true">
+    @if (Model.State.Phase == GamePhase.GameEnd)
+    {
+        <div class="final-results-overlay">
+            <div class="final-results-content">
+                <h2>Game Over</h2>
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var sorted = Model.State.Players.OrderByDescending(p => p.Score).ThenBy(p => p.Name).ToList(); }
+                        @for (int i = 0; i < sorted.Count; i++)
+                        {
+                            var p = sorted[i];
+                            <tr class="@(i == 0 ? "score-row--winner" : "")">
+                                <td>@(i + 1)</td>
+                                <td>@p.Name</td>
+                                <td>@p.Score</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

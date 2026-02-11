@@ -1,0 +1,10 @@
+@model BonViewModel
+<div id="card-pile" hx-swap-oob="true">
+    @if (Model.State.Phase == GamePhase.InProgress)
+    {
+        <div class="card-pile">
+            <div class="pile-visual">🂠</div>
+            <p>Table pile: <strong>@Model.State.TablePileCount</strong> cards</p>
+        </div>
+    }
+</div>

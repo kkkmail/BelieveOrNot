@@ -5,7 +5,14 @@
       "WebSearch",
       "WebFetch(domain:unpkg.com)",
       "Bash(curl:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(taskkill:*)",
+      "Bash(C:/GitHub/BelieveOrNot/Server/bin/Release/net9.0/BelieveOrNot.Server.exe:*)",
+      "Bash(./BelieveOrNot.Server.exe)",
+      "Bash(PLAYER_A_ID=\"cccccccc-cccc-cccc-cccc-cccccccccccc\")",
+      "Bash(PLAYER_B=\"33333333-3333-3333-3333-333333333333\":*)",
+      "Bash(PLAYER_B=\"55555555-5555-5555-5555-555555555555\")",
+      "Bash(PLAYER_B=\"77777777-7777-7777-7777-777777777777\":*)"
     ]
   }
 }
