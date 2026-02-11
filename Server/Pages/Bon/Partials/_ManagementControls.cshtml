@@ -1,0 +1,28 @@
+@model BonViewModel
+<div id="management-controls" hx-swap-oob="true">@if (Model.IsCreator && Model.State.MatchId != Guid.Empty)
+{
+    @if (Model.State.Phase == GamePhase.InProgress)
+    {
+        <div class="game-management-controls">
+            <button class="btn btn--danger"
+                    hx-post="/bon/end-round"
+                    hx-vals='{"matchId": "@Model.State.MatchId"}'
+                    hx-swap="none"
+                    hx-confirm="End this round without scoring?">
+                End Round
+            </button>
+        </div>
+    }
+    @if (Model.State.Phase == GamePhase.WaitingForPlayers || Model.State.Phase == GamePhase.RoundEnd)
+    {
+        <div class="game-management-controls">
+            <button class="btn btn--danger"
+                    hx-post="/bon/end-game"
+                    hx-vals='{"matchId": "@Model.State.MatchId"}'
+                    hx-swap="none"
+                    hx-confirm="End the game and calculate final scores?">
+                End Game
+            </button>
+        </div>
+    }
+}</div>

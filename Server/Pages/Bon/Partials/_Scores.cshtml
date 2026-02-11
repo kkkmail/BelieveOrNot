@@ -2,23 +2,17 @@
 <div id="score-table" hx-swap-oob="true">
     @if (Model.State.Players.Count > 0)
     {
-        <h3>Scores</h3>
-        <table class="score-table">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="scoring-area">
+            <h3>Scores</h3>
+            <div class="score-items">
                 @foreach (var player in Model.State.Players.OrderByDescending(p => p.Score))
                 {
-                    <tr class="@(player.Id == Model.YourPlayerId ? "score-row--you" : "")">
-                        <td>@player.Name</td>
-                        <td>@player.Score</td>
-                    </tr>
+                    <div class="score-item @(player.Id == Model.YourPlayerId ? "score-item--you" : "")">
+                        <div class="player-name">@player.Name</div>
+                        <div class="score">@player.Score</div>
+                    </div>
                 }
-            </tbody>
-        </table>
+            </div>
+        </div>
     }
 </div>

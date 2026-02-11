@@ -2,21 +2,28 @@
 <div id="game-status" hx-swap-oob="true">
     @if (Model.State.MatchId != Guid.Empty)
     {
-        <div class="game-status-bar">
-            <span><strong>Phase:</strong> @Model.State.Phase</span>
-            @if (Model.State.RoundNumber > 0)
-            {
-                <span><strong>Round:</strong> @Model.State.RoundNumber</span>
-            }
-            @if (Model.State.Phase == GamePhase.InProgress)
-            {
-                <span><strong>Turn:</strong> @(Model.CurrentPlayerName ?? "—")</span>
-                @if (!string.IsNullOrEmpty(Model.State.AnnouncedRank))
-                {
-                    <span><strong>Rank:</strong> @Model.State.AnnouncedRank</span>
-                }
-                <span><strong>Pile:</strong> @Model.State.TablePileCount cards</span>
-            }
+        var phaseText = Model.State.Phase switch
+        {
+            GamePhase.WaitingForPlayers => "Waiting for Players",
+            GamePhase.InProgress => "Round in Progress",
+            GamePhase.RoundEnd => "Round Ended",
+            GamePhase.GameEnd => "Game Over",
+            _ => Model.State.Phase.ToString()
+        };
+        <div class="game-status">
+            <h2>@phaseText</h2>
+            <div class="status-info">
+                <span>Round: <strong>@Model.State.RoundNumber</strong></span>
+                <span>Current Turn: <strong>@(Model.CurrentPlayerName ?? "---")</strong></span>
+                <span>Announced Rank: <strong>@(string.IsNullOrEmpty(Model.State.AnnouncedRank) ? "---" : Model.State.AnnouncedRank)</strong></span>
+                <span>Table Cards: <strong>@Model.State.TablePileCount</strong></span>
+                <span class="match-id-section">
+                    Match ID:
+                    <code>@Model.State.MatchId</code>
+                    <button type="button" class="btn-copy"
+                            onclick="navigator.clipboard.writeText('@Model.State.MatchId').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
+                </span>
+            </div>
         </div>
     }
 </div>

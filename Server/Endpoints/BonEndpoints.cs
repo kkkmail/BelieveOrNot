@@ -109,11 +109,31 @@ public static class BonEndpoints
         {
             var match = matchManager.CreateMatch(playerName, playerId.Value, settings);
 
+            // Create initial events for the game log
+            var welcomeEvent = new GameEventDto
+            {
+                Type = "System",
+                DisplayMessage = "Welcome to Believe Or Not! Wait for other players to join."
+            };
             var createEvent = GameEventFactory.CreateJoinEvent(playerName, true);
+            var shareEvent = new GameEventDto
+            {
+                Type = "System",
+                DisplayMessage = "Game created! Share the URL or Match ID with others to join."
+            };
+
+            // Broadcast to any existing SSE connections (other players)
             await BroadcastEventAsync(match, createEvent, viewRenderer, broadcaster);
             await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
+            // Render HTML response (includes SSE container for this player)
             var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+
+            // Append initial events to HTTP response (player has no SSE yet)
+            html += await viewRenderer.RenderEventLogEntryAsync(shareEvent);
+            html += await viewRenderer.RenderEventLogEntryAsync(createEvent);
+            html += await viewRenderer.RenderEventLogEntryAsync(welcomeEvent);
+
             return Results.Content(html, "text/html");
         }
         catch (Exception ex)
@@ -153,10 +173,22 @@ public static class BonEndpoints
             var joinedPlayer = match.Players.Last();
 
             var joinEvent = GameEventFactory.CreateJoinEvent(joinedPlayer.Name, false);
+            // Broadcast to existing SSE connections (other players already in match)
             await BroadcastEventAsync(match, joinEvent, viewRenderer, broadcaster);
             await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
+            // Render HTML response (includes SSE container for this player)
             var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
+
+            // Append join event to HTTP response (joining player has no SSE yet)
+            var welcomeEvent = new GameEventDto
+            {
+                Type = "System",
+                DisplayMessage = $"You joined the game. Wait for the host to start a round."
+            };
+            html += await viewRenderer.RenderEventLogEntryAsync(joinEvent);
+            html += await viewRenderer.RenderEventLogEntryAsync(welcomeEvent);
+
             return Results.Content(html, "text/html");
         }
         catch (InvalidOperationException ex)

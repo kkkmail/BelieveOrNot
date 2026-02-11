@@ -2,25 +2,25 @@
 <div id="players-area" hx-swap-oob="true">
     @if (Model.State.Players.Count > 0)
     {
-        <div class="players-list">
+        <div class="players-area">
             @foreach (var (player, index) in Model.State.Players.Select((p, i) => (p, i)))
             {
                 var isCurrent = index == Model.State.CurrentPlayerIndex && Model.State.Phase == GamePhase.InProgress;
                 var isYou = player.Id == Model.YourPlayerId;
-                <div class="player-card @(isCurrent ? "player-card--active" : "") @(!player.IsConnected ? "player-card--disconnected" : "")">
+                <div class="player-card @(isCurrent ? "current-turn" : "") @(!player.IsConnected ? "player-card--disconnected" : "")">
                     <div class="player-name">
                         @player.Name
-                        @if (isYou) { <span class="badge">(you)</span> }
-                        @if (player.Id == Model.State.CreatorPlayerId) { <span class="badge badge--creator">host</span> }
+                        @if (player.Id == Model.State.CreatorPlayerId) { <span class="badge badge--creator">👑 Creator</span> }
+                        @if (isYou) { <span class="badge">👤 You</span> }
                     </div>
                     <div class="player-stats">
-                        <span>🃏 @player.HandCount</span>
-                        <span>⭐ @player.Score</span>
+                        <span>Cards: @player.HandCount</span>
+                        <span>Score: @player.Score</span>
                         @if (!player.IsConnected) { <span class="badge badge--offline">offline</span> }
                     </div>
                     @if (isCurrent)
                     {
-                        <div class="turn-indicator">▶</div>
+                        <div class="turn-indicator">▶ Current Turn</div>
                     }
                 </div>
             }

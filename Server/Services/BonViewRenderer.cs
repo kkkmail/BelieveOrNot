@@ -33,6 +33,7 @@ public class BonViewRenderer : IBonViewRenderer
         "/Pages/Bon/Partials/_Scores.cshtml",
         "/Pages/Bon/Partials/_EventLog.cshtml",
         "/Pages/Bon/Partials/_GameManagement.cshtml",
+        "/Pages/Bon/Partials/_ManagementControls.cshtml",
         "/Pages/Bon/Partials/_FinalResults.cshtml",
         "/Pages/Bon/Partials/_Help.cshtml",
     ];

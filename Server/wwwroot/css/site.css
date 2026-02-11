@@ -173,6 +173,21 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     background: #dc3545;
 }
 
+/* === Management Controls (top-right, below Other Games) === */
+
+.game-management-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.game-management-controls .btn {
+    font-size: 13px;
+    padding: 8px 14px;
+    width: 140px;
+    text-align: center;
+}
+
 /* === Game Header === */
 
 .game-header {
@@ -345,58 +360,87 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     display: none;
 }
 
-/* === Match Info (after create/join) === */
+/* === Game Status === */
 
-.match-info {
-    background: #e0f2fe;
-    padding: 1rem;
-    border-radius: 8px;
+.game-status {
     text-align: center;
+    margin-bottom: 10px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
-.match-id {
-    display: block;
-    font-size: 0.9rem;
+.game-status h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.status-info {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #666;
+}
+
+.match-id-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.match-id-section code {
+    font-size: 0.85rem;
     background: #fff;
-    padding: 0.5rem;
+    padding: 2px 6px;
     border-radius: 4px;
     word-break: break-all;
     user-select: all;
 }
 
-/* === Game Status Bar === */
-
-.game-status-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 0.5rem 1rem;
-    background: #1e293b;
-    color: #f1f5f9;
-    border-radius: 6px;
-    font-size: 0.9rem;
+.btn-copy {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
 }
 
-/* === Players === */
+.btn-copy:hover { background: #138496; }
+.btn-copy:active { background: #0f6674; transform: scale(0.95); }
 
-.players-list {
+/* === Players Area === */
+
+.players-area {
     display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 20px;
 }
 
 .player-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-width: 150px;
+    border: 3px solid transparent;
+    transition: all 0.3s;
     position: relative;
-    padding: 0.5rem 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 6px;
-    background: #fff;
-    min-width: 120px;
 }
 
-.player-card--active {
-    border-color: #2563eb;
-    background: #eff6ff;
+.player-card.current-turn {
+    border-color: #28a745;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    animation: pulse-glow 2s infinite;
 }
 
 .player-card--disconnected {
@@ -407,23 +451,26 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     font-weight: 600;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.25rem;
+    margin-bottom: 5px;
+    color: #333;
 }
 
 .player-stats {
-    font-size: 0.85rem;
-    color: #64748b;
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 14px;
+    color: #666;
 }
 
 .turn-indicator {
-    position: absolute;
-    top: 50%;
-    right: -1.2rem;
-    transform: translateY(-50%);
-    color: #2563eb;
+    color: #28a745;
     font-weight: bold;
+    font-size: 12px;
+    margin-top: 5px;
+    animation: blink 1.5s infinite;
 }
 
 .badge {
@@ -437,12 +484,209 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .badge--creator { background: #fef3c7; color: #92400e; }
 .badge--offline { background: #fee2e2; color: #991b1b; }
 
+/* === Table Area (green dashed border) === */
+
+.table-area {
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgba(0, 100, 0, 0.1);
+    border-radius: 15px;
+    border: 3px dashed #28a745;
+}
+
+.table-area h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.5em;
+}
+
+/* Hide table area when all OOB children are empty */
+.table-area:not(:has([id]:not(:empty))) {
+    display: none;
+}
+
+.table-display {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    margin-bottom: 5px;
+    position: relative;
+    min-height: 180px;
+    width: 100%;
+}
+
+/* === Previous Play Section (left side of table) === */
+
+.previous-play-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 300px;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.play-label,
+.pile-label {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.previous-play-cards {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    min-height: 100px;
+    align-items: center;
+    width: 100%;
+    margin-top: 7px;
+}
+
+.previous-play-cards:empty::after {
+    content: "No previous play";
+    color: #999;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.play-info,
+.pile-count {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* === Card Pile Section (right side of table) === */
+
+.table-pile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+}
+
+.card-pile-container {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    border: 2px dashed #28a745;
+    border-radius: 8px;
+    padding: 5px;
+    background: rgba(40, 167, 69, 0.05);
+}
+
+.card-pile-container:empty::after {
+    content: "Empty";
+    color: #999;
+    font-style: italic;
+}
+
+.pile-visual {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+/* === Table Controls (blue bordered area for actions) === */
+
+.table-controls {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 10px;
+    border: 2px solid #007bff;
+    text-align: center;
+}
+
+.table-message {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    min-height: 20px;
+}
+
+.table-actions-inner {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 40px;
+}
+
+.table-controls.challenge-mode {
+    background: rgba(255, 193, 7, 0.2);
+    border-color: #ffc107;
+}
+
+.table-controls.challenge-mode .table-message {
+    color: #856404;
+}
+
+.table-controls.active-turn {
+    animation: pulse-glow-blue 2s infinite;
+}
+
+.table-controls.active-turn .table-message {
+    animation: blink 1.5s infinite;
+}
+
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.waiting-message {
+    color: #64748b;
+    font-style: italic;
+    padding: 0.5rem;
+}
+
+/* === Game Management (inside table area) === */
+
+.game-management {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.game-management .btn {
+    font-size: 14px;
+    padding: 8px 16px;
+    min-width: 120px;
+}
+
 /* === Cards === */
 
 .hand {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
 .card {
@@ -516,95 +760,101 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     font-style: italic;
 }
 
-/* === Card Pile === */
+/* === Scoring Area === */
 
-.card-pile {
+.scoring-area {
+    margin-top: 10px;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.scoring-area h3 {
     text-align: center;
-    padding: 0.5rem;
+    margin-bottom: 15px;
+    color: #333;
 }
 
-.pile-visual {
-    font-size: 3rem;
-    line-height: 1;
-}
-
-/* === Previous Play === */
-
-.previous-play-area {
-    padding: 0.5rem;
-}
-
-.face-down-cards {
+.score-items {
     display: flex;
-    gap: 0.4rem;
-}
-
-/* === Actions === */
-
-.actions {
-    display: flex;
+    justify-content: space-around;
     flex-wrap: wrap;
-    gap: 1rem;
-    align-items: flex-end;
+    gap: 20px;
 }
 
-.action-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.score-item {
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 100px;
 }
 
-.waiting-message {
-    color: #64748b;
-    font-style: italic;
-    padding: 0.5rem;
+.score-item .player-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
 }
 
-/* === Score Table === */
+.score-item .score {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+}
 
-.score-table {
+.score-item--you {
+    border: 2px solid #2563eb;
+    background: #eff6ff;
+}
+
+/* Score table (used only in final results overlay) */
+.final-results-content .score-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
 }
 
-.score-table th,
-.score-table td {
+.final-results-content .score-table th,
+.final-results-content .score-table td {
     padding: 0.4rem 0.75rem;
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.score-table th {
+.final-results-content .score-table th {
     background: #f8fafc;
     font-weight: 600;
 }
 
-.score-row--you { background: #eff6ff; }
 .score-row--winner { background: #fef3c7; font-weight: 600; }
 
 /* === Event Log === */
 
 #event-log {
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(23, 162, 184, 0.1);
+    border-radius: 10px;
+    border-left: 4px solid #17a2b8;
+    min-height: 200px;
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 0.5rem;
-    background: #fff;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
 #event-log h3 {
     position: sticky;
     top: 0;
-    background: #fff;
-    padding-bottom: 0.25rem;
+    background: inherit;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
 }
 
 .event-entry {
     padding: 0.25rem 0;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid rgba(23, 162, 184, 0.15);
 }
 
 .event-time {
@@ -613,13 +863,10 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     margin-right: 0.5rem;
 }
 
-/* === Management Buttons === */
-
-.management-buttons {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
+#event-log::-webkit-scrollbar { width: 6px; }
+#event-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+#event-log::-webkit-scrollbar-thumb { background: rgba(23, 162, 184, 0.3); border-radius: 3px; }
+#event-log::-webkit-scrollbar-thumb:hover { background: rgba(23, 162, 184, 0.5); }
 
 /* === Final Results Overlay === */
 
@@ -644,12 +891,6 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 /* === Help === */
 
-details summary {
-    cursor: pointer;
-    font-weight: 600;
-    padding: 0.5rem;
-}
-
 .help-text {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
@@ -661,6 +902,25 @@ details summary {
 
 .help-text li {
     margin-bottom: 0.3rem;
+}
+
+/* === Animations === */
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); }
+    50% { box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6); border-color: #20c997; }
+    100% { box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3); }
+}
+
+@keyframes pulse-glow-blue {
+    0% { box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2); }
+    50% { box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4); border-color: #0056b3; }
+    100% { box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2); }
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
 }
 
 /* === Responsive === */
@@ -697,6 +957,42 @@ details summary {
     .game-board-panel {
         padding: 15px;
     }
+
+    .players-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .table-display {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .previous-play-section {
+        width: 100%;
+    }
+
+    .table-actions-inner {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .status-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .score-items {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game-management-controls .btn {
+        font-size: 11px;
+        padding: 6px 10px;
+        width: 120px;
+    }
 }
 
 /* === Empty placeholder divs should not take space === */
@@ -711,6 +1007,7 @@ details summary {
 #score-table:empty,
 #event-log:empty,
 #game-management:empty,
+#management-controls:empty,
 #final-results:empty,
 #help-content:empty {
     display: none;

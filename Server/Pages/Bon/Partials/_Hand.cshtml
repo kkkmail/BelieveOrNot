@@ -33,8 +33,8 @@
         </div>
         <span class="selection-counter"></span>
     }
-    else if (Model.State.Phase == GamePhase.InProgress)
+    else if (Model.State.MatchId != Guid.Empty)
     {
-        <p class="hand-empty">You have no cards.</p>
+        <h3>Your Hand (0 cards)</h3>
     }
 </div>
