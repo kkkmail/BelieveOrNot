@@ -31,6 +31,7 @@
             <button class="help-button" title="Game Rules &amp; Help"
                     onclick="document.getElementById('help-modal').showModal()">?</button>
         </div>
+        <a href="/" class="btn btn-other-games">OTHER GAMES</a>
         <div id="management-controls"></div>
     </div>
 
@@ -89,9 +90,6 @@
                         hx-include="#playerName, #matchIdJoin"
                         hx-swap="none">JOIN EXISTING GAME</button>
             </div>
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="/" class="btn btn-other-games">OTHER GAMES</a>
-            </div>
         </section>
     </div>
 
@@ -120,6 +118,28 @@
 </div>
 
 <script>
+// Pre-fill player name from cookie
+(function() {
+    var m = document.cookie.match(/(?:^|;\s*)believeOrNotPlayerName=([^;]*)/);
+    if (m) {
+        var name = decodeURIComponent(m[1]);
+        var input = document.getElementById('playerName');
+        if (input && name) input.value = name;
+    }
+})();
+
+// Store player name in cookie before create/join
+document.body.addEventListener('htmx:configRequest', function(evt) {
+    var path = evt.detail.path;
+    if (path === '/bon/create' || path === '/bon/join') {
+        var name = document.getElementById('playerName').value;
+        if (name) {
+            document.cookie = 'believeOrNotPlayerName=' + encodeURIComponent(name) +
+                ';path=/;max-age=' + (365 * 24 * 60 * 60) + ';SameSite=Lax';
+        }
+    }
+});
+
 // Convert <time> elements from UTC to local time
 function convertTimes(root) {
     root.querySelectorAll('time.event-time[datetime]').forEach(function(el) {

@@ -1,5 +1,6 @@
 @model BonViewModel
 <div id="game-management" hx-swap-oob="true">@if (Model.IsCreator && Model.State.MatchId != Guid.Empty
+    && Model.State.Players.Count >= 2
     && (Model.State.Phase == GamePhase.WaitingForPlayers || Model.State.Phase == GamePhase.RoundEnd))
 {
     <div class="game-management">
