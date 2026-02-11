@@ -1,6 +1,7 @@
 // Program.cs
 using BelieveOrNot.Server.BelieveOrNot;
 using BelieveOrNot.Server.King;
+using BelieveOrNot.Server.Sse;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,9 @@ builder.Host.UseWindowsService();
 builder.Services.Configure<GameSettings>(
     builder.Configuration.GetSection("GameSettings"));
 
+// Add Razor Pages
+builder.Services.AddRazorPages();
+
 // Add services for BelieveOrNot
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IMatchManager, MatchManager>();
@@ -21,6 +25,10 @@ builder.Services.AddSingleton<IGameEngine, GameEngine>();
 builder.Services.AddSingleton<IKingMatchManager, KingMatchManager>();
 builder.Services.AddSingleton<IKingGameEngine, KingGameEngine>();
 builder.Services.AddSingleton<IKingEventBroadcaster, KingEventBroadcaster>();
+
+// Add SSE infrastructure
+builder.Services.AddSingleton<ISseConnectionManager, SseConnectionManager>();
+builder.Services.AddSingleton<ISseBroadcaster, SseBroadcaster>();
 
 builder.Services.AddCors(options =>
 {
@@ -38,6 +46,23 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 app.UseCors();
 
+// Player ID cookie middleware - generates a persistent player identity
+app.Use(async (context, next) =>
+{
+    if (!context.Request.Cookies.ContainsKey("PlayerId"))
+    {
+        var playerId = Guid.NewGuid().ToString();
+        context.Response.Cookies.Append("PlayerId", playerId, new CookieOptions
+        {
+            HttpOnly = true,
+            SameSite = SameSiteMode.Strict,
+            MaxAge = TimeSpan.FromDays(365),
+            Path = "/"
+        });
+    }
+    await next();
+});
+
 var staticFilesEnabled = app.Configuration.GetValue<bool>("ServerSettings:StaticFilesEnabled", true);
 if (staticFilesEnabled)
 {
@@ -52,6 +77,8 @@ if (staticFilesEnabled)
         RequestPath = "/king"
     });
 }
+
+app.MapRazorPages();
 
 // Map hubs for both games - use different paths to avoid conflicts
 var hubPath = app.Configuration.GetValue<string>("ServerSettings:SignalRHubPath") ?? "/game";
@@ -79,6 +106,42 @@ app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager m
 
     var match = matchManager.GetMatch(matchId);
     return Results.Ok(new { exists = match != null });
+});
+
+// SSE endpoint for BelieveOrNot real-time updates
+app.MapGet("/bon/sse", async (HttpContext context, ISseConnectionManager sseManager) =>
+{
+    if (!Guid.TryParse(context.Request.Query["matchId"], out var matchId) ||
+        !Guid.TryParse(context.Request.Query["playerId"], out var playerId))
+    {
+        context.Response.StatusCode = 400;
+        return;
+    }
+
+    context.Response.ContentType = "text/event-stream";
+    context.Response.Headers.CacheControl = "no-cache";
+    context.Response.Headers.Connection = "keep-alive";
+
+    var cts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted);
+    sseManager.AddConnection(playerId, matchId, context.Response, cts);
+
+    // Send initial connection confirmation
+    await context.Response.WriteAsync($"event: connected\ndata: ok\n\n", cts.Token);
+    await context.Response.Body.FlushAsync(cts.Token);
+
+    try
+    {
+        // Keep the connection open until cancelled
+        await Task.Delay(Timeout.Infinite, cts.Token);
+    }
+    catch (OperationCanceledException)
+    {
+        // Expected when connection closes
+    }
+    finally
+    {
+        sseManager.RemoveConnection(playerId);
+    }
 });
 
 app.Run();

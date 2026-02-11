@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebSearch",
+      "WebFetch(domain:unpkg.com)",
+      "Bash(curl:*)",
+      "Bash(dotnet build:*)"
     ]
   }
 }

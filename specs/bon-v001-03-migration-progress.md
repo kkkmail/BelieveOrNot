@@ -1,20 +1,22 @@
 # Migration Progress Tracker
 
 **Spec**: `bon-v001-02-migration.md`
-**Started**: not yet
-**Last updated**: not yet
+**Started**: 2026-02-10
+**Last updated**: 2026-02-10
 
 ---
 
-## Phase 1 — Foundation
-- [ ] Enable Razor Pages in Program.cs
-- [ ] Create Pages/ folder structure
-- [ ] Add htmx (CDN or vendored)
-- [ ] Player ID via server-set cookie
-- [ ] Create interaction.js (server-driven constraint enforcement)
-- [ ] Build SSE infrastructure (SseConnectionManager, SseBroadcaster)
-- [ ] Create site.css with layout primitives
-- [ ] Scaffold test page at /bon
+## Phase 1 — Foundation (COMPLETE)
+- [x] Enable Razor Pages in Program.cs
+- [x] Create Pages/ folder structure
+- [x] Add htmx (vendored: htmx 2.0.8, SSE ext 2.2.4 in wwwroot/lib/htmx/)
+- [x] Player ID via server-set cookie (HttpOnly, 365-day MaxAge)
+- [x] Create interaction.js (server-driven constraint enforcement)
+- [x] Build SSE infrastructure (SseConnectionManager, SseBroadcaster in Server/Sse/)
+- [x] GET /bon/sse endpoint registered in Program.cs
+- [x] Create site.css with layout primitives (.row, .stack, .grid)
+- [x] Scaffold test page at /bon
+- [x] Build succeeds (0 warnings, 0 errors)
 
 ## Phase 2 — BelieveOrNot Endpoints
 - [ ] POST /bon/create
@@ -26,7 +28,6 @@
 - [ ] POST /bon/end-round
 - [ ] POST /bon/end-game
 - [ ] POST /bon/message
-- [ ] GET /bon/sse (SSE connection endpoint)
 - [ ] BonViewRenderer service
 - [ ] Connection tracking via SseConnectionManager
 
@@ -85,4 +86,8 @@
 
 ## Decisions & Notes
 
-(Record any decisions or issues encountered during migration here)
+- **Player ID**: Server-set HttpOnly cookie (not localStorage). Persistent for 365 days.
+- **htmx**: Vendored locally (not CDN) at wwwroot/lib/htmx/ — htmx 2.0.8, SSE extension 2.2.4.
+- **HTTPS/HTTP2**: Deferred. Development uses HTTP/1.1. SSE connection limit (6/domain) acceptable for dev since each browser only needs 1 SSE connection per game tab.
+- **Git branch**: Working on `ai-htmx`.
+- **Commits**: User commits manually after review. LLM does not commit.
