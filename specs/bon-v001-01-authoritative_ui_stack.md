@@ -31,14 +31,15 @@ CC must **not** ask clarification questions or introduce alternatives.
 ---
 
 ### Interactivity Layer
-**htmx**
+**htmx + server-driven interaction script**
 
-- htmx is the **only allowed JavaScript library**
+- htmx is the **primary JavaScript library**
 - Player actions are defined declaratively via `hx-post` / `hx-get` attributes
 - Server-initiated updates are received via htmx SSE extension (`hx-ext="sse"`)
-- No custom JS logic for data, state, or flow control
+- A single **`interaction.js`** file is permitted for transient UI constraints (see section below)
+- No other custom JS files
 
-**Rationale:** htmx provides both the request/response cycle (player actions) and server-push reception (SSE) in a single declarative library. No custom JavaScript is needed for either direction of communication.
+**Rationale:** htmx provides both the request/response cycle (player actions) and server-push reception (SSE) in a single declarative library. A minimal interaction script handles pre-submission UX constraints that pure CSS cannot express.
 
 ---
 
@@ -137,6 +138,68 @@ Only step 2 is a game action. Step 1 is equivalent to a user filling out a form 
 
 ---
 
+## Interaction Script Rules (`interaction.js`)
+
+### Why it exists
+CSS `:checked` and `:has()` handle most selection visuals (highlighting, showing/hiding buttons). However, some pre-submission constraints cannot be expressed in CSS alone:
+- Enforce maximum card selection (e.g. "select up to 3 cards")
+- Enforce card filtering (e.g. "only spades are selectable")
+- Display selection counters (e.g. "2 of 3 cards selected")
+
+These constraints are **game rules** and must not be hardcoded in the client. The server defines them.
+
+### Server-driven constraints via `data-*` attributes
+
+The server renders constraint rules as `data-*` attributes on the container element. `interaction.js` reads these attributes and enforces them. When the server pushes new HTML (via SSE or HTTP response), the constraints update automatically because new `data-*` values arrive with the new HTML.
+
+Example — server renders the hand partial:
+```html
+<div id="hand-area"
+     data-max-select="3"
+     data-min-select="1"
+     data-selectable-suits="spades,hearts,diamonds,clubs"
+     data-selectable-ranks="7,8,9,10,J,Q,K,A">
+  <!-- card checkboxes here -->
+</div>
+```
+
+`interaction.js` reads these attributes and:
+- Disables further checkboxes when `data-max-select` is reached
+- Restricts selection to cards matching `data-selectable-suits` / `data-selectable-ranks`
+- Updates a counter display if present
+
+When the server sends a new `_Hand.cshtml` partial (e.g. after a round change with different rules), the `data-*` attributes change and the constraints change with them. No client logic needs updating.
+
+### Strict boundaries
+
+`interaction.js` **may**:
+- Read `data-*` attributes from server-rendered HTML
+- Enable/disable form controls (checkboxes, radio buttons, buttons)
+- Update text content of counter elements
+- Add/remove CSS modifier classes for visual feedback
+- Listen to `htmx:afterSwap` to re-apply constraints after SSE updates
+
+`interaction.js` **must NOT**:
+- Hold game state (match ID, player ID, game phase, scores, etc.)
+- Render HTML or construct DOM elements
+- Communicate with the server (htmx does all HTTP and SSE)
+- Contain game-rule logic — all rules come from server-rendered `data-*` attributes
+- Grow beyond a single file
+
+### Constraint vocabulary
+
+The following `data-*` attributes are the defined constraint vocabulary. `interaction.js` supports only these. New constraints require updating both the spec and the script.
+
+| Attribute | Type | Meaning |
+|---|---|---|
+| `data-max-select` | integer | Maximum selectable items |
+| `data-min-select` | integer | Minimum items required to enable submit |
+| `data-selectable-suits` | comma-separated | Which suits can be selected (empty = all) |
+| `data-selectable-ranks` | comma-separated | Which ranks can be selected (empty = all) |
+| `data-select-mode` | `"multi"` or `"single"` | Checkbox (multi) vs. radio (single) behavior |
+
+---
+
 ## UI Rendering Model
 - Initial page load returns full HTML (Razor page)
 - Player actions trigger HTTP POST via htmx → server returns HTML fragment → htmx swaps it
@@ -204,15 +267,19 @@ Every UI control has:
 ## LLM Interaction Contract
 - LLMs implement UI **only from approved specs**
 - Specs map directly to:
-  - Razor partials
+  - Razor partials (with `data-*` constraint attributes where needed)
   - CSS modifier classes
   - HTTP endpoints (for player actions)
   - SSE event names (for server pushes)
 - LLMs must not invent:
   - client state
-  - JS logic
+  - additional JS files (only `interaction.js` exists, and only for constraint enforcement)
   - additional frameworks or libraries
   - alternative communication mechanisms
+- When adding new interaction constraints:
+  - Define the `data-*` attribute in the spec first
+  - Add server-side rendering of the attribute in the Razor partial
+  - Add handling in `interaction.js`
 
 ---
 
@@ -222,6 +289,7 @@ Every UI control has:
 - Use SSE for all server-initiated updates to players
 - Render all UI on the server using Razor
 - Push personalized HTML to each player (do not expose other players' hands)
+- Encode all interaction constraints as `data-*` attributes in server-rendered HTML
 - Keep CSS minimal and owned in a single file
 - Follow layout primitives strictly
 - Implement overrides via modifier classes only
@@ -233,10 +301,11 @@ Every UI control has:
 - Do NOT add Node.js tooling
 - Do NOT add UI component libraries
 - Do NOT use `!important`
-- Do NOT implement client-side state
+- Do NOT implement client-side game state
 - Do NOT return JSON for UI rendering
 - Do NOT use SignalR
-- Do NOT write custom JavaScript (htmx declarative attributes only)
+- Do NOT hardcode game rules in `interaction.js` — all rules come from server-rendered `data-*` attributes
+- Do NOT create additional JS files beyond `interaction.js`
 
 ---
 

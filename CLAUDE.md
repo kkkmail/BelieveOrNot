@@ -76,6 +76,20 @@ Entry point: `initialization.js` → routes via `gameRouter.js` to the appropria
 - **Personalized state**: Server sends different `GameStateDto` to each player (hides other players' hands)
 - **Events**: `GameEventFactory` creates typed `GameEventDto` objects with emoji icons for the UI
 
+## Migration In Progress
+
+**Before doing any work, read `specs/bon-v001-03-migration-progress.md`** to understand what has been completed and what is next.
+
+- Tech stack spec: `specs/bon-v001-01-authoritative_ui_stack.md`
+- Migration spec: `specs/bon-v001-02-migration.md`
+- Progress tracker: `specs/bon-v001-03-migration-progress.md`
+
+**Rules**:
+- Never commit to git. Stop and ask when you think it's time to commit.
+- Follow the migration spec phase by phase. Do not skip ahead.
+- Zero custom JavaScript — htmx declarative attributes only.
+- All UI rendering is server-side via Razor partials.
+
 ## Game Rules Reference
 
 Full game specification is in `SPEC.md`. Key mechanics:
