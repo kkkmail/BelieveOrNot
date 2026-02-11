@@ -58,8 +58,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 /* === Page Container === */
 
 .page-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
     position: relative;
 }
 
@@ -484,7 +485,10 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     font-weight: normal;
 }
 
-.badge--creator { background: #fef3c7; color: #92400e; }
+.badge-icon {
+    font-size: 0.85rem;
+}
+
 .badge--offline { background: #fee2e2; color: #991b1b; }
 
 /* === Table Area (green dashed border) === */
@@ -512,7 +516,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .table-display {
     display: flex;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0;
     margin-bottom: 5px;
     position: relative;
@@ -583,7 +587,8 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .card-pile-container {
     position: relative;
     width: 100%;
-    height: 140px;
+    flex: 1;
+    min-height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -594,8 +599,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     background: rgba(40, 167, 69, 0.05);
 }
 
-.card-pile-container:empty::after {
-    content: "Empty";
+.pile-empty {
     color: #999;
     font-style: italic;
 }

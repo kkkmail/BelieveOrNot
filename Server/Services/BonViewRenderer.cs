@@ -83,9 +83,11 @@ public class BonViewRenderer : IBonViewRenderer
 
     public Task<string> RenderEventLogEntryAsync(GameEventDto gameEvent)
     {
-        // Render a single event log entry that will be prepended to #event-log via OOB
+        // Render a single event log entry that will be prepended to #event-log via OOB.
+        // Use <time> element with ISO datetime so client JS can convert to local time.
+        var iso = gameEvent.Timestamp.ToString("o");
         var html = $"<div hx-swap-oob=\"afterbegin:#event-log\">" +
-                   $"<div class=\"event-entry\"><span class=\"event-time\">{gameEvent.Timestamp:HH:mm:ss}</span> {gameEvent.DisplayMessage}</div>" +
+                   $"<div class=\"event-entry\"><time class=\"event-time\" datetime=\"{iso}\">{gameEvent.Timestamp:HH:mm:ss}</time> {gameEvent.DisplayMessage}</div>" +
                    $"</div>";
         return Task.FromResult(html);
     }

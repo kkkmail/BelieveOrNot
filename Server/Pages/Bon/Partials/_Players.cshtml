@@ -10,8 +10,8 @@
                 <div class="player-card @(isCurrent ? "current-turn" : "") @(!player.IsConnected ? "player-card--disconnected" : "")">
                     <div class="player-name">
                         @player.Name
-                        @if (player.Id == Model.State.CreatorPlayerId) { <span class="badge badge--creator">👑 Creator</span> }
-                        @if (isYou) { <span class="badge">👤 You</span> }
+                        @if (player.Id == Model.State.CreatorPlayerId) { <span class="badge-icon">⭐</span> <span>Creator</span> }
+                        @if (isYou) { <span class="badge-icon">👤</span> <span>You</span> }
                     </div>
                     <div class="player-stats">
                         <span>Cards: @player.HandCount</span>

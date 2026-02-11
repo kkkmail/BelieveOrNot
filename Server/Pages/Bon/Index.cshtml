@@ -118,3 +118,21 @@
         <div id="help-content"></div>
     </section>
 </div>
+
+<script>
+// Convert <time> elements from UTC to local time
+function convertTimes(root) {
+    root.querySelectorAll('time.event-time[datetime]').forEach(function(el) {
+        var d = new Date(el.getAttribute('datetime'));
+        if (!isNaN(d)) el.textContent = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    });
+}
+convertTimes(document);
+new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(n) {
+            if (n.nodeType === 1) convertTimes(n);
+        });
+    });
+}).observe(document.body, {childList: true, subtree: true});
+</script>
