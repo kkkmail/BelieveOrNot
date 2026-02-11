@@ -57,16 +57,21 @@ public class SseBroadcaster : ISseBroadcaster
         {
             if (connection.Cts.IsCancellationRequested) return;
 
+            // SSE spec requires \n line endings only. On Windows, StringBuilder.AppendLine()
+            // produces \r\n, and Razor output also uses \r\n. The SSE parser treats \r as a
+            // line terminator, so \r\r\n would create a spurious empty line that prematurely
+            // dispatches the event. We must use \n exclusively.
             var sb = new StringBuilder();
-            sb.Append("event: ").AppendLine(eventName);
+            sb.Append("event: ").Append(eventName).Append('\n');
 
-            // SSE data lines: each line of the HTML must be prefixed with "data: "
-            foreach (var line in htmlFragment.Split('\n'))
+            // Normalize HTML to \n-only, then prefix each line with "data: "
+            var normalized = htmlFragment.ReplaceLineEndings("\n");
+            foreach (var line in normalized.Split('\n'))
             {
-                sb.Append("data: ").AppendLine(line);
+                sb.Append("data: ").Append(line).Append('\n');
             }
 
-            sb.AppendLine(); // Empty line terminates the event
+            sb.Append('\n'); // Empty line terminates the event
 
             var bytes = Encoding.UTF8.GetBytes(sb.ToString());
             await connection.Response.Body.WriteAsync(bytes, connection.Cts.Token);
