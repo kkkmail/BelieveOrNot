@@ -127,6 +127,9 @@ public static class BonEndpoints
             await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
             // Render HTML response (includes SSE container for this player)
+            // Update browser URL to include match ID
+            context.Response.Headers["HX-Replace-Url"] = $"/bon?match={match.Id}";
+
             var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
 
             // Append initial events to HTTP response (player has no SSE yet)
@@ -155,8 +158,16 @@ public static class BonEndpoints
         if (playerId == null) return Results.BadRequest("Missing PlayerId cookie.");
 
         var form = await context.Request.ReadFormAsync();
-        var matchIdStr = form["matchId"].ToString();
+        var matchIdStr = form["matchId"].ToString().Trim();
         var playerName = form["playerName"].ToString();
+
+        // Extract GUID from pasted URL (e.g. http://host/bon?match=<guid>)
+        if (matchIdStr.Contains("match=", StringComparison.OrdinalIgnoreCase))
+        {
+            var idx = matchIdStr.IndexOf("match=", StringComparison.OrdinalIgnoreCase) + 6;
+            var end = matchIdStr.IndexOf('&', idx);
+            matchIdStr = end > 0 ? matchIdStr[idx..end] : matchIdStr[idx..];
+        }
 
         if (!Guid.TryParse(matchIdStr, out var matchId))
             return Results.BadRequest("Invalid match ID.");
@@ -177,6 +188,9 @@ public static class BonEndpoints
             // Broadcast to existing SSE connections (other players already in match)
             await BroadcastEventAsync(match, joinEvent, viewRenderer, broadcaster);
             await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
+
+            // Update browser URL to include match ID
+            context.Response.Headers["HX-Replace-Url"] = $"/bon?match={matchId}";
 
             // Render HTML response (includes SSE container for this player)
             var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
@@ -232,6 +246,9 @@ public static class BonEndpoints
         var reconnectEvent = GameEventFactory.CreateConnectionEvent(player.Name, true);
         await BroadcastEventAsync(match, reconnectEvent, viewRenderer, broadcaster);
         await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
+
+        // Update browser URL to include match ID
+        context.Response.Headers["HX-Replace-Url"] = $"/bon?match={matchId}";
 
         var html = await viewRenderer.RenderAllRegionsAsync(match, playerId.Value);
         return Results.Content(html, "text/html");

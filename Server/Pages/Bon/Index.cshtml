@@ -128,6 +128,19 @@
     }
 })();
 
+// Auto-reconnect or pre-fill join form when ?match= is in the URL
+(function() {
+    var matchId = new URLSearchParams(window.location.search).get('match');
+    if (!matchId) return;
+
+    // Pre-fill the join form with the match ID
+    var joinInput = document.getElementById('matchIdJoin');
+    if (joinInput) joinInput.value = matchId;
+
+    // Try to reconnect (succeeds if player is already in the match, otherwise join form stays visible)
+    htmx.ajax('POST', '/bon/reconnect', { target: 'body', swap: 'none', values: { matchId: matchId } });
+})();
+
 // Store player name in cookie before create/join
 document.body.addEventListener('htmx:configRequest', function(evt) {
     var path = evt.detail.path;
