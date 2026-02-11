@@ -10,6 +10,7 @@
 - [ ] Enable Razor Pages in Program.cs
 - [ ] Create Pages/ folder structure
 - [ ] Add htmx (CDN or vendored)
+- [ ] Player ID via server-set cookie
 - [ ] Create interaction.js (server-driven constraint enforcement)
 - [ ] Build SSE infrastructure (SseConnectionManager, SseBroadcaster)
 - [ ] Create site.css with layout primitives

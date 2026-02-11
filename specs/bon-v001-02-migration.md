@@ -69,7 +69,17 @@ Reference htmx from CDN (or vendor a local copy in `wwwroot/lib/`):
 
 Include in `_Layout.cshtml`.
 
-### 3.3 Build SSE infrastructure
+### 3.3 Player ID via cookie
+
+Player identity persists via a server-set cookie (replaces the current `localStorage` approach in JS):
+- On first visit (no cookie), the server generates a new `Guid` and sets it as an `HttpOnly` cookie named `PlayerId`
+- On subsequent requests, the server reads `PlayerId` from the cookie
+- The cookie is included automatically in all HTTP POST requests and the SSE connection
+- No JavaScript involvement in player identity
+
+Implement as middleware or inline in `Program.cs`.
+
+### 3.4 Build SSE infrastructure
 
 Create `Server/Sse/` folder:
 
@@ -91,7 +101,7 @@ Create `Server/Sse/` folder:
 
 Register as singletons in `Program.cs`.
 
-### 3.4 Create `interaction.js`
+### 3.5 Create `interaction.js`
 
 Create `wwwroot/js/interaction.js` — the single permitted JS file beyond htmx.
 
@@ -109,7 +119,7 @@ Include in `_Layout.cshtml` after htmx.
 
 See `bon-v001-01-authoritative_ui_stack.md` § "Interaction Script Rules" for strict boundaries and the full `data-*` constraint vocabulary.
 
-### 3.5 Create single CSS file
+### 3.6 Create single CSS file
 
 Create `wwwroot/css/site.css` with:
 - Layout primitives: `.row`, `.stack`, `.grid`
@@ -120,7 +130,7 @@ Create `wwwroot/css/site.css` with:
 
 This file is built incrementally during Phase 3 and Phase 5 as each UI region is migrated. Start with layout primitives and base styles only.
 
-### 3.6 Scaffold a test page
+### 3.7 Scaffold a test page
 
 Create `Pages/Bon/Index.cshtml` with minimal content (e.g. "BelieveOrNot — new UI") that loads htmx and the CSS file. Verify it renders at `/bon`.
 
