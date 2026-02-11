@@ -70,9 +70,16 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     top: 20px;
     right: 20px;
     display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.top-controls-row {
+    display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 1000;
 }
 
 .btn-other-games {
@@ -92,6 +99,60 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 .btn-other-games:hover { background: #218838; }
 
+/* === Help Button === */
+
+.help-button {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.help-button:hover {
+    background: #138496;
+    transform: scale(1.1);
+}
+
+/* === Help Modal === */
+
+.help-modal {
+    border: none;
+    border-radius: 15px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.help-modal::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.help-modal-content {
+    padding: 30px;
+}
+
+.help-modal-content h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.help-modal-content .btn {
+    display: block;
+    margin: 20px auto 0;
+}
+
 /* === Connection Badge (pill) === */
 
 .connection-badge {
@@ -109,7 +170,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 }
 
 .connection-badge:not(.connected) {
-    display: none;
+    background: #dc3545;
 }
 
 /* === Game Header === */
@@ -264,6 +325,25 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     border: none;
 }
 .btn--warning:hover { background: #e0a800; }
+
+/* === Game Board Panel === */
+
+.game-board-panel {
+    background: rgba(255,255,255,0.95);
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 800px;
+    margin: 0 auto 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Hide the panel entirely when it has no visible content */
+.game-board-panel:not(:has(div:not(:empty))) {
+    display: none;
+}
 
 /* === Match Info (after create/join) === */
 
@@ -613,4 +693,25 @@ details summary {
     .game-setup-panel {
         padding: 20px;
     }
+
+    .game-board-panel {
+        padding: 15px;
+    }
+}
+
+/* === Empty placeholder divs should not take space === */
+
+#sse-container:empty,
+#game-status:empty,
+#players-area:empty,
+#hand-area:empty,
+#previous-play:empty,
+#card-pile:empty,
+#table-actions:empty,
+#score-table:empty,
+#event-log:empty,
+#game-management:empty,
+#final-results:empty,
+#help-content:empty {
+    display: none;
 }

@@ -5,9 +5,33 @@
 
 <!-- Top Controls -->
 <div class="top-controls">
-    <div id="connection-status" class="connection-badge"></div>
+    <div class="top-controls-row">
+        <div id="connection-status" class="connection-badge connected">Connected</div>
+        <button class="help-button" title="Game Rules &amp; Help"
+                onclick="document.getElementById('help-modal').showModal()">?</button>
+    </div>
     <a href="/" class="btn btn-other-games">OTHER GAMES</a>
 </div>
+
+<!-- Help Modal -->
+<dialog id="help-modal" class="help-modal">
+    <div class="help-modal-content">
+        <h2>Game Rules</h2>
+        <div class="help-text">
+            <p><strong>Believe Or Not</strong> is a bluffing card game.</p>
+            <ul>
+                <li>The first player plays 1-3 cards face down and declares a rank (e.g. "Kings").</li>
+                <li>Subsequent players also play 1-3 cards face down, claiming the same rank.</li>
+                <li>Any player can challenge the previous player's cards by picking one card to reveal.</li>
+                <li>If the revealed card matches the declared rank - the challenger collects all table cards.</li>
+                <li>If it does not match - the challenged player collects all table cards.</li>
+                <li>The round ends when a player runs out of cards. That player wins the round.</li>
+                <li>Scores: winners get a bonus, losers lose points per remaining card (jokers cost triple).</li>
+            </ul>
+        </div>
+        <button class="btn btn-secondary" onclick="document.getElementById('help-modal').close()">Close</button>
+    </div>
+</dialog>
 
 <!-- Game Header -->
 <header class="game-header">
@@ -15,7 +39,7 @@
     <p>The Ultimate Bluffing Card Game</p>
 </header>
 
-<!-- Game Setup Section -->
+<!-- Game Setup Section (replaced via OOB after create/join) -->
 <div id="game-setup">
     <section class="game-setup-panel">
         <h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
@@ -67,15 +91,18 @@
     </section>
 </div>
 
-<div id="sse-container"></div>
-<div id="game-status"></div>
-<div id="players-area"></div>
-<div id="hand-area"></div>
-<div id="previous-play"></div>
-<div id="card-pile"></div>
-<div id="table-actions"></div>
-<div id="score-table"></div>
-<div id="event-log"></div>
-<div id="game-management"></div>
-<div id="final-results"></div>
-<div id="help-content"></div>
+<!-- Game Board (white panel, shown after create/join) -->
+<section class="game-board-panel">
+    <div id="sse-container"></div>
+    <div id="game-status"></div>
+    <div id="players-area"></div>
+    <div id="hand-area"></div>
+    <div id="previous-play"></div>
+    <div id="card-pile"></div>
+    <div id="table-actions"></div>
+    <div id="score-table"></div>
+    <div id="event-log"></div>
+    <div id="game-management"></div>
+    <div id="final-results"></div>
+    <div id="help-content"></div>
+</section>
