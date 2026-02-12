@@ -38,9 +38,11 @@ public class BonViewRenderer : IBonViewRenderer
         "/Pages/Bon/Partials/_Help.cshtml",
     ];
 
-    // State updates exclude _SseContainer to avoid replacing the live SSE connection
+    // State updates exclude _SseContainer (avoid replacing live SSE connection)
+    // and _EventLog (entries are delivered individually via afterbegin OOB swaps;
+    // including it here would wipe accumulated entries on every broadcast).
     private static readonly string[] StateUpdatePartials =
-        AllPartials.Where(p => !p.Contains("_SseContainer")).ToArray();
+        AllPartials.Where(p => !p.Contains("_SseContainer") && !p.Contains("_EventLog")).ToArray();
 
     public BonViewRenderer(IRazorPartialRenderer renderer, IGameEngine gameEngine, ILogger<BonViewRenderer> logger)
     {
