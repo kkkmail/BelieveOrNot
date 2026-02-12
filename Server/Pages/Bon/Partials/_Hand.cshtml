@@ -24,8 +24,7 @@
         .ToList();
 }
 <div id="hand-area" hx-swap-oob="true"
-     data-max-select="@maxSelect"
-     data-min-select="@minSelect">
+     @if (Model.CanPlay) {<text>data-max-select="@maxSelect" data-min-select="@minSelect"</text>}
     @if (hand.Count > 0 && Model.State.Phase == GamePhase.InProgress)
     {
         <h3>Your Hand (@hand.Count cards)</h3>

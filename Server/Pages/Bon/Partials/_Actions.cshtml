@@ -23,12 +23,8 @@
                 {
                     @if (Model.MustChallenge)
                     {
-                        @* Previous player has 0 cards — must challenge *@
-                        var prevPlayerName = Model.State.LastActualPlayerIndex.HasValue
-                            && Model.State.LastActualPlayerIndex.Value < Model.State.Players.Count
-                            ? Model.State.Players[Model.State.LastActualPlayerIndex.Value].Name
-                            : "opponent";
-                        <div class="table-message">@prevPlayerName has no cards left — select a card to challenge!</div>
+                        @* Only player with cards — must challenge *@
+                        <div class="table-message">You are the only player with cards — select a card to challenge!</div>
                         <div class="table-actions-inner">
                             <div class="action-group">
                                 <button class="btn btn--challenge" hidden
@@ -113,13 +109,29 @@
         else if (Model.State.Phase == GamePhase.WaitingForPlayers)
         {
             <div class="table-controls">
-                <div class="table-message">Waiting for players to join...</div>
+                @if (Model.IsCreator)
+                {
+                    <div class="table-message">Waiting for players to join. Start the round when ready!</div>
+                }
+                else
+                {
+                    var creatorName = Model.State.Players.Count > 0 ? Model.State.Players[0].Name : "the host";
+                    <div class="table-message">Waiting for <strong>@creatorName</strong> to start the round...</div>
+                }
             </div>
         }
         else if (Model.State.Phase == GamePhase.RoundEnd)
         {
             <div class="table-controls">
-                <div class="table-message">Round ended. Start a new round or end the game.</div>
+                @if (Model.IsCreator)
+                {
+                    <div class="table-message">Round ended. Start a new round or end the game.</div>
+                }
+                else
+                {
+                    var creatorName = Model.State.Players.Count > 0 ? Model.State.Players[0].Name : "the host";
+                    <div class="table-message">Round ended. Waiting for <strong>@creatorName</strong> to continue...</div>
+                }
             </div>
         }
     }
