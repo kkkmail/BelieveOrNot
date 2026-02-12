@@ -18,4 +18,7 @@ public class Match
     // NEW: Track disposed ranks for this round
     public HashSet<string> DisposedRanks { get; set; } = new();
     public int? LastActualPlayerIndex { get; set; } // Track who actually played last
+
+    // Challenge result for UI animation (set after challenge, cleared on next play)
+    public ChallengeEventData? LastChallengeResult { get; set; }
 }

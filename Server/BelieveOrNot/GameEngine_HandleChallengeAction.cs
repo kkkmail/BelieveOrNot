@@ -69,6 +69,23 @@ public partial class GameEngine
             }
         }
 
+        // Store challenge result for UI animation
+        match.LastChallengeResult = new ChallengeEventData
+        {
+            ChallengerName = challenger.Name,
+            ChallengedPlayerName = challengedPlayer.Name,
+            CardIndex = request.ChallengePickIndex!.Value,
+            TotalCards = currentLastPlayCount,
+            RevealedCard = revealedCard,
+            AnnouncedRank = currentAnnouncedRank,
+            IsMatch = isMatch,
+            CollectorName = collector.Name,
+            CardsCollected = collectedCount,
+            RemainingCards = remainingCards,
+            RemainingCardsMatch = remainingCardsMatch,
+            AllTableCards = allTableCards,
+        };
+
         var challengeEvent = GameEventFactory.CreateChallengeEvent(
             challenger.Name,
             challengedPlayer.Name,

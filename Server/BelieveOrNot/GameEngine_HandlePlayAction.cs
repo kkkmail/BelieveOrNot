@@ -5,6 +5,9 @@ public partial class GameEngine
 {
     private GameEventDto HandlePlayAction(Match match, Player player, SubmitMoveRequest request)
     {
+        // Clear any previous challenge result
+        match.LastChallengeResult = null;
+
         // Remove cards from player's hand
         var cardsToRemove = new List<Card>();
         foreach (var requestedCard in request.Cards!)

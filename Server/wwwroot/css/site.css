@@ -10,6 +10,9 @@
     padding: 0;
 }
 
+/* Ensure the hidden attribute always wins over display rules */
+[hidden] { display: none !important; }
+
 /* === Base Typography === */
 
 html {
@@ -778,10 +781,11 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 }
 
 .card--joker .card-suit {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
+    margin-top: 4px;
 }
 
 /* Face-down cards */
@@ -915,6 +919,81 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     font-size: 10px;
     color: rgba(255, 255, 255, 0.25);
     letter-spacing: 2px;
+}
+
+/* === Challenge Result Animation === */
+
+.challenge-result {
+    min-height: 160px;
+}
+
+/* Own-play cards (non-interactive, slightly muted border) */
+.card--own-play .card-face {
+    border-color: #94a3b8;
+    opacity: 0.85;
+}
+
+.card--own-play {
+    cursor: default;
+}
+
+/* Revealed card: flip animation */
+.challenge-card--revealed .challenge-flip {
+    animation: challenge-flip-in 0.6s ease forwards;
+}
+
+/* Remaining cards: delayed flip */
+.challenge-card--remaining .challenge-flip-delayed {
+    animation: challenge-flip-in 0.6s ease forwards;
+    /* delay set via inline style */
+}
+
+/* Start from face-down appearance, animate to face-up */
+@keyframes challenge-flip-in {
+    0% {
+        transform: rotateY(90deg);
+    }
+    100% {
+        transform: rotateY(0deg);
+    }
+}
+
+/* Verdict badge (checkmark or cross) */
+.challenge-verdict {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    animation: verdict-pop 0.3s ease forwards;
+    animation-delay: inherit;
+}
+
+.challenge-verdict--match {
+    background: #28a745;
+}
+
+.challenge-verdict--no-match {
+    background: #dc3545;
+}
+
+@keyframes verdict-pop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Card face needs relative positioning for the verdict badge */
+.challenge-card .card-face {
+    position: relative;
 }
 
 /* === Scoring Area === */

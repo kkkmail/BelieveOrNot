@@ -12,8 +12,6 @@
         if (!container) return;
 
         var maxSelect = parseInt(container.getAttribute("data-max-select"), 10) || Infinity;
-        var minSelect = parseInt(container.getAttribute("data-min-select"), 10) || 0;
-        var selectMode = container.getAttribute("data-select-mode") || "multi";
         var selectableSuits = parseList(container.getAttribute("data-selectable-suits"));
         var selectableRanks = parseList(container.getAttribute("data-selectable-ranks"));
 
@@ -70,14 +68,17 @@
 
     // === Play / Challenge toggling ===
 
-    function getDefaultMessage() {
+    function isFirstTurn() {
         var actions = document.getElementById("table-actions");
-        if (!actions) return "";
-        var rankSelector = actions.querySelector(".rank-selector[data-first-turn]");
-        if (rankSelector) return "Select cards from your hand to play";
-        var hiddenRank = actions.querySelector("input[name='declaredRank'][type='hidden']");
-        if (hiddenRank) return "Select cards to play as " + hiddenRank.value + " or click a card to challenge";
-        return "";
+        if (!actions) return false;
+        return !!actions.querySelector(".rank-selector[data-first-turn]");
+    }
+
+    function getSelectedRank() {
+        var actions = document.getElementById("table-actions");
+        if (!actions) return null;
+        var checked = actions.querySelector('.rank-btn input[type="radio"]:checked');
+        return checked ? checked.value : null;
     }
 
     function updatePlayControls() {
@@ -93,12 +94,18 @@
         var message = actions.querySelector(".table-message");
 
         if (count > 0) {
-            // Cards selected: show play controls, hide challenge
+            // Cards selected: show rank selector (if first turn) and play button
+            if (rankSelector) rankSelector.hidden = false;
             if (playBtn) {
                 playBtn.hidden = false;
                 playBtn.textContent = "PLAY " + count + " CARD" + (count > 1 ? "S" : "");
+                // Disable play button until rank is declared (first turn only)
+                if (isFirstTurn()) {
+                    playBtn.disabled = !getSelectedRank();
+                } else {
+                    playBtn.disabled = false;
+                }
             }
-            if (rankSelector) rankSelector.hidden = false;
             if (challengeBtn) challengeBtn.hidden = true;
 
             // Deselect any previous-play radios (mutual exclusion)
@@ -109,25 +116,22 @@
                 });
             }
 
-            // Build preview from selected cards
-            if (message) {
-                var preview = [];
-                checked.forEach(function (cb) {
-                    var card = cb.closest("[data-rank][data-suit]");
-                    if (card) {
-                        var r = card.getAttribute("data-rank");
-                        var s = card.getAttribute("data-suit");
-                        var sym = { Hearts: "♥", Diamonds: "♦", Clubs: "♣", Spades: "♠" }[s] || "";
-                        preview.push(r === "Joker" ? "🃏" : r + sym);
-                    }
-                });
-                message.textContent = "Playing: " + preview.join(" ");
-            }
+            // Hide the instructional message when cards are selected
+            if (message) message.hidden = true;
         } else {
-            // No cards selected: hide play controls
-            if (playBtn) playBtn.hidden = true;
-            if (rankSelector) rankSelector.hidden = true;
-            if (message) message.innerHTML = getDefaultMessage();
+            // No cards selected: hide play controls and clear rank
+            if (playBtn) {
+                playBtn.hidden = true;
+                playBtn.disabled = true;
+            }
+            if (rankSelector) {
+                rankSelector.hidden = true;
+                // Clear rank selection
+                rankSelector.querySelectorAll('input[type="radio"]').forEach(function (r) {
+                    r.checked = false;
+                });
+            }
+            if (message) message.hidden = false;
         }
     }
 
@@ -158,11 +162,14 @@
             }
 
             var idx = parseInt(checkedRadio.value, 10) + 1;
-            if (message) message.textContent = "Flip card " + idx + " to challenge";
+            if (message) {
+                message.textContent = "Flip card " + idx + " to challenge";
+                message.hidden = false;
+            }
         } else {
             // No previous-play card selected: hide challenge
             if (challengeBtn) challengeBtn.hidden = true;
-            if (message) message.innerHTML = getDefaultMessage();
+            if (message) message.hidden = false;
         }
     }
 
@@ -172,9 +179,32 @@
         var playBtn = actions.querySelector("#play-btn");
         var rankSelector = actions.querySelector(".rank-selector");
         var challengeBtn = actions.querySelector("#challenge-btn");
-        if (playBtn) playBtn.hidden = true;
+        var message = actions.querySelector(".table-message");
+        if (playBtn) { playBtn.hidden = true; playBtn.disabled = true; }
         if (rankSelector) rankSelector.hidden = true;
         if (challengeBtn) challengeBtn.hidden = true;
+        if (message) message.hidden = false;
+    }
+
+    // === Radio button toggle-off support ===
+    // HTML radios can't be unchecked by clicking again; this enables it.
+
+    var lastCheckedRadio = {};
+
+    function handleRadioClick(e) {
+        var radio = e.target;
+        if (radio.type !== "radio") return;
+
+        var key = radio.name;
+        if (lastCheckedRadio[key] === radio) {
+            // Same radio clicked again: uncheck it
+            radio.checked = false;
+            delete lastCheckedRadio[key];
+            // Fire change event so other handlers react
+            radio.dispatchEvent(new Event("change", { bubbles: true }));
+        } else {
+            lastCheckedRadio[key] = radio;
+        }
     }
 
     // === Event listeners ===
@@ -192,16 +222,28 @@
             updatePlayControls();
         }
 
+        // Rank radio selection changed (first turn)
+        if (target.type === "radio" && target.name === "declaredRank") {
+            var playBtn = document.getElementById("play-btn");
+            if (playBtn && !playBtn.hidden) {
+                playBtn.disabled = !target.checked;
+            }
+        }
+
         // Previous-play radio changed
         if (target.type === "radio" && target.name === "challengePickIndex") {
             updateChallengeControls();
         }
     });
 
+    // Click handler for radio toggle-off (must use click, not change)
+    document.addEventListener("click", handleRadioClick);
+
     // Re-apply after htmx swaps new HTML into the DOM
     document.addEventListener("htmx:afterSwap", function (e) {
         applyAll(e.detail.target);
         resetControls();
+        lastCheckedRadio = {};
     });
 
     // Re-apply after SSE-driven out-of-band swaps
@@ -210,6 +252,7 @@
         var id = e.detail.target.id;
         if (id === "table-actions" || id === "hand-area" || id === "previous-play") {
             resetControls();
+            lastCheckedRadio = {};
         }
     });
 

@@ -35,6 +35,23 @@ public partial class GameEngine
             state.YourHand = requestingPlayer.Hand.Select(c => new Card(c.Rank, c.Suit)).ToList();
         }
 
+        // Personalized: include last played cards only for the player who played them
+        if (match.LastActualPlayerIndex.HasValue
+            && match.LastActualPlayerIndex.Value < match.Players.Count
+            && match.LastPlayCardCount > 0
+            && match.TablePile.Count >= match.LastPlayCardCount
+            && requestingPlayer != null
+            && match.Players[match.LastActualPlayerIndex.Value].Id == requestingPlayerId)
+        {
+            state.LastPlayedCards = match.TablePile
+                .Skip(match.TablePile.Count - match.LastPlayCardCount)
+                .Select(c => new Card(c.Rank, c.Suit))
+                .ToList();
+        }
+
+        // Include challenge result for animation display
+        state.ChallengeResult = match.LastChallengeResult;
+
         return state;
     }
 }

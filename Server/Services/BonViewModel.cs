@@ -31,4 +31,10 @@ public class BonViewModel
     public bool CanPlay => State.Phase == GamePhase.InProgress
                            && IsYourTurn
                            && (State.YourHand?.Count ?? 0) > 0;
+
+    // True when the "Last Play" cards belong to this player (show face-up)
+    public bool IsYourLastPlay => State.LastPlayedCards != null && State.LastPlayedCards.Count > 0;
+
+    // True when a challenge just happened (show result animation)
+    public bool HasChallengeResult => State.ChallengeResult != null;
 }

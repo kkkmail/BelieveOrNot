@@ -24,4 +24,10 @@ public record GameStateDto
     // NEW: Structured event data instead of LastAction string
     public GameEventDto? Event { get; set; }
     public int? LastActualPlayerIndex { get; set; }
+
+    // Personalized: actual cards of the last play (only sent to the player who played them)
+    public List<Card>? LastPlayedCards { get; set; }
+
+    // Challenge result for animation (set after a challenge, cleared on next play)
+    public ChallengeEventData? ChallengeResult { get; set; }
 }

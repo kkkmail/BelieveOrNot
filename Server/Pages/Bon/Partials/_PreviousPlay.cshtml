@@ -4,26 +4,145 @@
     {
         <div class="previous-play-section">
             <span class="play-label">Last Play</span>
-            @if (Model.State.LastPlayCardCount > 0)
+            @if (Model.HasChallengeResult)
+            {
+                var cr = Model.State.ChallengeResult!;
+                var suitSymbolMap = new Dictionary<string, string>
+                {
+                    ["Hearts"] = "♥", ["Diamonds"] = "♦", ["Clubs"] = "♣", ["Spades"] = "♠"
+                };
+
+                <div class="previous-play-cards challenge-result">
+                    @* Render all cards in the last play, with the challenged card face-up *@
+                    @for (int i = 0; i < cr.TotalCards; i++)
+                    {
+                        @if (i == cr.CardIndex)
+                        {
+                            @* Revealed card (the one that was challenged) *@
+                            var rc = cr.RevealedCard;
+                            var rcSuitClass = rc.IsJoker ? "joker" : rc.Suit.ToLower();
+                            var rcSym = suitSymbolMap.GetValueOrDefault(rc.Suit, "");
+                            var rcRank = rc.IsJoker ? "🃏" : rc.Rank;
+                            var rcSuit = rc.IsJoker ? "JOKER" : rcSym;
+                            var matchIcon = cr.IsMatch ? "✓" : "✗";
+                            var matchClass = cr.IsMatch ? "match" : "no-match";
+                            <div class="card card--@rcSuitClass challenge-card challenge-card--revealed">
+                                <span class="card-face challenge-flip">
+                                    <span class="card-rank">@rcRank</span>
+                                    <span class="card-suit">@rcSuit</span>
+                                    <span class="challenge-verdict challenge-verdict--@matchClass">@matchIcon</span>
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            @* Remaining cards: flip if challenger lost (isMatch=true) *@
+                            var remainingIdx = i < cr.CardIndex ? i : i - 1;
+                            @if (cr.IsMatch && remainingIdx < cr.RemainingCards.Count)
+                            {
+                                var rem = cr.RemainingCards[remainingIdx];
+                                var remSuitClass = rem.IsJoker ? "joker" : rem.Suit.ToLower();
+                                var remSym = suitSymbolMap.GetValueOrDefault(rem.Suit, "");
+                                var remRank = rem.IsJoker ? "🃏" : rem.Rank;
+                                var remSuit = rem.IsJoker ? "JOKER" : remSym;
+                                var remMatch = remainingIdx < cr.RemainingCardsMatch.Count && cr.RemainingCardsMatch[remainingIdx];
+                                var remIcon = remMatch ? "✓" : "✗";
+                                var remClass = remMatch ? "match" : "no-match";
+                                var delayMs = (remainingIdx + 1) * 600;
+                                <div class="card card--@remSuitClass challenge-card challenge-card--remaining"
+                                     style="animation-delay: @(delayMs)ms">
+                                    <span class="card-face challenge-flip-delayed" style="animation-delay: @(delayMs)ms">
+                                        <span class="card-rank">@remRank</span>
+                                        <span class="card-suit">@remSuit</span>
+                                        <span class="challenge-verdict challenge-verdict--@remClass"
+                                              style="animation-delay: @(delayMs)ms">@remIcon</span>
+                                    </span>
+                                </div>
+                            }
+                            else
+                            {
+                                @* Stay face-down (challenger won) *@
+                                <div class="card card--facedown challenge-card">
+                                    <span class="card-face">
+                                        <span class="card-rank">?</span>
+                                        <span class="card-suit">@cr.AnnouncedRank</span>
+                                    </span>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+                <span class="play-info">
+                    @cr.ChallengerName challenged @cr.ChallengedPlayerName &mdash;
+                    @if (cr.IsMatch)
+                    {
+                        <span>card matched! @cr.ChallengerName collects @cr.CardsCollected cards</span>
+                    }
+                    else
+                    {
+                        <span>bluff caught! @cr.ChallengedPlayerName collects @cr.CardsCollected cards</span>
+                    }
+                </span>
+            }
+            else if (Model.State.LastPlayCardCount > 0)
             {
                 var lastPlayerName = Model.State.LastActualPlayerIndex.HasValue
                     && Model.State.LastActualPlayerIndex.Value < Model.State.Players.Count
                     ? Model.State.Players[Model.State.LastActualPlayerIndex.Value].Name
                     : "Unknown";
+
                 <div class="previous-play-cards">
-                    @for (int i = 0; i < Model.State.LastPlayCardCount; i++)
+                    @if (Model.IsYourLastPlay)
                     {
-                        <label class="card card--facedown">
-                            <input type="radio" name="challengePickIndex" value="@i"
-                                   @(Model.CanChallenge ? "" : "disabled") />
-                            <span class="card-face">
-                                <span class="card-rank">?</span>
-                                <span class="card-suit">@Model.State.AnnouncedRank</span>
-                            </span>
-                        </label>
+                        @* Show face-up: this player knows their own cards *@
+                        @for (int i = 0; i < Model.State.LastPlayedCards!.Count; i++)
+                        {
+                            var card = Model.State.LastPlayedCards[i];
+                            var suitClass = card.IsJoker ? "joker" : card.Suit.ToLower();
+                            var suitSymbol = card.Suit switch
+                            {
+                                "Hearts" => "♥",
+                                "Diamonds" => "♦",
+                                "Clubs" => "♣",
+                                "Spades" => "♠",
+                                _ => ""
+                            };
+                            var displayRank = card.IsJoker ? "🃏" : card.Rank;
+                            var displaySuit = card.IsJoker ? "JOKER" : suitSymbol;
+                            <div class="card card--@suitClass card--own-play">
+                                <span class="card-face">
+                                    <span class="card-rank">@displayRank</span>
+                                    <span class="card-suit">@displaySuit</span>
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @* Show face-down for other players *@
+                        @for (int i = 0; i < Model.State.LastPlayCardCount; i++)
+                        {
+                            <label class="card card--facedown">
+                                <input type="radio" name="challengePickIndex" value="@i"
+                                       @(Model.CanChallenge ? "" : "disabled") />
+                                <span class="card-face">
+                                    <span class="card-rank">?</span>
+                                    <span class="card-suit">@Model.State.AnnouncedRank</span>
+                                </span>
+                            </label>
+                        }
                     }
                 </div>
-                <span class="play-info">@lastPlayerName played @Model.State.LastPlayCardCount card(s) as @Model.State.AnnouncedRank</span>
+                <span class="play-info">
+                    @if (Model.IsYourLastPlay)
+                    {
+                        @:You played @Model.State.LastPlayCardCount card(s) as @Model.State.AnnouncedRank
+                    }
+                    else
+                    {
+                        @:@lastPlayerName played @Model.State.LastPlayCardCount card(s) as @Model.State.AnnouncedRank
+                    }
+                </span>
             }
             else
             {
