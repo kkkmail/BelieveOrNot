@@ -1,5 +1,5 @@
 @model BonViewModel
-<div id="sse-container" hx-swap-oob="true" hx-ext="sse"
+<div id="sse-container" hx-swap-oob="true"
      sse-connect="/bon/sse?matchId=@Model.State.MatchId&playerId=@Model.YourPlayerId">
     <div sse-swap="state-update"></div>
     <div sse-swap="game-event"></div>
