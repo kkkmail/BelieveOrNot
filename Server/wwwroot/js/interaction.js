@@ -66,6 +66,67 @@
         findConstraintContainers(root || document).forEach(applyConstraints);
     }
 
+    // === Card selection order tracking ===
+
+    var selectionOrder = []; // array of data-card-index values in click order
+
+    function rebuildCardOrderInputs() {
+        var orderContainer = document.getElementById("card-order");
+        if (!orderContainer) return;
+        orderContainer.innerHTML = "";
+        selectionOrder.forEach(function (idx) {
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "cardIndices";
+            input.value = idx;
+            orderContainer.appendChild(input);
+        });
+    }
+
+    function updateOrderBadges() {
+        var handArea = document.getElementById("hand-area");
+        if (!handArea) return;
+        handArea.querySelectorAll(".card-order-badge").forEach(function (badge) {
+            badge.hidden = true;
+            badge.textContent = "";
+        });
+        selectionOrder.forEach(function (idx, pos) {
+            var cb = handArea.querySelector('input[data-card-index="' + idx + '"]');
+            if (!cb) return;
+            var badge = cb.closest("label").querySelector(".card-order-badge");
+            if (badge) {
+                badge.textContent = pos + 1;
+                badge.hidden = false;
+            }
+        });
+    }
+
+    function handleCardSelection(checkbox) {
+        var cardIndex = checkbox.getAttribute("data-card-index");
+        if (!cardIndex) return;
+
+        if (checkbox.checked) {
+            // Add to selection order
+            if (selectionOrder.indexOf(cardIndex) === -1) {
+                selectionOrder.push(cardIndex);
+            }
+        } else {
+            // Remove from selection order
+            var pos = selectionOrder.indexOf(cardIndex);
+            if (pos !== -1) {
+                selectionOrder.splice(pos, 1);
+            }
+        }
+        rebuildCardOrderInputs();
+        updateOrderBadges();
+    }
+
+    function clearSelectionOrder() {
+        selectionOrder = [];
+        rebuildCardOrderInputs();
+        updateOrderBadges();
+    }
+
     // === Play / Challenge toggling ===
 
     function isFirstTurn() {
@@ -86,8 +147,7 @@
         var actions = document.getElementById("table-actions");
         if (!handArea || !actions) return;
 
-        var checked = handArea.querySelectorAll('input[type="checkbox"]:checked');
-        var count = checked.length;
+        var count = selectionOrder.length;
         var playBtn = actions.querySelector("#play-btn");
         var rankSelector = actions.querySelector(".rank-selector");
         var challengeBtn = actions.querySelector("#challenge-btn");
@@ -160,6 +220,7 @@
                 });
                 applyConstraints(handArea);
             }
+            clearSelectionOrder();
 
             var idx = parseInt(checkedRadio.value, 10) + 1;
             if (message) {
@@ -184,6 +245,7 @@
         if (rankSelector) rankSelector.hidden = true;
         if (challengeBtn) challengeBtn.hidden = true;
         if (message) message.hidden = false;
+        clearSelectionOrder();
     }
 
     // === Radio button toggle-off support ===
@@ -217,8 +279,9 @@
             if (container) applyConstraints(container);
         }
 
-        // Hand card selection changed
-        if (target.type === "checkbox" && target.name === "cardIndices") {
+        // Hand card selection changed (checkboxes with data-card-index)
+        if (target.type === "checkbox" && target.hasAttribute("data-card-index")) {
+            handleCardSelection(target);
             updatePlayControls();
         }
 

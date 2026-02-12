@@ -59,7 +59,7 @@
                                 <button class="btn btn--play" hidden
                                         id="play-btn"
                                         hx-post="/bon/play"
-                                        hx-include="#hand-area input[name='cardIndices'], #table-actions input[name='declaredRank']"
+                                        hx-include="#card-order input[name='cardIndices'], #table-actions input[name='declaredRank']"
                                         hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
                                         hx-swap="none">
                                     Play Cards
@@ -77,7 +77,7 @@
                                 <button class="btn btn--play" hidden
                                         id="play-btn"
                                         hx-post="/bon/play"
-                                        hx-include="#hand-area input[name='cardIndices'], #table-actions input[name='declaredRank']"
+                                        hx-include="#card-order input[name='cardIndices'], #table-actions input[name='declaredRank']"
                                         hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
                                         hx-swap="none">
                                     Play Cards

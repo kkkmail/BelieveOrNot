@@ -24,7 +24,7 @@
         .ToList();
 }
 <div id="hand-area" hx-swap-oob="true"
-     @if (Model.CanPlay) {<text>data-max-select="@maxSelect" data-min-select="@minSelect"</text>}
+     @if (Model.CanPlay) {<text>data-max-select="@maxSelect" data-min-select="@minSelect"</text>}>
     @if (hand.Count > 0 && Model.State.Phase == GamePhase.InProgress)
     {
         <h3>Your Hand (@hand.Count cards)</h3>
@@ -45,15 +45,17 @@
                 var displayRank = card.IsJoker ? "🃏" : card.Rank;
                 var displaySuit = card.IsJoker ? "JOKER" : suitSymbol;
                 <label class="card card--@suitClass" data-rank="@card.Rank" data-suit="@card.Suit">
-                    <input type="checkbox" name="cardIndices" value="@originalIndex"
+                    <input type="checkbox" data-card-index="@originalIndex"
                            @(Model.CanPlay ? "" : "disabled") />
                     <span class="card-face">
                         <span class="card-rank">@displayRank</span>
                         <span class="card-suit">@displaySuit</span>
+                        <span class="card-order-badge" hidden></span>
                     </span>
                 </label>
             }
         </div>
+        <div id="card-order"></div>
         <span class="selection-counter"></span>
     }
     else if (Model.State.MatchId != Guid.Empty)
