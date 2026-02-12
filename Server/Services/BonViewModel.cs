@@ -37,4 +37,16 @@ public class BonViewModel
 
     // True when a challenge just happened (show result animation)
     public bool HasChallengeResult => State.ChallengeResult != null;
+
+    // True when the previous player has 0 cards — current player must challenge
+    public bool MustChallenge => State.Phase == GamePhase.InProgress
+                                  && IsYourTurn
+                                  && CanChallenge
+                                  && State.LastActualPlayerIndex.HasValue
+                                  && State.LastActualPlayerIndex.Value < State.Players.Count
+                                  && State.Players[State.LastActualPlayerIndex.Value].HandCount == 0;
+
+    // True when you are the challenged player (for personalized challenge result display)
+    public bool IsYouChallengedPlayer => HasChallengeResult
+                                         && State.ChallengeResult!.ChallengedPlayerName == YourName;
 }

@@ -21,7 +21,28 @@
             <div class="@controlsClass">
                 @if (Model.IsYourTurn)
                 {
-                    @if (Model.IsOpeningPlay)
+                    @if (Model.MustChallenge)
+                    {
+                        @* Previous player has 0 cards — must challenge *@
+                        var prevPlayerName = Model.State.LastActualPlayerIndex.HasValue
+                            && Model.State.LastActualPlayerIndex.Value < Model.State.Players.Count
+                            ? Model.State.Players[Model.State.LastActualPlayerIndex.Value].Name
+                            : "opponent";
+                        <div class="table-message">@prevPlayerName has no cards left — select a card to challenge!</div>
+                        <div class="table-actions-inner">
+                            <div class="action-group">
+                                <button class="btn btn--challenge" hidden
+                                        id="challenge-btn"
+                                        hx-post="/bon/challenge"
+                                        hx-include="#previous-play input[name='challengePickIndex']"
+                                        hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
+                                        hx-swap="none">
+                                    Flip Selected Card
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.IsOpeningPlay)
                     {
                         <div class="table-message">Select cards from your hand to play</div>
                         <div class="table-actions-inner">

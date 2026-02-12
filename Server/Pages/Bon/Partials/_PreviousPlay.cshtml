@@ -1,4 +1,10 @@
 @model BonViewModel
+@{
+    var suitSymbolMap = new Dictionary<string, string>
+    {
+        ["Hearts"] = "♥", ["Diamonds"] = "♦", ["Clubs"] = "♣", ["Spades"] = "♠"
+    };
+}
 <div id="previous-play" hx-swap-oob="true">
     @if (Model.State.MatchId != Guid.Empty)
     {
@@ -7,67 +13,92 @@
             @if (Model.HasChallengeResult)
             {
                 var cr = Model.State.ChallengeResult!;
-                var suitSymbolMap = new Dictionary<string, string>
-                {
-                    ["Hearts"] = "♥", ["Diamonds"] = "♦", ["Clubs"] = "♣", ["Spades"] = "♠"
-                };
+                var lastPlayCards = cr.AllTableCards
+                    .Skip(cr.AllTableCards.Count - cr.TotalCards)
+                    .ToList();
 
                 <div class="previous-play-cards challenge-result">
-                    @* Render all cards in the last play, with the challenged card face-up *@
-                    @for (int i = 0; i < cr.TotalCards; i++)
+                    @if (Model.IsYouChallengedPlayer)
                     {
-                        @if (i == cr.CardIndex)
+                        @* Challenged player: all cards face-up (they know them), picked card highlighted *@
+                        @for (int i = 0; i < lastPlayCards.Count; i++)
                         {
-                            @* Revealed card (the one that was challenged) *@
-                            var rc = cr.RevealedCard;
-                            var rcSuitClass = rc.IsJoker ? "joker" : rc.Suit.ToLower();
-                            var rcSym = suitSymbolMap.GetValueOrDefault(rc.Suit, "");
-                            var rcRank = rc.IsJoker ? "🃏" : rc.Rank;
-                            var rcSuit = rc.IsJoker ? "JOKER" : rcSym;
-                            var matchIcon = cr.IsMatch ? "✓" : "✗";
-                            var matchClass = cr.IsMatch ? "match" : "no-match";
-                            <div class="card card--@rcSuitClass challenge-card challenge-card--revealed">
-                                <span class="card-face challenge-flip">
-                                    <span class="card-rank">@rcRank</span>
-                                    <span class="card-suit">@rcSuit</span>
-                                    <span class="challenge-verdict challenge-verdict--@matchClass">@matchIcon</span>
+                            var card = lastPlayCards[i];
+                            var suitClass = card.IsJoker ? "joker" : card.Suit.ToLower();
+                            var sym = suitSymbolMap.GetValueOrDefault(card.Suit, "");
+                            var rank = card.IsJoker ? "🃏" : card.Rank;
+                            var suit = card.IsJoker ? "JOKER" : sym;
+                            var isPicked = i == cr.CardIndex;
+                            var cardMatch = card.Rank == cr.AnnouncedRank || card.IsJoker;
+                            <div class="card card--@suitClass challenge-card @(isPicked ? "challenge-card--picked" : "")">
+                                <span class="card-face">
+                                    <span class="card-rank">@rank</span>
+                                    <span class="card-suit">@suit</span>
+                                    @if (isPicked)
+                                    {
+                                        var matchIcon = cr.IsMatch ? "✓" : "✗";
+                                        var matchClass = cr.IsMatch ? "match" : "no-match";
+                                        <span class="challenge-verdict challenge-verdict--@matchClass">@matchIcon</span>
+                                    }
                                 </span>
                             </div>
                         }
-                        else
+                    }
+                    else
+                    {
+                        @* Other players: flip animation on picked card, delayed flip on remaining *@
+                        @for (int i = 0; i < cr.TotalCards; i++)
                         {
-                            @* Remaining cards: flip if challenger lost (isMatch=true) *@
-                            var remainingIdx = i < cr.CardIndex ? i : i - 1;
-                            @if (cr.IsMatch && remainingIdx < cr.RemainingCards.Count)
+                            @if (i == cr.CardIndex)
                             {
-                                var rem = cr.RemainingCards[remainingIdx];
-                                var remSuitClass = rem.IsJoker ? "joker" : rem.Suit.ToLower();
-                                var remSym = suitSymbolMap.GetValueOrDefault(rem.Suit, "");
-                                var remRank = rem.IsJoker ? "🃏" : rem.Rank;
-                                var remSuit = rem.IsJoker ? "JOKER" : remSym;
-                                var remMatch = remainingIdx < cr.RemainingCardsMatch.Count && cr.RemainingCardsMatch[remainingIdx];
-                                var remIcon = remMatch ? "✓" : "✗";
-                                var remClass = remMatch ? "match" : "no-match";
-                                var delayMs = (remainingIdx + 1) * 600;
-                                <div class="card card--@remSuitClass challenge-card challenge-card--remaining"
-                                     style="animation-delay: @(delayMs)ms">
-                                    <span class="card-face challenge-flip-delayed" style="animation-delay: @(delayMs)ms">
-                                        <span class="card-rank">@remRank</span>
-                                        <span class="card-suit">@remSuit</span>
-                                        <span class="challenge-verdict challenge-verdict--@remClass"
-                                              style="animation-delay: @(delayMs)ms">@remIcon</span>
+                                var rc = cr.RevealedCard;
+                                var rcSuitClass = rc.IsJoker ? "joker" : rc.Suit.ToLower();
+                                var rcSym = suitSymbolMap.GetValueOrDefault(rc.Suit, "");
+                                var rcRank = rc.IsJoker ? "🃏" : rc.Rank;
+                                var rcSuit = rc.IsJoker ? "JOKER" : rcSym;
+                                var matchIcon = cr.IsMatch ? "✓" : "✗";
+                                var matchClass = cr.IsMatch ? "match" : "no-match";
+                                <div class="card card--@rcSuitClass challenge-card challenge-card--revealed">
+                                    <span class="card-face challenge-flip">
+                                        <span class="card-rank">@rcRank</span>
+                                        <span class="card-suit">@rcSuit</span>
+                                        <span class="challenge-verdict challenge-verdict--@matchClass">@matchIcon</span>
                                     </span>
                                 </div>
                             }
                             else
                             {
-                                @* Stay face-down (challenger won) *@
-                                <div class="card card--facedown challenge-card">
-                                    <span class="card-face">
-                                        <span class="card-rank">?</span>
-                                        <span class="card-suit">@cr.AnnouncedRank</span>
-                                    </span>
-                                </div>
+                                var remainingIdx = i < cr.CardIndex ? i : i - 1;
+                                @if (cr.IsMatch && remainingIdx < cr.RemainingCards.Count)
+                                {
+                                    var rem = cr.RemainingCards[remainingIdx];
+                                    var remSuitClass = rem.IsJoker ? "joker" : rem.Suit.ToLower();
+                                    var remSym = suitSymbolMap.GetValueOrDefault(rem.Suit, "");
+                                    var remRank = rem.IsJoker ? "🃏" : rem.Rank;
+                                    var remSuit = rem.IsJoker ? "JOKER" : remSym;
+                                    var remMatch = remainingIdx < cr.RemainingCardsMatch.Count && cr.RemainingCardsMatch[remainingIdx];
+                                    var remIcon = remMatch ? "✓" : "✗";
+                                    var remClass = remMatch ? "match" : "no-match";
+                                    var delayMs = (remainingIdx + 1) * 600;
+                                    <div class="card card--@remSuitClass challenge-card challenge-card--remaining"
+                                         style="animation-delay: @(delayMs)ms">
+                                        <span class="card-face challenge-flip-delayed" style="animation-delay: @(delayMs)ms">
+                                            <span class="card-rank">@remRank</span>
+                                            <span class="card-suit">@remSuit</span>
+                                            <span class="challenge-verdict challenge-verdict--@remClass"
+                                                  style="animation-delay: @(delayMs)ms">@remIcon</span>
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="card card--facedown challenge-card">
+                                        <span class="card-face">
+                                            <span class="card-rank">?</span>
+                                            <span class="card-suit">@cr.AnnouncedRank</span>
+                                        </span>
+                                    </div>
+                                }
                             }
                         }
                     }
@@ -94,21 +125,13 @@
                 <div class="previous-play-cards">
                     @if (Model.IsYourLastPlay)
                     {
-                        @* Show face-up: this player knows their own cards *@
                         @for (int i = 0; i < Model.State.LastPlayedCards!.Count; i++)
                         {
                             var card = Model.State.LastPlayedCards[i];
                             var suitClass = card.IsJoker ? "joker" : card.Suit.ToLower();
-                            var suitSymbol = card.Suit switch
-                            {
-                                "Hearts" => "♥",
-                                "Diamonds" => "♦",
-                                "Clubs" => "♣",
-                                "Spades" => "♠",
-                                _ => ""
-                            };
+                            var sym = suitSymbolMap.GetValueOrDefault(card.Suit, "");
                             var displayRank = card.IsJoker ? "🃏" : card.Rank;
-                            var displaySuit = card.IsJoker ? "JOKER" : suitSymbol;
+                            var displaySuit = card.IsJoker ? "JOKER" : sym;
                             <div class="card card--@suitClass card--own-play">
                                 <span class="card-face">
                                     <span class="card-rank">@displayRank</span>
@@ -119,7 +142,6 @@
                     }
                     else
                     {
-                        @* Show face-down for other players *@
                         @for (int i = 0; i < Model.State.LastPlayCardCount; i++)
                         {
                             <label class="card card--facedown">

@@ -52,6 +52,12 @@ public partial class GameEngine
             scoreResults
         );
 
+        // Clear hands after scoring (cards have been counted)
+        foreach (var player in match.Players)
+        {
+            player.Hand.Clear();
+        }
+
         Console.WriteLine($"Round {match.RoundNumber} ended: {roundEndEvent.DisplayMessage}");
     }
 }

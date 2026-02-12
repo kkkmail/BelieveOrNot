@@ -36,14 +36,18 @@ public partial class GameEngine
         match.LastPlayCardCount = 0;
         match.LastActualPlayerIndex = null;
 
-        // Handle automatic disposal
-        var disposalEvents = AutoDisposeFourOfAKind(collector, match);
+        // Check if round will end (someone has 0 cards) BEFORE auto-dispose
+        // When round ends, all collected cards should count toward the score
+        var roundEnding = match.Players.Any(p => p.Hand.Count == 0);
+        var disposalEvents = roundEnding
+            ? new List<string>()
+            : AutoDisposeFourOfAKind(collector, match);
 
         // Set current player to the collector
         var collectorIndex = match.Players.IndexOf(collector);
         match.CurrentPlayerIndex = collectorIndex;
 
-        // FIXED: Calculate remaining cards and their match status for animation
+        // Calculate remaining cards and their match status for animation
         List<Card> remainingCards = new();
         List<bool> remainingCardsMatch = new();
 
@@ -109,9 +113,8 @@ public partial class GameEngine
             challengeEvent.DisplayMessage += " " + string.Join(" ", disposalMessages);
         }
 
-        // Check if round should end
-        var playersWithNoCards = match.Players.Where(p => p.Hand.Count == 0).ToList();
-        if (playersWithNoCards.Any())
+        // End round if someone has 0 cards, otherwise advance
+        if (roundEnding)
         {
             EndRound(match);
         }
