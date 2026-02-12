@@ -7,7 +7,14 @@
             <div class="card-pile-container">
                 @if (Model.State.TablePileCount > 0)
                 {
-                    <span class="pile-visual">🂠</span>
+                    var displayCount = Math.Min(Model.State.TablePileCount, 15);
+                    var spacing = displayCount <= 5 ? 8 : (displayCount <= 10 ? 5 : 3);
+                    <div class="card-pile-stack" style="width: @(60 + (displayCount - 1) * spacing)px">
+                        @for (int i = 0; i < displayCount; i++)
+                        {
+                            <div class="card-back" style="left: @(i * spacing)px"></div>
+                        }
+                    </div>
                 }
                 else
                 {

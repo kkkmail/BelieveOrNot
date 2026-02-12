@@ -555,9 +555,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 .previous-play-cards {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
-    min-height: 100px;
+    min-height: 140px;
     align-items: center;
     width: 100%;
     margin-top: 7px;
@@ -611,11 +611,6 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .pile-empty {
     color: #999;
     font-style: italic;
-}
-
-.pile-visual {
-    font-size: 3rem;
-    line-height: 1;
 }
 
 /* === Table Controls (blue bordered area for actions) === */
@@ -700,7 +695,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .hand {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 10px;
     justify-content: center;
     margin-bottom: 10px;
 }
@@ -711,6 +706,11 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
     align-items: center;
     cursor: pointer;
     position: relative;
+    transition: transform 0.15s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
 }
 
 .card input[type="checkbox"],
@@ -723,24 +723,37 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 
 .card-face {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 78px;
-    border: 2px solid #cbd5e1;
-    border-radius: 6px;
+    width: 90px;
+    height: 130px;
+    border: 3px solid #333;
+    border-radius: 12px;
     background: #fff;
-    font-size: 1.1rem;
     font-weight: 700;
-    transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease, border-color 0.15s, box-shadow 0.15s, background 0.15s;
     user-select: none;
 }
 
+.card-rank {
+    font-size: clamp(36px, 3.5vw, 48px);
+    font-weight: bold;
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.card-suit {
+    font-size: clamp(24px, 2.5vw, 32px);
+    line-height: 1;
+}
+
 .card input:checked + .card-face {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px #93c5fd;
-    transform: translateY(-4px);
-    background: #eff6ff;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px #93c5fd, 0 4px 12px rgba(0, 123, 255, 0.3);
+    transform: translateY(-15px);
+    background: #e3f2fd;
 }
 
 .card input:disabled + .card-face {
@@ -752,17 +765,49 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .card--diamonds .card-face { color: #dc2626; }
 .card--clubs .card-face,
 .card--spades .card-face { color: #1e293b; }
-.card--joker .card-face { color: #7c3aed; }
 
+/* Joker card */
+.card--joker .card-face {
+    background: linear-gradient(45deg, #ff6b6b, #feca57);
+    color: #fff;
+    border-color: #ff6b6b;
+}
+
+.card--joker .card-rank {
+    font-size: clamp(48px, 4vw, 64px);
+}
+
+.card--joker .card-suit {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Face-down cards */
 .card--facedown .card-face {
     background: #334155;
     color: #94a3b8;
-    font-size: 1.5rem;
+    border-color: #475569;
+    width: 90px;
+    height: 130px;
+}
+
+.card--facedown .card-rank {
+    font-size: clamp(36px, 3.5vw, 48px);
+}
+
+.card--facedown .card-suit {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0.7;
 }
 
 .card--facedown input:checked + .card-face {
     border-color: #dc2626;
-    box-shadow: 0 0 0 2px #fca5a5;
+    box-shadow: 0 0 0 3px #fca5a5, 0 4px 12px rgba(220, 38, 38, 0.3);
+    transform: translateY(-15px);
 }
 
 .selection-counter {
@@ -774,6 +819,102 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 .hand-empty {
     color: #64748b;
     font-style: italic;
+}
+
+/* === Rank Selector === */
+
+.rank-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.rank-selector-label {
+    font-weight: 700;
+    font-size: 14px;
+    color: #333;
+}
+
+.rank-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.rank-btn {
+    cursor: pointer;
+}
+
+.rank-btn input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.rank-btn span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border: 2px solid #adb5bd;
+    border-radius: 6px;
+    background: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    color: #333;
+    transition: all 0.15s;
+    cursor: pointer;
+}
+
+.rank-btn span:hover {
+    border-color: #007bff;
+    background: #e3f2fd;
+}
+
+.rank-btn input:checked + span {
+    background: #007bff;
+    color: #fff;
+    border-color: #0056b3;
+}
+
+/* === Card Pile Stack === */
+
+.card-pile-stack {
+    position: relative;
+    height: 100px;
+    min-width: 60px;
+}
+
+.card-back {
+    position: absolute;
+    top: 0;
+    width: 60px;
+    height: 90px;
+    border-radius: 8px;
+    border: 2px solid #475569;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 30%, #1e3a5f 50%, #2d5a8e 70%, #1e3a5f 100%);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.card-back::after {
+    content: "♠♥♦♣";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.25);
+    letter-spacing: 2px;
 }
 
 /* === Scoring Area === */

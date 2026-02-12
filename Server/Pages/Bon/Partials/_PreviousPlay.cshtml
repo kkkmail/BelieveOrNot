@@ -16,11 +16,14 @@
                         <label class="card card--facedown">
                             <input type="radio" name="challengePickIndex" value="@i"
                                    @(Model.CanChallenge ? "" : "disabled") />
-                            <span class="card-face">?</span>
+                            <span class="card-face">
+                                <span class="card-rank">?</span>
+                                <span class="card-suit">@Model.State.AnnouncedRank</span>
+                            </span>
                         </label>
                     }
                 </div>
-                <span class="play-info">@lastPlayerName played @Model.State.LastPlayCardCount card(s)</span>
+                <span class="play-info">@lastPlayerName played @Model.State.LastPlayCardCount card(s) as @Model.State.AnnouncedRank</span>
             }
             else
             {

@@ -3,6 +3,25 @@
     var hand = Model.State.YourHand ?? new List<Card>();
     var maxSelect = Model.MaxCardsPerPlay;
     var minSelect = Model.MinCardsPerPlay;
+
+    // Sort: Jokers first, then by rank (2→A), then by suit (S, C, D, H)
+    var rankOrder = new Dictionary<string, int>
+    {
+        ["2"] = 0, ["3"] = 1, ["4"] = 2, ["5"] = 3, ["6"] = 4,
+        ["7"] = 5, ["8"] = 6, ["9"] = 7, ["10"] = 8,
+        ["J"] = 9, ["Q"] = 10, ["K"] = 11, ["A"] = 12
+    };
+    var suitOrder = new Dictionary<string, int>
+    {
+        ["Spades"] = 0, ["Clubs"] = 1, ["Diamonds"] = 2, ["Hearts"] = 3
+    };
+
+    var sortedHand = hand
+        .Select((card, idx) => new { card, idx })
+        .OrderBy(x => x.card.IsJoker ? 0 : 1)
+        .ThenBy(x => rankOrder.GetValueOrDefault(x.card.Rank, -1))
+        .ThenBy(x => suitOrder.GetValueOrDefault(x.card.Suit, 99))
+        .ToList();
 }
 <div id="hand-area" hx-swap-oob="true"
      data-max-select="@maxSelect"
@@ -11,9 +30,10 @@
     {
         <h3>Your Hand (@hand.Count cards)</h3>
         <div class="hand">
-            @for (int i = 0; i < hand.Count; i++)
+            @foreach (var item in sortedHand)
             {
-                var card = hand[i];
+                var card = item.card;
+                var originalIndex = item.idx;
                 var suitClass = card.IsJoker ? "joker" : card.Suit.ToLower();
                 var suitSymbol = card.Suit switch
                 {
@@ -23,11 +43,15 @@
                     "Spades" => "♠",
                     _ => ""
                 };
-                var displayText = card.IsJoker ? "🃏" : $"{card.Rank}{suitSymbol}";
-                <label class="card card--@suitClass">
-                    <input type="checkbox" name="cardIndices" value="@i"
+                var displayRank = card.IsJoker ? "🃏" : card.Rank;
+                var displaySuit = card.IsJoker ? "JOKER" : suitSymbol;
+                <label class="card card--@suitClass" data-rank="@card.Rank" data-suit="@card.Suit">
+                    <input type="checkbox" name="cardIndices" value="@originalIndex"
                            @(Model.CanPlay ? "" : "disabled") />
-                    <span class="card-face">@displayText</span>
+                    <span class="card-face">
+                        <span class="card-rank">@displayRank</span>
+                        <span class="card-suit">@displaySuit</span>
+                    </span>
                 </label>
             }
         </div>

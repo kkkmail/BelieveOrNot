@@ -21,48 +21,67 @@
             <div class="@controlsClass">
                 @if (Model.IsYourTurn)
                 {
-                    <div class="table-message">Your turn!</div>
-                    <div class="table-actions-inner">
-                        <div class="action-group">
-                            @if (Model.IsOpeningPlay)
-                            {
-                                <label>Declare Rank
-                                    <select name="declaredRank">
+                    @if (Model.IsOpeningPlay)
+                    {
+                        <div class="table-message">Select cards from your hand to play</div>
+                        <div class="table-actions-inner">
+                            <div class="action-group">
+                                <div class="rank-selector" data-first-turn="true" hidden>
+                                    <span class="rank-selector-label">Declare Rank:</span>
+                                    <div class="rank-buttons">
                                         @foreach (var rank in availableRanks)
                                         {
-                                            <option value="@rank">@rank</option>
+                                            <label class="rank-btn">
+                                                <input type="radio" name="declaredRank" value="@rank" />
+                                                <span>@rank</span>
+                                            </label>
                                         }
-                                    </select>
-                                </label>
-                            }
-                            else
-                            {
-                                <input type="hidden" name="declaredRank" value="@Model.State.AnnouncedRank" />
-                                <p>Playing as <strong>@Model.State.AnnouncedRank</strong></p>
-                            }
+                                    </div>
+                                </div>
 
-                            <button class="btn btn--play"
-                                    hx-post="/bon/play"
-                                    hx-include="#hand-area input[name='cardIndices'], #table-actions input, #table-actions select"
-                                    hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
-                                    hx-swap="none">
-                                Play Cards
-                            </button>
-                        </div>
-
-                        @if (Model.CanChallenge)
-                        {
-                            <div class="action-group">
-                                <button class="btn btn--challenge"
-                                        hx-post="/bon/challenge"
-                                        hx-include="#previous-play input[name='challengePickIndex']"
+                                <button class="btn btn--play" hidden
+                                        id="play-btn"
+                                        hx-post="/bon/play"
+                                        hx-include="#hand-area input[name='cardIndices'], #table-actions input[name='declaredRank']"
                                         hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
                                         hx-swap="none">
-                                    Challenge
+                                    Play Cards
                                 </button>
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-message">Select cards to play as <strong>@Model.State.AnnouncedRank</strong> or click a card to challenge</div>
+                        <div class="table-actions-inner">
+                            <div class="action-group">
+                                <input type="hidden" name="declaredRank" value="@Model.State.AnnouncedRank" />
+
+                                <button class="btn btn--play" hidden
+                                        id="play-btn"
+                                        hx-post="/bon/play"
+                                        hx-include="#hand-area input[name='cardIndices'], #table-actions input[name='declaredRank']"
+                                        hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
+                                        hx-swap="none">
+                                    Play Cards
+                                </button>
+                            </div>
+
+                            @if (Model.CanChallenge)
+                            {
+                                <div class="action-group">
+                                    <button class="btn btn--challenge" hidden
+                                            id="challenge-btn"
+                                            hx-post="/bon/challenge"
+                                            hx-include="#previous-play input[name='challengePickIndex']"
+                                            hx-vals='{"matchId": "@Model.State.MatchId", "clientCmdId": "@Guid.NewGuid()"}'
+                                            hx-swap="none">
+                                        Flip Selected Card
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
                 }
                 else
                 {
