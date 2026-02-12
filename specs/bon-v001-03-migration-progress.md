@@ -2,7 +2,7 @@
 
 **Spec**: `bon-v001-02-migration.md`
 **Started**: 2026-02-10
-**Last updated**: 2026-02-11
+**Last updated**: 2026-02-12
 
 ---
 
@@ -61,7 +61,8 @@
 - [x] All endpoints return correct HTML (curl-tested: create, join, start-round, play, challenge, end-round, end-game, message, check-match)
 - [x] Error cases verified (missing cookie, bad IDs, non-creator, etc.)
 - [x] Old frontend at / still works
-- [ ] Full browser testing with htmx (SSE push, OOB swaps, interaction.js)
+- [x] Full browser testing with htmx (SSE push, OOB swaps, interaction.js)
+- [x] UI fixes documented in `bon-v001-04-phase3-browser-testing.md`
 
 ## Phase 4 — King Endpoints
 - [ ] POST /king/create
