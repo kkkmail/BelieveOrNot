@@ -33,15 +33,13 @@ public static class BonEndpoints
     }
 
     private static async Task BroadcastStatesAsync(
-        Match match, IBonViewRenderer viewRenderer, ISseBroadcaster broadcaster, ISseConnectionManager sseManager,
-        Guid? excludePlayerId = null)
+        Match match, IBonViewRenderer viewRenderer, ISseBroadcaster broadcaster, ISseConnectionManager sseManager)
     {
         // Use RenderStateUpdateAsync (excludes _SseContainer and _EventLog) to avoid
         // OOB-replacing the live SSE connection or wiping accumulated event entries.
-        // When excludePlayerId is set, skip that player (they already get the HTTP response).
-        var connections = excludePlayerId.HasValue
-            ? sseManager.GetOtherConnectionsForMatch(match.Id, excludePlayerId.Value).ToList()
-            : sseManager.GetConnectionsForMatch(match.Id).ToList();
+        // All players receive the SSE broadcast — the acting player's HTTP response OOB
+        // swaps are not reliably processed by htmx with hx-swap="none".
+        var connections = sseManager.GetConnectionsForMatch(match.Id).ToList();
 
         var rendered = new Dictionary<Guid, string>();
 
@@ -288,8 +286,7 @@ public static class BonEndpoints
         if (roundState.Event != null)
             await BroadcastEventAsync(match, roundState.Event, viewRenderer, broadcaster);
 
-        // Exclude requesting player from SSE broadcast (they get the HTTP response)
-        await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager, playerId.Value);
+        await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
         var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
         return Results.Content(html, "text/html");
@@ -357,8 +354,7 @@ public static class BonEndpoints
             ProcessedCommands.TryAdd(clientCmdId, matchId);
 
             await BroadcastMoveEventAsync(match, state, viewRenderer, broadcaster);
-            // Exclude requesting player from SSE broadcast (they get the HTTP response)
-            await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager, playerId.Value);
+            await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
             var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
             return Results.Content(html, "text/html");
@@ -417,8 +413,7 @@ public static class BonEndpoints
             ProcessedCommands.TryAdd(clientCmdId, matchId);
 
             await BroadcastMoveEventAsync(match, state, viewRenderer, broadcaster);
-            // Exclude requesting player from SSE broadcast (they get the HTTP response)
-            await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager, playerId.Value);
+            await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
             var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
             return Results.Content(html, "text/html");
@@ -471,8 +466,7 @@ public static class BonEndpoints
         };
 
         await BroadcastEventAsync(match, endEvent, viewRenderer, broadcaster);
-        // Exclude requesting player from SSE broadcast (they get the HTTP response)
-        await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager, playerId.Value);
+        await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
         var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
         return Results.Content(html, "text/html");
@@ -540,8 +534,7 @@ public static class BonEndpoints
         await broadcaster.SendToMatchAsync(match.Id, "game-ended", _ => finalHtml);
 
         match.Phase = GamePhase.GameEnd;
-        // Exclude requesting player from SSE broadcast (they get the HTTP response)
-        await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager, playerId.Value);
+        await BroadcastStatesAsync(match, viewRenderer, broadcaster, sseManager);
 
         var html = await viewRenderer.RenderStateUpdateAsync(match, playerId.Value);
         return Results.Content(html, "text/html");
