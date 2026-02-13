@@ -11,23 +11,17 @@
             _ => Model.State.Phase.ToString()
         };
         var round = Model.State.CurrentRound;
-        <div class="game-status">
+        var trumpText = Model.State.SelectedTrumpSuit.HasValue ? Model.State.SelectedTrumpSuit.Value.ToString() : "-";
+        <div class="king-status">
             <h2>@phaseText</h2>
-            <div class="status-info">
+            <div class="king-status-bar">
+                <span>Round: <strong>@(Model.State.CurrentRoundIndex + 1) of 14</strong></span>
                 @if (round != null)
                 {
-                    <span>Round: <strong>@(Model.State.CurrentRoundIndex + 1)</strong> &mdash; @round.Name</span>
-                    <span>Phase: <strong>@(round.IsCollectingPhase ? "Collecting" : "Avoiding")</strong></span>
+                    <span>Round Type: <strong>@round.Name</strong></span>
                 }
-                else
-                {
-                    <span>Round: <strong>@(Model.State.CurrentRoundIndex + 1)</strong></span>
-                }
-                <span>Turn: <strong>@(Model.CurrentPlayerName ?? "---")</strong></span>
-                @if (Model.State.Phase == GamePhase.InProgress)
-                {
-                    <span>Tricks: <strong>@Model.State.CompletedTricks.Count / 8</strong></span>
-                }
+                <span>Current Turn: <strong>@(Model.CurrentPlayerName ?? "---")</strong></span>
+                <span>Trump: <strong>@trumpText</strong></span>
                 <span class="match-id-section">
                     Match ID:
                     <code>@Model.State.MatchId</code>

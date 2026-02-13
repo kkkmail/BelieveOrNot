@@ -90,16 +90,23 @@
     <section class="game-board-panel" hx-ext="sse">
         <div id="king-sse-container"></div>
         <div id="king-game-status"></div>
-        <div id="king-players"></div>
-        <div id="king-trump-display"></div>
-        <div id="king-trick"></div>
+
+        <!-- King table area: green oval with players and trick -->
+        <div class="king-table-area">
+            <div id="king-trump-display"></div>
+            <div class="king-table">
+                <div id="king-players"></div>
+                <div id="king-trick"></div>
+            </div>
+        </div>
+
         <div id="king-hand"></div>
         <div id="king-actions"></div>
         <div id="king-trump-select"></div>
         <div id="king-round-info"></div>
+        <div id="king-management"></div>
         <div id="king-scores"></div>
         <div id="king-event-log"></div>
-        <div id="king-management"></div>
         <div id="king-final-results"></div>
     </section>
 </div>

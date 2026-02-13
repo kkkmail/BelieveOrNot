@@ -1309,57 +1309,149 @@ body:has(.king-page) {
     box-shadow: 0 5px 15px rgba(230, 81, 0, 0.3);
 }
 
-/* === King Trick Display (cross layout) === */
+/* === King Game Status Bar === */
 
-.king-trick-area {
+.king-status {
     text-align: center;
-    padding: 10px;
-    background: rgba(0, 100, 0, 0.1);
-    border-radius: 15px;
-    border: 3px dashed #28a745;
+    margin-bottom: 10px;
 }
 
-.king-trick-area h3 {
-    margin: 0 0 10px 0;
-    color: #333;
+.king-status h2 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
 }
 
-.king-trick-display {
-    display: grid;
-    grid-template-columns: 1fr 120px 1fr;
-    grid-template-rows: auto 160px auto;
-    gap: 8px;
-    justify-items: center;
-    align-items: center;
-    min-height: 300px;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.king-trick-slot {
+.king-status-bar {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-}
-
-.king-trick-slot--0 { grid-column: 2; grid-row: 1; } /* top */
-.king-trick-slot--1 { grid-column: 3; grid-row: 2; } /* right */
-.king-trick-slot--2 { grid-column: 2; grid-row: 3; } /* bottom */
-.king-trick-slot--3 { grid-column: 1; grid-row: 2; } /* left */
-
-.king-trick-player-name {
-    font-size: 12px;
-    font-weight: 600;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 20px;
+    font-size: 14px;
     color: #555;
 }
 
-.king-trick-empty {
+/* === King Table Area (green oval + players) === */
+
+.king-table-area {
+    position: relative;
+    margin: 20px auto;
+    padding: 30px 20px;
+    min-height: 560px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.king-table {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    margin-top: 70px;
+    background: linear-gradient(135deg, #2d5016, #4a7c59);
+    border-radius: 200px;
+    border: 8px solid #8b4513;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.3);
+}
+
+/* === King Player Positions (around the oval) === */
+
+#king-players {
+    position: absolute;
+    inset: 0;
+}
+
+.king-player-pos {
+    position: absolute;
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    padding: 8px 14px;
+    text-align: center;
+    min-width: 110px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border: 2px solid #e0e0e0;
+}
+
+.king-player-pos.current-turn {
+    border-color: #28a745;
+    box-shadow: 0 0 12px rgba(40, 167, 69, 0.4);
+}
+
+.king-player-pos--top {
+    top: -85px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.king-player-pos--right {
+    right: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.king-player-pos--bottom {
+    bottom: -85px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.king-player-pos--left {
+    left: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.king-player-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.king-player-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* === King Trick Card Slots (inside the oval) === */
+
+.king-card-slot {
+    position: absolute;
     width: 90px;
     height: 130px;
-    border: 2px dashed #ccc;
-    border-radius: 12px;
-    background: rgba(0,0,0,0.03);
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 8px;
+}
+
+.king-card-slot--top {
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.king-card-slot--right {
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.king-card-slot--bottom {
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.king-card-slot--left {
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.king-card-slot .card {
+    width: 100%;
+    height: 100%;
 }
 
 .card--trick {
@@ -1370,42 +1462,48 @@ body:has(.king-page) {
     transform: none;
 }
 
-/* === King Trump Display (indicator bar) === */
+/* === King Trump Display (card indicator on the side) === */
 
-.king-trump-indicator {
+#king-trump-display {
+    position: absolute;
+    left: 50px;
+    top: 200px;
+}
+
+.king-trump-card {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 16px;
-}
-
-.king-trump-indicator.trump-red {
-    background: #fee2e2;
-    border: 2px solid #dc2626;
-    color: #dc2626;
-}
-
-.king-trump-indicator.trump-black {
-    background: #e2e8f0;
-    border: 2px solid #1e293b;
-    color: #1e293b;
+    gap: 6px;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 10px 14px;
+    width: 80px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .trump-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
+    color: #555;
 }
 
 .trump-suit-symbol {
-    font-size: 24px;
+    font-size: 36px;
+    line-height: 1;
 }
 
-.trump-suit-name {
-    font-size: 14px;
+.trump-suit-symbol.trump-red {
+    color: #dc2626;
+}
+
+.trump-suit-symbol.trump-black {
+    color: #1e293b;
+}
+
+.trump-suit-symbol.trump-none {
+    color: #ccc;
 }
 
 /* === King Trump Selection Buttons === */
@@ -1558,15 +1656,43 @@ body:has(.king-page) {
 /* === King Responsive === */
 
 @media (max-width: 768px) {
-    .king-trick-display {
-        grid-template-columns: 1fr 90px 1fr;
-        grid-template-rows: auto 130px auto;
-        min-height: 240px;
+    .king-table {
+        width: 350px;
+        height: 250px;
+        border-radius: 130px;
+        margin-top: 80px;
     }
 
-    .king-trick-empty {
+    .king-table-area {
+        min-height: 420px;
+    }
+
+    .king-player-pos {
+        min-width: 90px;
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .king-card-slot {
         width: 70px;
         height: 100px;
+    }
+
+    .king-card-slot--right { right: 20px; }
+    .king-card-slot--left { left: 20px; }
+
+    #king-trump-display {
+        left: 10px;
+        top: 160px;
+    }
+
+    .king-trump-card {
+        width: 60px;
+        padding: 8px 10px;
+    }
+
+    .trump-suit-symbol {
+        font-size: 28px;
     }
 
     .king-trump-buttons {

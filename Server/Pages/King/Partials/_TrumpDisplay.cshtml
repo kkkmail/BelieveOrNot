@@ -1,21 +1,24 @@
 @model KingViewModel
 <div id="king-trump-display" hx-swap-oob="true">
-    @if (Model.State.SelectedTrumpSuit.HasValue && Model.State.Phase == GamePhase.InProgress)
-    {
-        var suit = Model.State.SelectedTrumpSuit.Value;
-        var suitSymbol = suit switch
+    <div class="king-trump-card">
+        <span class="trump-label">Trump</span>
+        @if (Model.State.SelectedTrumpSuit.HasValue && Model.State.Phase == GamePhase.InProgress)
         {
-            Suit.Hearts => "\u2665",
-            Suit.Diamonds => "\u2666",
-            Suit.Clubs => "\u2663",
-            Suit.Spades => "\u2660",
-            _ => ""
-        };
-        var colorClass = (suit == Suit.Hearts || suit == Suit.Diamonds) ? "trump-red" : "trump-black";
-        <div class="king-trump-indicator @colorClass">
-            <span class="trump-label">Trump:</span>
-            <span class="trump-suit-symbol">@suitSymbol</span>
-            <span class="trump-suit-name">@suit</span>
-        </div>
-    }
+            var suit = Model.State.SelectedTrumpSuit.Value;
+            var suitSymbol = suit switch
+            {
+                Suit.Hearts => "\u2665",
+                Suit.Diamonds => "\u2666",
+                Suit.Clubs => "\u2663",
+                Suit.Spades => "\u2660",
+                _ => ""
+            };
+            var colorClass = (suit == Suit.Hearts || suit == Suit.Diamonds) ? "trump-red" : "trump-black";
+            <span class="trump-suit-symbol @colorClass">@suitSymbol</span>
+        }
+        else
+        {
+            <span class="trump-suit-symbol trump-none">&mdash;</span>
+        }
+    </div>
 </div>

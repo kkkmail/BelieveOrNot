@@ -2,7 +2,7 @@
 @{
     var hand = Model.State.YourHand ?? new List<Card>();
 
-    // Sort: by rank (7→A), then by suit (S, C, D, H)
+    // Sort: Jokers first, then by rank (2→A), then by suit (S, C, D, H) — matches Bon
     var rankOrder = new Dictionary<string, int>
     {
         ["2"] = 0, ["3"] = 1, ["4"] = 2, ["5"] = 3, ["6"] = 4,
@@ -16,7 +16,8 @@
 
     var sortedHand = hand
         .Select((card, idx) => new { card, idx })
-        .OrderBy(x => rankOrder.GetValueOrDefault(x.card.Rank, -1))
+        .OrderBy(x => x.card.IsJoker ? 0 : 1)
+        .ThenBy(x => rankOrder.GetValueOrDefault(x.card.Rank, -1))
         .ThenBy(x => suitOrder.GetValueOrDefault(x.card.Suit, 99))
         .ToList();
 
