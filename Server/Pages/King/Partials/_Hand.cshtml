@@ -1,26 +1,6 @@
 @model KingViewModel
 @{
     var hand = Model.State.YourHand ?? new List<Card>();
-
-    // Sort: Jokers first, then by rank (2→A), then by suit (S, C, D, H) — matches Bon
-    var rankOrder = new Dictionary<string, int>
-    {
-        ["2"] = 0, ["3"] = 1, ["4"] = 2, ["5"] = 3, ["6"] = 4,
-        ["7"] = 5, ["8"] = 6, ["9"] = 7, ["10"] = 8,
-        ["J"] = 9, ["Q"] = 10, ["K"] = 11, ["A"] = 12
-    };
-    var suitOrder = new Dictionary<string, int>
-    {
-        ["Spades"] = 0, ["Clubs"] = 1, ["Diamonds"] = 2, ["Hearts"] = 3
-    };
-
-    var sortedHand = hand
-        .Select((card, idx) => new { card, idx })
-        .OrderBy(x => x.card.IsJoker ? 0 : 1)
-        .ThenBy(x => rankOrder.GetValueOrDefault(x.card.Rank, -1))
-        .ThenBy(x => suitOrder.GetValueOrDefault(x.card.Suit, 99))
-        .ToList();
-
     var selectableSuits = Model.SelectableSuits;
 }
 <div id="king-hand" hx-swap-oob="true"
@@ -30,9 +10,8 @@
     {
         <h3>Your Hand (@hand.Count cards)</h3>
         <div class="hand">
-            @foreach (var item in sortedHand)
+            @foreach (var card in hand)
             {
-                var card = item.card;
                 var suitClass = card.Suit.ToLower();
                 var suitSymbol = card.Suit switch
                 {
