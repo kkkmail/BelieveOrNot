@@ -1,0 +1,24 @@
+@model KingViewModel
+<div id="king-round-info" hx-swap-oob="true">
+    @if (Model.State.CurrentRound != null && Model.State.Phase == GamePhase.InProgress)
+    {
+        var round = Model.State.CurrentRound;
+        <div class="king-round-info-panel">
+            <div class="king-round-info-header">
+                <strong>@round.Name</strong>
+                <span class="king-round-phase-badge @(round.IsCollectingPhase ? "king-round-phase--collecting" : "king-round-phase--avoiding")">
+                    @(round.IsCollectingPhase ? "Collecting" : "Avoiding")
+                </span>
+            </div>
+            <p class="king-round-description">@round.Description</p>
+            @if (round.CannotLeadHearts)
+            {
+                <p class="king-round-rule">&#9888; Cannot lead with Hearts unless you have no other suit</p>
+            }
+            @if (round.MustDiscardKingOfHearts)
+            {
+                <p class="king-round-rule">&#9888; Must discard K&#9829; when you cannot follow suit</p>
+            }
+        </div>
+    }
+</div>

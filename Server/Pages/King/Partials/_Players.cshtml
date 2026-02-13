@@ -1,0 +1,30 @@
+@model KingViewModel
+<div id="king-players" hx-swap-oob="true">
+    @if (Model.State.Players.Count > 0)
+    {
+        <div class="players-area">
+            @foreach (var (player, index) in Model.State.Players.Select((p, i) => (p, i)))
+            {
+                var isCurrent = index == Model.State.CurrentPlayerIndex && Model.State.Phase == GamePhase.InProgress;
+                var isYou = player.Id == Model.YourPlayerId;
+                <div class="player-card @(isCurrent ? "current-turn" : "") @(!player.IsConnected ? "player-card--disconnected" : "")">
+                    <div class="player-name">
+                        @player.Name
+                        @if (index == 0) { <span class="badge-icon">&#11088;</span> }
+                        @if (isYou) { <span class="badge-icon">&#128100;</span> <span>You</span> }
+                    </div>
+                    <div class="player-stats">
+                        <span>Cards: @player.HandCount</span>
+                        <span>Tricks: @player.TricksWon</span>
+                        <span>Score: @player.Score</span>
+                        @if (!player.IsConnected) { <span class="badge badge--offline">offline</span> }
+                    </div>
+                    @if (isCurrent)
+                    {
+                        <div class="turn-indicator">&#9654; Current Turn</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

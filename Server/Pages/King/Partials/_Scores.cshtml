@@ -1,0 +1,22 @@
+@model KingViewModel
+<div id="king-scores" hx-swap-oob="true">
+    @if (Model.State.Players.Count > 0)
+    {
+        <div class="scoring-area">
+            <h3>Scores</h3>
+            <div class="score-items">
+                @foreach (var player in Model.State.Players.OrderByDescending(p => p.Score))
+                {
+                    <div class="score-item @(player.Id == Model.YourPlayerId ? "score-item--you" : "")">
+                        <div class="player-name">@player.Name</div>
+                        <div class="score">@player.Score</div>
+                        @if (Model.State.Phase == GamePhase.InProgress)
+                        {
+                            <div class="king-tricks-won">@player.TricksWon tricks</div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

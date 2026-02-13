@@ -1,0 +1,16 @@
+@model KingViewModel
+<div id="king-management-controls" hx-swap-oob="true">@if (Model.IsCreator && Model.State.MatchId != Guid.Empty)
+{
+    @if (Model.State.Phase == GamePhase.InProgress)
+    {
+        <div class="game-management-controls">
+            <button class="btn btn--danger"
+                    hx-post="/king/end-round"
+                    hx-vals='{"matchId": "@Model.State.MatchId"}'
+                    hx-swap="none"
+                    hx-confirm="End this round without scoring?">
+                End Round
+            </button>
+        </div>
+    }
+}</div>

@@ -1268,6 +1268,313 @@ hr { border: none; border-top: 1px solid #ddd; margin: 0; }
 #game-management:empty,
 #management-controls:empty,
 #final-results:empty,
-#help-content:empty {
+#help-content:empty,
+#king-sse-container:empty,
+#king-game-status:empty,
+#king-players:empty,
+#king-trump-display:empty,
+#king-trick:empty,
+#king-hand:empty,
+#king-actions:empty,
+#king-trump-select:empty,
+#king-round-info:empty,
+#king-scores:empty,
+#king-event-log:empty,
+#king-management:empty,
+#king-management-controls:empty,
+#king-final-results:empty {
     display: none;
+}
+
+/* ============================================================
+   KING — Game-specific styles
+   ============================================================ */
+
+/* === King Page Background === */
+
+body:has(.king-page) {
+    background: linear-gradient(135deg, #e65100 0%, #ff8f00 50%, #f57c00 100%);
+}
+
+.king-page .game-header h1 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+}
+
+.king-btn-primary {
+    background: linear-gradient(45deg, #e65100, #ff8f00) !important;
+}
+
+.king-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 81, 0, 0.3);
+}
+
+/* === King Trick Display (cross layout) === */
+
+.king-trick-area {
+    text-align: center;
+    padding: 10px;
+    background: rgba(0, 100, 0, 0.1);
+    border-radius: 15px;
+    border: 3px dashed #28a745;
+}
+
+.king-trick-area h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.king-trick-display {
+    display: grid;
+    grid-template-columns: 1fr 120px 1fr;
+    grid-template-rows: auto 160px auto;
+    gap: 8px;
+    justify-items: center;
+    align-items: center;
+    min-height: 300px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.king-trick-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.king-trick-slot--0 { grid-column: 2; grid-row: 1; } /* top */
+.king-trick-slot--1 { grid-column: 3; grid-row: 2; } /* right */
+.king-trick-slot--2 { grid-column: 2; grid-row: 3; } /* bottom */
+.king-trick-slot--3 { grid-column: 1; grid-row: 2; } /* left */
+
+.king-trick-player-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+}
+
+.king-trick-empty {
+    width: 90px;
+    height: 130px;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.03);
+}
+
+.card--trick {
+    cursor: default;
+}
+
+.card--trick:hover {
+    transform: none;
+}
+
+/* === King Trump Display (indicator bar) === */
+
+.king-trump-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.king-trump-indicator.trump-red {
+    background: #fee2e2;
+    border: 2px solid #dc2626;
+    color: #dc2626;
+}
+
+.king-trump-indicator.trump-black {
+    background: #e2e8f0;
+    border: 2px solid #1e293b;
+    color: #1e293b;
+}
+
+.trump-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.trump-suit-symbol {
+    font-size: 24px;
+}
+
+.trump-suit-name {
+    font-size: 14px;
+}
+
+/* === King Trump Selection Buttons === */
+
+.king-trump-selection {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 193, 7, 0.15);
+    border-radius: 10px;
+    border: 2px solid #ffc107;
+}
+
+.king-trump-selection h3 {
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.king-trump-selection p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.king-trump-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.king-trump-btn {
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 10px;
+    min-width: 120px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.king-trump-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.king-trump-btn--spades {
+    background: #1e293b;
+    color: white;
+    border: 2px solid #0f172a;
+}
+
+.king-trump-btn--clubs {
+    background: #334155;
+    color: white;
+    border: 2px solid #1e293b;
+}
+
+.king-trump-btn--diamonds {
+    background: #fff1f2;
+    color: #dc2626;
+    border: 2px solid #dc2626;
+}
+
+.king-trump-btn--hearts {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 2px solid #dc2626;
+}
+
+/* === King Round Info Panel === */
+
+.king-round-info-panel {
+    padding: 12px 16px;
+    background: rgba(108, 117, 125, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #6c757d;
+}
+
+.king-round-info-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.king-round-phase-badge {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.king-round-phase--avoiding {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.king-round-phase--collecting {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.king-round-description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.king-round-rule {
+    font-size: 13px;
+    color: #b45309;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* === King Tricks Won (in score items) === */
+
+.king-tricks-won {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* === King Event Log === */
+
+#king-event-log {
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(230, 81, 0, 0.1);
+    border-radius: 10px;
+    border-left: 4px solid #e65100;
+    min-height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+}
+
+#king-event-log h3 {
+    position: sticky;
+    top: 0;
+    background: inherit;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+#king-event-log::-webkit-scrollbar { width: 6px; }
+#king-event-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+#king-event-log::-webkit-scrollbar-thumb { background: rgba(230, 81, 0, 0.3); border-radius: 3px; }
+#king-event-log::-webkit-scrollbar-thumb:hover { background: rgba(230, 81, 0, 0.5); }
+
+/* === King Responsive === */
+
+@media (max-width: 768px) {
+    .king-trick-display {
+        grid-template-columns: 1fr 90px 1fr;
+        grid-template-rows: auto 130px auto;
+        min-height: 240px;
+    }
+
+    .king-trick-empty {
+        width: 70px;
+        height: 100px;
+    }
+
+    .king-trump-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .king-trump-btn {
+        width: 160px;
+    }
 }

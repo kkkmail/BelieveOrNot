@@ -1,0 +1,8 @@
+@model KingViewModel
+<div id="king-connection-status" hx-swap-oob="true"
+     class="connection-badge @(Model.State.MatchId != Guid.Empty ? "connected" : "")">
+    @if (Model.State.MatchId != Guid.Empty)
+    {
+        @:Connected
+    }
+</div>

@@ -2,7 +2,7 @@
 
 **Spec**: `bon-v001-02-migration.md`
 **Started**: 2026-02-10
-**Last updated**: 2026-02-12
+**Last updated**: 2026-02-12 (Phase 5 complete)
 
 ---
 
@@ -64,31 +64,44 @@
 - [x] Full browser testing with htmx (SSE push, OOB swaps, interaction.js)
 - [x] UI fixes documented in `bon-v001-04-phase3-browser-testing.md`
 
-## Phase 4 — King Endpoints
-- [ ] POST /king/create
-- [ ] POST /king/join
-- [ ] POST /king/reconnect
-- [ ] POST /king/start-round
-- [ ] POST /king/play-card
-- [ ] POST /king/select-trump
-- [ ] POST /king/end-round
-- [ ] GET /king/sse
-- [ ] KingViewRenderer service
+## Phase 4 — King Endpoints (COMPLETE)
+- [x] POST /king/create
+- [x] POST /king/join
+- [x] POST /king/reconnect
+- [x] POST /king/start-round
+- [x] POST /king/play-card
+- [x] POST /king/select-trump
+- [x] POST /king/end-round
+- [x] GET /king/sse
+- [x] KingViewRenderer service (placeholder HTML, Phase 5 renders actual Razor)
+- [x] KingEventBroadcaster dual-broadcast (SignalR + SSE)
+- [x] IKingViewRenderer registered as scoped service
+- [x] Build succeeds (0 warnings, 0 errors)
 
-## Phase 5 — King UI
-- [ ] _KingSetupForm partial
-- [ ] _KingGameStatus partial
-- [ ] _KingPlayers partial
-- [ ] _KingTrick partial
-- [ ] _KingHand partial (radio button card selection)
-- [ ] _KingActions partial
-- [ ] _KingTrumpSelect partial
-- [ ] _KingRoundInfo partial
-- [ ] _KingScores partial
-- [ ] _KingEventLog partial
-- [ ] _KingManagement partial
-- [ ] _KingTrumpDisplay partial
-- [ ] Full game playable at /king
+## Phase 5 — King UI (COMPLETE)
+- [x] KingViewModel wrapper with computed properties (IsCreator, IsYourTurn, CanPlay, CanSelectTrump, SelectableSuits)
+- [x] _ViewImports updated with King namespace
+- [x] King/Index.cshtml page with setup forms and all region placeholders
+- [x] _SseContainer partial (SSE connection for King)
+- [x] _ConnectionStatus partial
+- [x] _SetupForm partial (hides form after create/join)
+- [x] _GameStatus partial (phase, round, round name, turn, tricks, match ID)
+- [x] _Players partial (4 player cards with stats, tricks won, turn indicator)
+- [x] _TrumpDisplay partial (trump suit indicator bar)
+- [x] _Trick partial (4 card slots in cross layout)
+- [x] _Hand partial (radio button single-select, suit filtering via data-selectable-suits)
+- [x] _Actions partial (play button, waiting messages, phase-aware)
+- [x] _TrumpSelect partial (4 suit buttons for collecting rounds)
+- [x] _RoundInfo partial (round name, description, special rules)
+- [x] _Scores partial (score table with tricks won)
+- [x] _EventLog partial (SSE-populated)
+- [x] _Management partial (start round button, creator-only, 4 players required)
+- [x] _ManagementControls partial (end round button, creator-only)
+- [x] _FinalResults partial (game over overlay)
+- [x] KingViewRenderer renders all Razor partials (mirrors BonViewRenderer)
+- [x] interaction.js updated with King card selection and play button handlers
+- [x] site.css updated with King-specific styles (trick cross layout, trump display, trump selection, round info)
+- [x] Build succeeds (0 warnings, 0 errors)
 
 ## Phase 6 — Switchover & Cleanup
 - [ ] Remap root URL to /bon

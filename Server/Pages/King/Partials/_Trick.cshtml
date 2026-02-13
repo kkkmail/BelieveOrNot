@@ -1,0 +1,50 @@
+@model KingViewModel
+@{
+    var trick = Model.State.CurrentTrick;
+    var players = Model.State.Players;
+}
+<div id="king-trick" hx-swap-oob="true">
+    @if (Model.State.Phase == GamePhase.InProgress && trick != null)
+    {
+        <div class="king-trick-area">
+            <h3>Current Trick @(Model.State.CompletedTricks.Count + 1) of 8</h3>
+            <div class="king-trick-display">
+                @for (int i = 0; i < 4; i++)
+                {
+                    var played = trick.Cards.FirstOrDefault(c =>
+                    {
+                        var pIdx = players.FindIndex(p => p.Id == c.PlayerId);
+                        return pIdx == i;
+                    });
+                    var playerName = i < players.Count ? players[i].Name : "";
+                    <div class="king-trick-slot king-trick-slot--@i">
+                        <span class="king-trick-player-name">@playerName</span>
+                        @if (played != null)
+                        {
+                            var card = played.Card;
+                            var suitClass = card.Suit.ToLower();
+                            var suitSymbol = card.Suit switch
+                            {
+                                "Hearts" => "\u2665",
+                                "Diamonds" => "\u2666",
+                                "Clubs" => "\u2663",
+                                "Spades" => "\u2660",
+                                _ => ""
+                            };
+                            <div class="card card--@suitClass card--trick">
+                                <span class="card-face">
+                                    <span class="card-rank">@card.Rank</span>
+                                    <span class="card-suit">@suitSymbol</span>
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="king-trick-empty"></div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

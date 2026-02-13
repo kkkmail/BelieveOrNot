@@ -1,0 +1,43 @@
+@model KingViewModel
+<div id="king-trump-select" hx-swap-oob="true">
+    @if (Model.CanSelectTrump)
+    {
+        <div class="king-trump-selection">
+            <h3>Select Trump Suit</h3>
+            <p>You are the dealer. Choose the trump suit for this collecting round.</p>
+            <div class="king-trump-buttons">
+                <button class="btn king-trump-btn king-trump-btn--spades"
+                        hx-post="/king/select-trump"
+                        hx-vals='{"matchId": "@Model.State.MatchId", "trumpSuit": "Spades"}'
+                        hx-swap="none">
+                    &#9824; Spades
+                </button>
+                <button class="btn king-trump-btn king-trump-btn--clubs"
+                        hx-post="/king/select-trump"
+                        hx-vals='{"matchId": "@Model.State.MatchId", "trumpSuit": "Clubs"}'
+                        hx-swap="none">
+                    &#9827; Clubs
+                </button>
+                <button class="btn king-trump-btn king-trump-btn--diamonds"
+                        hx-post="/king/select-trump"
+                        hx-vals='{"matchId": "@Model.State.MatchId", "trumpSuit": "Diamonds"}'
+                        hx-swap="none">
+                    &#9830; Diamonds
+                </button>
+                <button class="btn king-trump-btn king-trump-btn--hearts"
+                        hx-post="/king/select-trump"
+                        hx-vals='{"matchId": "@Model.State.MatchId", "trumpSuit": "Hearts"}'
+                        hx-swap="none">
+                    &#9829; Hearts
+                </button>
+            </div>
+        </div>
+    }
+    else if (Model.State.WaitingForTrumpSelection && Model.State.Phase == GamePhase.InProgress)
+    {
+        <div class="king-trump-selection">
+            <h3>Waiting for Trump Selection</h3>
+            <p><strong>@Model.CurrentPlayerName</strong> is choosing the trump suit...</p>
+        </div>
+    }
+</div>

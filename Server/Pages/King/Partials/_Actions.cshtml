@@ -1,0 +1,60 @@
+@model KingViewModel
+<div id="king-actions" hx-swap-oob="true">
+    @if (Model.State.MatchId != Guid.Empty)
+    {
+        @if (Model.State.Phase == GamePhase.InProgress && !Model.State.WaitingForTrumpSelection)
+        {
+            var controlsClass = "table-controls";
+            if (Model.IsYourTurn) { controlsClass += " active-turn"; }
+
+            <div class="@controlsClass">
+                @if (Model.IsYourTurn)
+                {
+                    <div class="table-message">Select a card from your hand to play</div>
+                    <div class="table-actions-inner">
+                        <button class="btn btn--play" hidden
+                                id="king-play-btn"
+                                hx-post="/king/play-card"
+                                hx-include="#king-card-order"
+                                hx-vals='{"matchId": "@Model.State.MatchId"}'
+                                hx-swap="none">
+                            PLAY CARD
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-message">Waiting for <strong>@Model.CurrentPlayerName</strong> to play...</div>
+                }
+            </div>
+        }
+        else if (Model.State.Phase == GamePhase.WaitingForPlayers)
+        {
+            <div class="table-controls">
+                @if (Model.IsCreator)
+                {
+                    <div class="table-message">Waiting for players to join (need 4 players). Start the round when ready!</div>
+                }
+                else
+                {
+                    var creatorName = Model.State.Players.Count > 0 ? Model.State.Players[0].Name : "the host";
+                    <div class="table-message">Waiting for <strong>@creatorName</strong> to start the round...</div>
+                }
+            </div>
+        }
+        else if (Model.State.Phase == GamePhase.RoundEnd)
+        {
+            <div class="table-controls">
+                @if (Model.IsCreator)
+                {
+                    <div class="table-message">Round ended. Start a new round or end the game.</div>
+                }
+                else
+                {
+                    var creatorName = Model.State.Players.Count > 0 ? Model.State.Players[0].Name : "the host";
+                    <div class="table-message">Round ended. Waiting for <strong>@creatorName</strong> to continue...</div>
+                }
+            </div>
+        }
+    }
+</div>

@@ -66,7 +66,7 @@
         findConstraintContainers(root || document).forEach(applyConstraints);
     }
 
-    // === Card selection order tracking ===
+    // === Card selection order tracking (BelieveOrNot) ===
 
     var selectionOrder = []; // array of data-card-index values in click order
 
@@ -127,7 +127,7 @@
         updateOrderBadges();
     }
 
-    // === Play / Challenge toggling ===
+    // === Play / Challenge toggling (BelieveOrNot) ===
 
     function isFirstTurn() {
         var actions = document.getElementById("table-actions");
@@ -248,6 +248,64 @@
         clearSelectionOrder();
     }
 
+    // === King card selection (single radio select) ===
+
+    function rebuildKingCardOrderInputs(radio) {
+        var orderContainer = document.getElementById("king-card-order");
+        if (!orderContainer) return;
+        orderContainer.innerHTML = "";
+
+        if (radio && radio.checked) {
+            var rankInput = document.createElement("input");
+            rankInput.type = "hidden";
+            rankInput.name = "cardRank";
+            rankInput.value = radio.getAttribute("data-card-rank") || "";
+            orderContainer.appendChild(rankInput);
+
+            var suitInput = document.createElement("input");
+            suitInput.type = "hidden";
+            suitInput.name = "cardSuit";
+            suitInput.value = radio.getAttribute("data-card-suit") || "";
+            orderContainer.appendChild(suitInput);
+        }
+    }
+
+    function updateKingPlayControls() {
+        var kingHand = document.getElementById("king-hand");
+        var kingActions = document.getElementById("king-actions");
+        if (!kingHand || !kingActions) return;
+
+        var selectedRadio = kingHand.querySelector('input[name="kingCardSelect"]:checked');
+        var playBtn = kingActions.querySelector("#king-play-btn");
+        var message = kingActions.querySelector(".table-message");
+
+        if (selectedRadio) {
+            rebuildKingCardOrderInputs(selectedRadio);
+            if (playBtn) {
+                playBtn.hidden = false;
+                playBtn.disabled = false;
+            }
+            if (message) message.hidden = true;
+        } else {
+            rebuildKingCardOrderInputs(null);
+            if (playBtn) {
+                playBtn.hidden = true;
+                playBtn.disabled = true;
+            }
+            if (message) message.hidden = false;
+        }
+    }
+
+    function resetKingControls() {
+        var kingActions = document.getElementById("king-actions");
+        if (!kingActions) return;
+        var playBtn = kingActions.querySelector("#king-play-btn");
+        var message = kingActions.querySelector(".table-message");
+        if (playBtn) { playBtn.hidden = true; playBtn.disabled = true; }
+        if (message) message.hidden = false;
+        rebuildKingCardOrderInputs(null);
+    }
+
     // === Radio button toggle-off support ===
     // HTML radios can't be unchecked by clicking again; this enables it.
 
@@ -279,13 +337,13 @@
             if (container) applyConstraints(container);
         }
 
-        // Hand card selection changed (checkboxes with data-card-index)
+        // Hand card selection changed (checkboxes with data-card-index) — BelieveOrNot
         if (target.type === "checkbox" && target.hasAttribute("data-card-index")) {
             handleCardSelection(target);
             updatePlayControls();
         }
 
-        // Rank radio selection changed (first turn)
+        // Rank radio selection changed (first turn) — BelieveOrNot
         if (target.type === "radio" && target.name === "declaredRank") {
             var playBtn = document.getElementById("play-btn");
             if (playBtn && !playBtn.hidden) {
@@ -293,9 +351,14 @@
             }
         }
 
-        // Previous-play radio changed
+        // Previous-play radio changed — BelieveOrNot
         if (target.type === "radio" && target.name === "challengePickIndex") {
             updateChallengeControls();
+        }
+
+        // King card selection changed (radio with data-card-rank/data-card-suit)
+        if (target.type === "radio" && target.name === "kingCardSelect") {
+            updateKingPlayControls();
         }
     });
 
@@ -306,6 +369,7 @@
     document.addEventListener("htmx:afterSwap", function (e) {
         applyAll(e.detail.target);
         resetControls();
+        resetKingControls();
         lastCheckedRadio = {};
     });
 
@@ -315,6 +379,10 @@
         var id = e.detail.target.id;
         if (id === "table-actions" || id === "hand-area" || id === "previous-play") {
             resetControls();
+            lastCheckedRadio = {};
+        }
+        if (id === "king-actions" || id === "king-hand") {
+            resetKingControls();
             lastCheckedRadio = {};
         }
     });

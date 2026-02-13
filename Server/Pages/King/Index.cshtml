@@ -1,0 +1,156 @@
+@page "/king"
+@{
+    ViewData["Title"] = "King";
+}
+
+<!-- Help Modal -->
+<dialog id="help-modal" class="help-modal">
+    <div class="help-modal-content">
+        <h2>King - Game Rules</h2>
+        <div class="help-text">
+            <p><strong>King</strong> is a trick-taking card game for 4 players using a standard 32-card deck (7 through Ace).</p>
+            <h3>Gameplay</h3>
+            <ul>
+                <li>Each round, all 32 cards are dealt equally (8 cards per player).</li>
+                <li>Players take turns playing one card per trick. You must follow the lead suit if you can.</li>
+                <li>The highest card of the lead suit wins the trick (unless trumped in collecting rounds).</li>
+                <li>Each round has 8 tricks total.</li>
+            </ul>
+            <h3>Avoiding Phase (Rounds 1-6)</h3>
+            <ul>
+                <li><strong>Avoid Tricks:</strong> -2 points per trick taken</li>
+                <li><strong>Avoid Hearts:</strong> -2 points per heart card taken</li>
+                <li><strong>Avoid Boys:</strong> -2 points per Jack or King taken</li>
+                <li><strong>Avoid Queens:</strong> -4 points per Queen taken</li>
+                <li><strong>Avoid Last 2 Tricks:</strong> -8 points per last 2 tricks</li>
+                <li><strong>Avoid King of Hearts:</strong> -16 points for taking K&#9829;</li>
+            </ul>
+            <h3>Collecting Phase (Rounds 7+)</h3>
+            <ul>
+                <li>The dealer selects a trump suit before play begins.</li>
+                <li>Trump cards beat all non-trump cards.</li>
+                <li><strong>Collect Tricks:</strong> +3 points per trick taken</li>
+            </ul>
+        </div>
+        <button class="btn btn-secondary" onclick="document.getElementById('help-modal').close()">Close</button>
+    </div>
+</dialog>
+
+<div class="page-container king-page">
+    <!-- Top Controls -->
+    <div class="top-controls">
+        <div class="top-controls-row">
+            <div id="king-connection-status" class="connection-badge connected">Connected</div>
+            <button class="help-button" title="Game Rules &amp; Help"
+                    onclick="document.getElementById('help-modal').showModal()">?</button>
+        </div>
+        <a href="/" class="btn btn-other-games">OTHER GAMES</a>
+        <div id="king-management-controls"></div>
+    </div>
+
+    <!-- Game Header -->
+    <header class="game-header">
+        <h1>&#128081; King</h1>
+        <p>The Classic Trick-Taking Card Game</p>
+    </header>
+
+    <!-- Game Setup Section -->
+    <div id="king-game-setup">
+        <section class="game-setup-panel">
+            <h2 style="text-align: center; margin-bottom: 20px;">Join or Create Game</h2>
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="kingPlayerName">Your Name:</label>
+                    <input type="text" id="kingPlayerName" name="playerName" placeholder="Enter your name" required />
+                </div>
+
+                <button class="btn btn-primary king-btn-primary"
+                        hx-post="/king/create"
+                        hx-include="#kingPlayerName"
+                        hx-swap="none">CREATE NEW GAME</button>
+
+                <div class="or-divider">
+                    <hr /><span>Or</span><hr />
+                </div>
+
+                <div class="form-group">
+                    <label for="kingMatchIdJoin">Match ID to Join:</label>
+                    <input type="text" id="kingMatchIdJoin" name="matchId" placeholder="Enter match ID or share URL" />
+                </div>
+
+                <button class="btn btn-secondary"
+                        hx-post="/king/join"
+                        hx-include="#kingPlayerName, #kingMatchIdJoin"
+                        hx-swap="none">JOIN EXISTING GAME</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Game Board -->
+    <section class="game-board-panel" hx-ext="sse">
+        <div id="king-sse-container"></div>
+        <div id="king-game-status"></div>
+        <div id="king-players"></div>
+        <div id="king-trump-display"></div>
+        <div id="king-trick"></div>
+        <div id="king-hand"></div>
+        <div id="king-actions"></div>
+        <div id="king-trump-select"></div>
+        <div id="king-round-info"></div>
+        <div id="king-scores"></div>
+        <div id="king-event-log"></div>
+        <div id="king-management"></div>
+        <div id="king-final-results"></div>
+    </section>
+</div>
+
+<script>
+// Pre-fill player name from cookie
+(function() {
+    var m = document.cookie.match(/(?:^|;\s*)believeOrNotPlayerName=([^;]*)/);
+    if (m) {
+        var name = decodeURIComponent(m[1]);
+        var input = document.getElementById('kingPlayerName');
+        if (input && name) input.value = name;
+    }
+})();
+
+// Auto-reconnect or pre-fill join form when ?match= is in the URL
+(function() {
+    var matchId = new URLSearchParams(window.location.search).get('match');
+    if (!matchId) return;
+
+    var joinInput = document.getElementById('kingMatchIdJoin');
+    if (joinInput) joinInput.value = matchId;
+
+    htmx.ajax('POST', '/king/reconnect', { target: 'body', swap: 'none', values: { matchId: matchId } });
+})();
+
+// Store player name in cookie before create/join
+document.body.addEventListener('htmx:configRequest', function(evt) {
+    var path = evt.detail.path;
+    if (path === '/king/create' || path === '/king/join') {
+        var name = document.getElementById('kingPlayerName').value;
+        if (name) {
+            document.cookie = 'believeOrNotPlayerName=' + encodeURIComponent(name) +
+                ';path=/;max-age=' + (365 * 24 * 60 * 60) + ';SameSite=Lax';
+        }
+    }
+});
+
+// Convert <time> elements from UTC to local time
+function convertTimes(root) {
+    root.querySelectorAll('time.event-time[datetime]').forEach(function(el) {
+        var d = new Date(el.getAttribute('datetime'));
+        if (!isNaN(d)) el.textContent = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    });
+}
+convertTimes(document);
+new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(n) {
+            if (n.nodeType === 1) convertTimes(n);
+        });
+    });
+}).observe(document.body, {childList: true, subtree: true});
+</script>
