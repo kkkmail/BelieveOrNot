@@ -1,7 +1,7 @@
 @model KingViewModel
 <div id="king-sse-container" hx-swap-oob="true"
-     hx-ext="sse" sse-connect="/king/sse?matchId=@Model.State.MatchId&playerId=@Model.YourPlayerId">
-    <div sse-swap="state-update" hx-swap="none"></div>
-    <div sse-swap="game-event" hx-swap="none"></div>
-    <div sse-swap="game-ended" hx-swap="none"></div>
+     sse-connect="/king/sse?matchId=@Model.State.MatchId&playerId=@Model.YourPlayerId">
+    <div sse-swap="state-update"></div>
+    <div sse-swap="game-event"></div>
+    <div sse-swap="game-ended"></div>
 </div>
