@@ -1,8 +1,0 @@
-/* styles/game-board/actions.css */
-.actions-area {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-}

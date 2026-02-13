@@ -1,0 +1,27 @@
+@page "/"
+@{
+    ViewData["Title"] = "Game Selector";
+}
+
+<div class="page-container">
+    <header class="game-header">
+        <h1>Card Games</h1>
+        <p>Choose a game to play</p>
+    </header>
+
+    <section class="game-setup-panel">
+        <div class="setup-form" style="gap: 20px;">
+            <a href="/bon" class="btn btn-primary" style="text-align: center; text-decoration: none; display: block; font-size: 1.2em; padding: 20px;">
+                Believe Or Not
+            </a>
+            <p style="text-align: center; color: #666;">A bluffing card game for 2-6 players. Play cards face down, claim a rank, and challenge your opponents!</p>
+
+            <hr />
+
+            <a href="/king" class="btn btn-primary" style="text-align: center; text-decoration: none; display: block; font-size: 1.2em; padding: 20px; background: linear-gradient(45deg, #d4a843, #b8860b);">
+                King
+            </a>
+            <p style="text-align: center; color: #666;">A trick-taking card game for 4 players. Avoid or collect tricks across multiple rounds!</p>
+        </div>
+    </section>
+</div>

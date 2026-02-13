@@ -4,7 +4,6 @@ using BelieveOrNot.Server.Endpoints;
 using BelieveOrNot.Server.King;
 using BelieveOrNot.Server.Services;
 using BelieveOrNot.Server.Sse;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +18,6 @@ builder.Services.Configure<GameSettings>(
 builder.Services.AddRazorPages();
 
 // Add services for BelieveOrNot
-builder.Services.AddSignalR();
 builder.Services.AddSingleton<IMatchManager, MatchManager>();
 builder.Services.AddSingleton<IGameEngine, GameEngine>();
 
@@ -73,47 +71,10 @@ app.Use(async (context, next) =>
 var staticFilesEnabled = app.Configuration.GetValue<bool>("ServerSettings:StaticFilesEnabled", true);
 if (staticFilesEnabled)
 {
-    app.UseDefaultFiles();
     app.UseStaticFiles();
-
-    // Add static file serving for King game subfolder (for CSS/JS files only)
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(
-            Path.Combine(builder.Environment.WebRootPath, "king")),
-        RequestPath = "/king"
-    });
 }
 
 app.MapRazorPages();
-
-// Map hubs for both games - use different paths to avoid conflicts
-var hubPath = app.Configuration.GetValue<string>("ServerSettings:SignalRHubPath") ?? "/game";
-app.MapHub<GameHub>(hubPath);
-app.MapHub<KingHub>("/kingHub");
-
-// Add API endpoints to check match existence for routing
-app.MapPost("/game/check-match", (MatchCheckRequest request, IMatchManager matchManager) =>
-{
-    if (!Guid.TryParse(request.MatchId, out var matchId))
-    {
-        return Results.Ok(new { exists = false });
-    }
-
-    var match = matchManager.GetMatch(matchId);
-    return Results.Ok(new { exists = match != null });
-});
-
-app.MapPost("/king/check-match", (MatchCheckRequest request, IKingMatchManager matchManager) =>
-{
-    if (!Guid.TryParse(request.MatchId, out var matchId))
-    {
-        return Results.Ok(new { exists = false });
-    }
-
-    var match = matchManager.GetMatch(matchId);
-    return Results.Ok(new { exists = match != null });
-});
 
 // Map HTTP POST endpoints
 app.MapBonEndpoints();

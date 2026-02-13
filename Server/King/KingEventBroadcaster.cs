@@ -8,12 +8,10 @@ namespace BelieveOrNot.Server.King;
 
 public class KingEventBroadcaster : IKingEventBroadcaster
 {
-    private readonly IHubContext<KingHub> _hubContext;
     private readonly ISseBroadcaster _sseBroadcaster;
 
-    public KingEventBroadcaster(IHubContext<KingHub> hubContext, ISseBroadcaster sseBroadcaster)
+    public KingEventBroadcaster(ISseBroadcaster sseBroadcaster)
     {
-        _hubContext = hubContext;
         _sseBroadcaster = sseBroadcaster;
     }
 
@@ -105,10 +103,7 @@ public class KingEventBroadcaster : IKingEventBroadcaster
 
     private async Task BroadcastToMatch(Guid matchId, GameEventDto gameEvent)
     {
-        // SignalR (old UI)
-        await _hubContext.Clients.Group($"kingmatch:{matchId}").SendAsync("GameEvent", gameEvent);
-
-        // SSE (new htmx UI) — render event log entry HTML inline
+        // SSE (htmx UI) — render event log entry HTML inline
         var iso = gameEvent.Timestamp.ToString("o");
         var html = $"<div hx-swap-oob=\"afterbegin:#king-event-log\">" +
                    $"<div class=\"event-entry\"><time class=\"event-time\" datetime=\"{iso}\">{gameEvent.Timestamp:HH:mm:ss}</time> {gameEvent.DisplayMessage}</div>" +

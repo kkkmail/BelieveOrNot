@@ -2,7 +2,7 @@
 
 **Spec**: `bon-v001-02-migration.md`
 **Started**: 2026-02-10
-**Last updated**: 2026-02-12 (Phase 5 complete)
+**Last updated**: 2026-02-12 (Phase 6 complete)
 
 ---
 
@@ -103,14 +103,17 @@
 - [x] site.css updated with King-specific styles (trick cross layout, trump display, trump selection, round info)
 - [x] Build succeeds (0 warnings, 0 errors)
 
-## Phase 6 — Switchover & Cleanup
-- [ ] Remap root URL to /bon
-- [ ] Delete old JS files (wwwroot/js/, king/js/)
-- [ ] Delete old CSS files (wwwroot/styles/, king/styles/)
-- [ ] Delete old HTML files
-- [ ] Delete GameHub and KingHub files
-- [ ] Remove SignalR NuGet package
-- [ ] Clean up Program.cs
+## Phase 6 — Switchover & Cleanup (COMPLETE)
+- [x] Delete old JS files (wwwroot/js/, king/js/) — 71 + 37 modules removed
+- [x] Delete old CSS files (wwwroot/styles/, king/styles/) — 29 + 5 files removed
+- [x] Delete old HTML files — 9 files removed (index.html, game-board.html, help.html, setup-form.html, other-games.html, king/*.html)
+- [x] Delete GameHub and KingHub files — 10 + 11 hub files removed
+- [x] Remove SignalR NuGet package from .csproj
+- [x] Remove SignalR global using from !_GlobalUsings.cs
+- [x] Remove IHubContext from KingEventBroadcaster (SSE-only now)
+- [x] Clean up Program.cs — removed AddSignalR, UseDefaultFiles, MapHub, old check-match endpoint, King static file provider
+- [x] Create game selector landing page at / (Pages/Index.cshtml)
+- [x] Build succeeds (0 warnings, 0 errors)
 
 ---
 
